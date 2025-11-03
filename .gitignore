@@ -1,0 +1,86 @@
+##############################
+# eGovFrame / Java / Maven
+##############################
+
+# Eclipse
+.project
+.classpath
+.settings/
+.metadata/
+bin/
+build/
+target/
+
+# Maven
+log/
+logs/
+!src/main/resources/log4j.xml
+!src/main/resources/logback.xml
+
+# IDE specific
+.idea/
+*.iml
+.vscode/
+*.launch
+*.swp
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# eGovFrame config backups
+egovProps/*.properties.bak
+*.tmp
+*.bak
+*.orig
+
+# Local config / secrets
+src/main/resources/egovframework/egovProps/globals.properties
+src/main/resources/egovframework/egovProps/database.properties
+src/main/resources/application.properties
+src/main/resources/application-local.yml
+*.env
+
+# Compiled / generated
+*.class
+*.war
+*.ear
+*.jar
+*.log
+hs_err_pid*
+replay_pid*
+
+# Annotation processing
+target/generated-sources/
+target/generated-test-sources/
+target/generated-sources/annotations/
+target/generated-test-sources/annotations/
+
+# Tomcat / Jetty / servers
+Servers/
+.work/
+.settings/org.eclipse.wst.server.core.prefs
+*.deploy/
+*.tmp0/
+temp/
+logs/
+apache-tomcat*/
+wtpwebapps/
+.cache/
+
+# Test outputs
+test-output/
+coverage/
+jacoco.exec
+
+# Wallets or DB credentials (Oracle Autonomous)
+wallet_*/
+*.zip
+*.p12
+*.keystore
+*.jks
+
+# OS-specific temp
+*.~lock*
+*.bak
+*.tmp
