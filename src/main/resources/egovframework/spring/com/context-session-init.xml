@@ -1,0 +1,22 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="sessionSchemaPopulator" class="org.springframework.jdbc.datasource.init.ResourceDatabasePopulator">
+        <property name="continueOnError" value="true"/>
+        <property name="ignoreFailedDrops" value="true"/>
+        <property name="scripts">
+            <list>
+                <value>classpath:org/springframework/session/jdbc/schema-oracle.sql</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean class="org.springframework.jdbc.datasource.init.DataSourceInitializer">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="databasePopulator" ref="sessionSchemaPopulator"/>
+        <property name="enabled" value="true"/>
+    </bean>
+
+</beans>
