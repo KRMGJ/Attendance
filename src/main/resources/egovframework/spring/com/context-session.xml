@@ -18,5 +18,25 @@
         <property name="databasePopulator" ref="sessionSchemaPopulator"/>
         <property name="enabled" value="true"/>
     </bean>
+    
+	<bean id="securitySchemaPopulator" class="org.springframework.jdbc.datasource.init.ResourceDatabasePopulator">
+		<property name="continueOnError" value="true"/>
+		<property name="ignoreFailedDrops" value="true"/>
+		<property name="scripts">
+			<list>
+				<value>classpath:sql/security_schema.sql</value> <!-- 직접 생성한 파일 경로 -->
+			</list>
+		</property>
+	</bean>
+
+	<bean class="org.springframework.jdbc.datasource.init.DataSourceInitializer">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="databasePopulator" ref="securitySchemaPopulator"/>
+		<property name="enabled" value="true"/>
+	</bean>
+    
+	<bean class="org.springframework.session.jdbc.config.annotation.web.http.JdbcHttpSessionConfiguration">
+    	<property name="maxInactiveIntervalInSeconds" value="1800"/> <!-- 30분 -->
+  </bean>
 
 </beans>
