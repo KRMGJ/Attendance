@@ -265,6 +265,14 @@
 		    <artifactId>lombok</artifactId>
 		    <version>1.18.42</version>
 		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>7.1.6.Final</version>
+			<type>pom</type>
+		</dependency>
 	</dependencies>
 
 	<build>
