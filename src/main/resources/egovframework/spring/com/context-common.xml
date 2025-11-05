@@ -90,5 +90,10 @@
     <!-- choose one from above and alias it to the name Spring expects -->
     <alias name="local.MultiCommonsMultipartResolver" alias="filterMultipartResolver" />
     <!-- <alias name="spring.RegularCommonsMultipartResolver" alias="multipartResolver" /> -->
+    
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/jsp/" />
+        <property name="suffix" value=".jsp" />
+    </bean>
         
 </beans>

@@ -1,7 +1,5 @@
 package egovframework.let.attendance.web;
 
-import static egovframework.let.attendance.web.RootController.PREFIX;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,7 +20,7 @@ public class EmployeeController {
 	@RequestMapping(value = "/join.do", method = RequestMethod.GET)
 	public String joinForm(Model model) {
 		model.addAttribute("registEmployeeDto", new RegistEmployeeDto());
-		return PREFIX + "employee/join";
+		return "employee/join";
 	}
 
 	@RequestMapping(value = "/join.do", method = RequestMethod.POST)

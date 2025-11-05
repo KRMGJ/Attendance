@@ -91,7 +91,7 @@
 	</servlet-mapping>
 
 	<welcome-file-list>
-		<welcome-file>index.jsp</welcome-file>
+		<welcome-file>WEB-INF/jsp/main/dashboard.jsp</welcome-file>
 	</welcome-file-list>
 	<login-config>
 		<auth-method>BASIC</auth-method>
@@ -107,10 +107,10 @@
 	</error-page>
 	<error-page>
 		<error-code>404</error-code>
-		<location>/common/error.jsp</location>
+		<location>/WEB-INF/jsp/common/404.jsp</location>
 	</error-page>
 	<error-page>
 		<error-code>500</error-code>
-		<location>/common/error.jsp</location>
+		<location>/WEB-INF/jsp/common/500.jsp</location>
 	</error-page>
 </web-app>
