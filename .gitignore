@@ -13,8 +13,6 @@ build/
 target/
 
 # Maven
-log/
-logs/
 !src/main/resources/log4j.xml
 !src/main/resources/logback.xml
 
@@ -64,7 +62,6 @@ Servers/
 *.deploy/
 *.tmp0/
 temp/
-logs/
 apache-tomcat*/
 wtpwebapps/
 .cache/
