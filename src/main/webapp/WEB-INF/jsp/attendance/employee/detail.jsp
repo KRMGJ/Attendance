@@ -1,12 +1,6 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
-</head>
-<body>
-
-</body>
-</html>
+<%@ page contentType="text/html; charset=UTF-8"%>
+<%
+request.setAttribute("pageTitle", "직원 상세");
+request.setAttribute("content", "/WEB-INF/jsp/attendance/employee/_detail_body.jsp");
+%>
+<jsp:include page="/WEB-INF/jsp/attendance/layout/layout.jsp" />
