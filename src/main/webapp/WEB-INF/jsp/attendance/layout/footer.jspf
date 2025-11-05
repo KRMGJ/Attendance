@@ -1,12 +1,8 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
-</head>
-<body>
-
-</body>
-</html>
+<%@ page contentType="text/html; charset=UTF-8" %>
+<footer class="mt-auto border-t bg-white">
+	<div class="mx-auto px-6 py-4 text-sm text-gray-500">
+		©
+		<%=java.time.Year.now()%>
+		eGovFrame Attendance
+	</div>
+</footer>
