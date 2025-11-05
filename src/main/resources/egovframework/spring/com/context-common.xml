@@ -10,6 +10,9 @@
 		<context:include-filter type="annotation" expression="org.springframework.stereotype.Repository"/>
 		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
 	</context:component-scan>
+	
+	<import resource="classpath:/egovframework/spring/com/context-jpa.xml"/>
+	<!-- <import resource="classpath:/egovframework/spring/com/context-session-init.xml"/> -->
 
     <!-- 메시지소스빈 설정 -->
     <bean id="egovMessageSource" class="egovframework.com.cmm.EgovMessageSource">

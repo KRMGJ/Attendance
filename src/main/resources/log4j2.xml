@@ -1,29 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xml>
-<Configuration>
+<Configuration status="WARN">
     <Appenders>
         <Console name="console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d %5p [%c] %m%n" />
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5p [%c{1}] %m%n" />
         </Console>
     </Appenders>
+
     <Loggers>
-        <Logger name="java.sql" level="INFO" additivity="false">
+        <Logger name="egovframework" level="INFO" additivity="false">
             <AppenderRef ref="console" />
         </Logger>
-        <Logger name="egovframework" level="DEBUG" additivity="false">
+        <Logger name="org.egovframe" level="INFO" additivity="false">
             <AppenderRef ref="console" />
         </Logger>
-        <Logger name="org.egovframe" level="DEBUG" additivity="false">
+        <Logger name="com.example" level="INFO" additivity="false">
             <AppenderRef ref="console" />
         </Logger>
-          <!-- log SQL with timing information, post execution -->
-        <Logger name="jdbc.sqltiming" level="INFO" additivity="false">
+
+        <!-- Spring 핵심 컴포넌트는 INFO, 필요 시 조정 -->
+        <Logger name="org.springframework.web" level="DEBUG" additivity="false">
             <AppenderRef ref="console" />
         </Logger>
-        <Logger name="org.springframework" level="INFO" additivity="false">
+        <Logger name="org.springframework.context" level="INFO" additivity="false">
             <AppenderRef ref="console" />
         </Logger>
-        <Root level="ERROR">
+        <Logger name="org.springframework.beans" level="INFO" additivity="false">
+            <AppenderRef ref="console" />
+        </Logger>
+        <Logger name="org.springframework.jdbc" level="INFO" additivity="false">
+            <AppenderRef ref="console" />
+        </Logger>
+        <Logger name="org.springframework.orm.jpa" level="INFO" additivity="false">
+            <AppenderRef ref="console" />
+        </Logger>
+        <Logger name="org.springframework.transaction" level="DEBUG" additivity="false">
+            <AppenderRef ref="console" />
+        </Logger>
+        <Logger name="org.springframework.security" level="INFO" additivity="false">
+            <AppenderRef ref="console" />
+        </Logger>
+
+        <Logger name="org.apache.catalina" level="WARN" additivity="false">
+            <AppenderRef ref="console" />
+        </Logger>
+        <Logger name="org.apache.coyote" level="WARN" additivity="false">
+            <AppenderRef ref="console" />
+        </Logger>
+        <Logger name="org.apache.tomcat" level="WARN" additivity="false">
+            <AppenderRef ref="console" />
+        </Logger>
+
+        <!-- SQL 출력 -->
+        <Logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
+            <AppenderRef ref="console" />
+        </Logger>
+        <Logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="INFO" additivity="false">
+            <AppenderRef ref="console" />
+        </Logger>
+
+        <Root level="INFO">
             <AppenderRef ref="console" />
         </Root>
     </Loggers>

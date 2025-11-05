@@ -36,10 +36,10 @@ egovProps/*.properties.bak
 *.orig
 
 # Local config / secrets
-src/main/resources/egovframework/egovProps/globals.properties
-src/main/resources/egovframework/egovProps/database.properties
-src/main/resources/application.properties
-src/main/resources/application-local.yml
+# src/main/resources/egovframework/egovProps/globals.properties
+# src/main/resources/egovframework/egovProps/database.properties
+# src/main/resources/application.properties
+# src/main/resources/application-local.yml
 *.env
 
 # Compiled / generated
