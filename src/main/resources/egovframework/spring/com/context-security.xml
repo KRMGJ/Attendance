@@ -47,9 +47,6 @@
 		</security:session-management>
 	</security:http>
 
-	<!-- BCrypt -->
-	<bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
-
 	<!-- URL에 세미콜론(semicolon)허용 여부(기본값/false) -->
 	<bean id="egovStrictHttpFirewall" class="org.springframework.security.web.firewall.StrictHttpFirewall">
 		<property name="allowSemicolon" value="true" />
