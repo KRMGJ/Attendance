@@ -4,9 +4,7 @@
 <div class="space-y-6">
 	<div class="bg-white border rounded-xl p-6 shadow-sm">
 		<h2 class="text-lg font-semibold mb-3">
-			안녕하세요,
-			<c:out value="${pageContext.request.userPrincipal.name}" />
-			님
+			안녕하세요, <c:out value="${empName}" /> 님
 		</h2>
 		<p class="text-gray-600">
 			오늘은 <strong><%=java.time.LocalDate.now()%></strong> 입니다.

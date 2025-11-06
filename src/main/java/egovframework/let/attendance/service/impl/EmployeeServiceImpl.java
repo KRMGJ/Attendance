@@ -32,9 +32,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 				.position(dto.getPosition()).employmentType(dto.getEmploymentType()).build();
 		employeeRepository.save(employee);
 
-		jdbcTemplate.update("INSERT INTO USERS (USERNAME, PASSWORD, ENABLED) VALUES (?, ?, 1)", dto.getEmail(),
-				encodedPassword);
-		jdbcTemplate.update("INSERT INTO AUTHORITIES (USERNAME, AUTHORITY) VALUES (?, ?)", dto.getEmail(),
-				"ROLE_EMPLOYEE");
+		jdbcTemplate.update("INSERT INTO USERS (USERNAME, PASSWORD, EMAIL, ENABLED) VALUES (?, ?, ?, 1)",
+				dto.getEmail(), encodedPassword, dto.getEmail());
+		jdbcTemplate.update("INSERT INTO AUTHORITIES (USERNAME, AUTHORITY) VALUES (?, ?)", dto.getEmail(), "ROLE_USER");
 	}
 }

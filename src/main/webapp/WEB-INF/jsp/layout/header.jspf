@@ -6,7 +6,7 @@
 		<div class="flex items-center gap-3">
 			<c:if test="${not empty sessionScope.SPRING_SECURITY_CONTEXT}">
 				<span class="text-sm text-gray-600"> <c:out
-						value="${pageContext.request.userPrincipal.name}" /> 님
+						value="${sessionScope.empName}" /> 님
 				</span>
 				<form action="<c:url value='/logout.do'/>" method="post">
 					<button class="px-3 py-1.5 rounded-md border text-sm">로그아웃</button>

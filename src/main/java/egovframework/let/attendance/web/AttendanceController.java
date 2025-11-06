@@ -1,14 +1,15 @@
 package egovframework.let.attendance.web;
 
-import java.util.List;
+import java.security.Principal;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import egovframework.let.attendance.service.AttendanceService;
-import egovframework.let.attendance.service.AttendanceVO;
 
 @Controller
 @RequestMapping("/attendance")
@@ -17,10 +18,15 @@ public class AttendanceController {
 	@Autowired
 	private AttendanceService attendanceService;
 
-	@RequestMapping("/attendance/list.do")
-	public String selectAttendanceList(Model model, AttendanceVO vo) throws Exception {
-		List<AttendanceVO> resultList = attendanceService.selectAttendanceList(vo);
-		model.addAttribute("resultList", resultList);
-		return "attendance/AttendanceList";
+	@RequestMapping(value = "/checkin.do", method = RequestMethod.POST)
+	public String checkIn(HttpServletRequest request, Principal principal) throws Exception {
+		attendanceService.checkIn(principal.getName());
+		return "redirect:/main.do";
+	}
+
+	@RequestMapping(value = "/checkout.do", method = RequestMethod.POST)
+	public String checkOut(HttpServletRequest request, Principal principal) throws Exception {
+		attendanceService.checkOut(principal.getName());
+		return "redirect:/main.do";
 	}
 }

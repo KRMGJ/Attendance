@@ -32,10 +32,11 @@
 		<security:csrf disabled="true" />
 		<security:intercept-url pattern="/login.do" access="permitAll" />
 		<security:intercept-url pattern="/signup.do" access="permitAll" />
-		<!-- <security:intercept-url pattern="/**" access="isAuthenticated()" /> -->
+		<security:intercept-url pattern="/**" access="isAuthenticated()" />
 		<security:form-login login-page="/login.do"
 							 login-processing-url="/loginProcess.do" 
 							 default-target-url="/main.do"
+							 authentication-success-handler-ref="customLoginSuccessHandler"
 							 authentication-failure-url="/login.do?error=true"
 							 username-parameter="username" 
 							 password-parameter="password" />
@@ -53,4 +54,5 @@
 	</bean>
 	<security:http-firewall ref="egovStrictHttpFirewall" />
 
+	<bean id="customLoginSuccessHandler" class="egovframework.let.attendance.handler.CustomLoginSuccessHandler"/>
 </beans>
