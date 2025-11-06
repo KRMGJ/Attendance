@@ -3,7 +3,13 @@
 <div class="mx-auto max-w-md">
 	<div class="bg-white border rounded-xl p-6 shadow-sm">
 		<h2 class="text-lg font-semibold mb-4">로그인</h2>
-		<form method="post" action="<c:url value='/login.do'/>"
+		<c:if test="${not empty error}">
+        	<div class="text-red-600 text-sm mb-2">${error}</div>
+    	</c:if>
+    	<c:if test="${not empty msg}">
+        	<div class="text-green-600 text-sm mb-2">${msg}</div>
+    	</c:if>
+		<form method="post" action="<c:url value='/loginProcess.do'/>"
 			class="space-y-4">
 			<div>
 				<label class="block text-sm mb-1">아이디</label> <input name="username"

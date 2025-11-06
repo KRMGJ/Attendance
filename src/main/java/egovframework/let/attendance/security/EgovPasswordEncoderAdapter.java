@@ -17,6 +17,6 @@ public class EgovPasswordEncoderAdapter implements PasswordEncoder {
 
 	@Override
 	public boolean matches(CharSequence rawPassword, String encodedPassword) {
-		return delegate.checkPassword(encodedPassword, rawPassword.toString());
+		return delegate.checkPassword(rawPassword.toString(), encodedPassword);
 	}
 }

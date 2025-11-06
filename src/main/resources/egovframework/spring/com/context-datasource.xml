@@ -17,14 +17,6 @@
     <alias name="dataSource-${Globals.DbType}" alias="dataSource" />
     <alias name="dataSource-${Globals.DbType}" alias="egov.dataSource" />
     
-    <!-- mysql -->
-<!--     <bean id="dataSource-mysql" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
-        <property name="driverClassName" value="${Globals.DriverClassName}"/>
-        <property name="url" value="${Globals.Url}" />
-        <property name="username" value="${Globals.UserName}"/>
-        <property name="password" value="${Globals.Password}"/>
-    </bean> -->
-    
     <!-- Oracle -->
 	<bean id="dataSource-oracle" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
 		<property name="driverClassName" value="${Globals.DriverClassName}"/>
@@ -37,30 +29,7 @@
 		<property name="connectionInitSql" value="ALTER SESSION SET NLS_DATE_FORMAT='YYYY-MM-DD'"/>
 	</bean>
     
-    <!-- Altibase -->
-    <!-- <bean id="dataSource-altibase" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
-        <property name="driverClassName" value="${Globals.DriverClassName}"/>
-        <property name="url" value="${Globals.Url}" />
-        <property name="username" value="${Globals.UserName}"/>
-        <property name="password" value="${Globals.Password}"/>
-        
-        <property name="validationQuery" value="select 1 from dual;"/>
-    </bean> -->
-
-    <!-- Tibero -->
-<!--     <bean id="dataSource-tibero" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
-        <property name="driverClassName" value="${Globals.DriverClassName}"/>
-        <property name="url" value="${Globals.Url}" />
-        <property name="username" value="${Globals.UserName}"/>
-        <property name="password" value="${Globals.Password}"/>
-    </bean> -->
-	
-	<!-- cubrid -->
-<!--     <bean id="dataSource-cubrid" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
-        <property name="driverClassName" value="${Globals.DriverClassName}"/>
-        <property name="url" value="${Globals.Url}" />
-        <property name="username" value="${Globals.UserName}"/>
-        <property name="password" value="${Globals.Password}"/>
-    </bean> -->
-    
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+    	<property name="dataSource" ref="egov.dataSource"/>
+	</bean>
 </beans>

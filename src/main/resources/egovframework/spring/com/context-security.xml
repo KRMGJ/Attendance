@@ -34,7 +34,7 @@
 		<security:intercept-url pattern="/signup.do" access="permitAll" />
 		<!-- <security:intercept-url pattern="/**" access="isAuthenticated()" /> -->
 		<security:form-login login-page="/login.do"
-							 login-processing-url="loginProcess.do" 
+							 login-processing-url="/loginProcess.do" 
 							 default-target-url="/main.do"
 							 authentication-failure-url="/login.do?error=true"
 							 username-parameter="username" 
