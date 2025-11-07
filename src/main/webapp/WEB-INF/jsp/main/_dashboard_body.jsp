@@ -22,11 +22,11 @@
 			</p>
 			<div class="flex gap-2">
 				<form method="post" action="<c:url value='/attendance/checkin.do'/>">
-					<button class="px-4 py-2 rounded-md bg-emerald-600 text-white">출근</button>
+					<button type="submit" id="checkinBtn" class="px-4 py-2 rounded-md bg-emerald-600 text-white">출근</button>
 				</form>
 				<form method="post"
 					action="<c:url value='/attendance/checkout.do'/>">
-					<button class="px-4 py-2 rounded-md bg-rose-600 text-white">퇴근</button>
+					<button type="submit" id="checkoutBtn" class="px-4 py-2 rounded-md bg-rose-600 text-white">퇴근</button>
 				</form>
 			</div>
 		</div>
@@ -69,3 +69,18 @@
 		</div>
 	</div>
 </div>
+<c:if test="${not empty attendanceResult}">
+<script>
+  const messages = {
+    checkin_success: "출근이 정상적으로 처리되었습니다.",
+    checkin_fail: "출근 처리에 실패했습니다. 다시 시도해주세요.",
+    already_check_in: "이미 출근 처리가 되어 있습니다.",
+    checkout_success: "퇴근이 정상적으로 처리되었습니다.",
+    checkout_fail: "퇴근 처리에 실패했습니다. 다시 시도해주세요.",
+    already_checked_out: "이미 퇴근 처리가 되어 있습니다."
+  };
+  const code = "${attendanceResult}";
+  if (code) alert(messages[code] || "처리 결과를 알 수 없습니다.");
+</script>
+
+</c:if>
