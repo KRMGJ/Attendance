@@ -1,4 +1,4 @@
-package egovframework.let.attendance.dto;
+package egovframework.let.attendance.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;

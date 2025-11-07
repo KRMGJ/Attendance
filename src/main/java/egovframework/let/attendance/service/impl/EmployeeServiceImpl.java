@@ -6,7 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import egovframework.let.attendance.dto.RegistEmployeeDto;
+import egovframework.let.attendance.dto.request.RegistEmployeeDto;
 import egovframework.let.attendance.entity.Employee;
 import egovframework.let.attendance.repository.EmployeeRepository;
 import egovframework.let.attendance.service.EmployeeService;

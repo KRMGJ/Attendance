@@ -19,6 +19,9 @@ public class AttendanceController {
 	@Autowired
 	private AttendanceService attendanceService;
 
+	/**
+	 * 출근 처리
+	 */
 	@RequestMapping(value = "/checkin.do", method = RequestMethod.POST)
 	public String checkIn(HttpServletRequest request, Principal principal, RedirectAttributes attributes)
 			throws Exception {
@@ -27,6 +30,9 @@ public class AttendanceController {
 		return "redirect:/main.do";
 	}
 
+	/**
+	 * 퇴근 처리
+	 */
 	@RequestMapping(value = "/checkout.do", method = RequestMethod.POST)
 	public String checkOut(HttpServletRequest request, Principal principal, RedirectAttributes attributes) {
 		String result = attendanceService.checkOut(principal.getName());

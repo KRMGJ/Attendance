@@ -5,11 +5,14 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import egovframework.let.attendance.dto.response.AttendanceViewDto;
 import egovframework.let.attendance.entity.Attendance;
 import egovframework.let.attendance.entity.Employee;
 import egovframework.let.attendance.repository.AttendanceRepository;
@@ -43,6 +46,9 @@ public class AttendanceServiceImpl implements AttendanceService {
 		return null;
 	}
 
+	/**
+	 * 출근 처리
+	 */
 	@Override
 	public String checkIn(String username) {
 		try {
@@ -70,6 +76,9 @@ public class AttendanceServiceImpl implements AttendanceService {
 		return "checkin_success";
 	}
 
+	/**
+	 * 퇴근 처리
+	 */
 	@Override
 	public String checkOut(String username) {
 		try {
@@ -106,26 +115,44 @@ public class AttendanceServiceImpl implements AttendanceService {
 		return "checkout_success";
 	}
 
+	/**
+	 * 오늘 출퇴근 정보 조회
+	 */
 	@Override
-	public Attendance getToday(String empId) {
+	public AttendanceViewDto getToday(String empId) {
+		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		LocalDate today = LocalDate.now(ZONE);
-		Attendance attendance = null;
+		AttendanceViewDto attendance = null;
 		try {
-			attendance = attendanceRepository.findByEmpIdAndWorkDate(empId, today).orElseGet(() -> {
+			Attendance att = attendanceRepository.findByEmpIdAndWorkDate(empId, today).orElseGet(() -> {
 				Attendance empty = Attendance.builder().empId(empId).workDate(today).status("NONE").build();
 				return empty;
 			});
+			attendance = AttendanceViewDto.builder().workDate(att.getWorkDate().toString())
+					.checkIn(att.getCheckIn() != null ? att.getCheckIn().format(fmt) : null)
+					.checkOut(att.getCheckOut() != null ? att.getCheckOut().format(fmt) : null).status(att.getStatus())
+					.build();
 		} catch (Exception e) {
 			log.error("Error fetching today's attendance for empId {}: {}", empId, e.getMessage());
 		}
 		return attendance;
 	}
 
+	/**
+	 * 최근 출퇴근 정보 조회
+	 */
 	@Override
-	public List<Attendance> getRecent(String empId) {
-		List<Attendance> recent = null;
+	public List<AttendanceViewDto> getRecent(String empId) {
+		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		List<AttendanceViewDto> recent = null;
 		try {
-			recent = attendanceRepository.findTop7ByEmpIdOrderByWorkDateDesc(empId);
+			List<Attendance> att = attendanceRepository.findTop7ByEmpIdOrderByWorkDateDesc(empId);
+			recent = att.stream()
+					.map(a -> AttendanceViewDto.builder().workDate(a.getWorkDate().toString())
+							.checkIn(a.getCheckIn() != null ? a.getCheckIn().format(fmt) : null)
+							.checkOut(a.getCheckOut() != null ? a.getCheckOut().format(fmt) : null)
+							.status(a.getStatus()).build())
+					.collect(Collectors.toList());
 		} catch (Exception e) {
 			log.error("Error fetching recent attendance for empId {}: {}", empId, e.getMessage());
 		}

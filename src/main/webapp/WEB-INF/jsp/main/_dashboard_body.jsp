@@ -77,7 +77,7 @@
     already_check_in: "이미 출근 처리가 되어 있습니다.",
     checkout_success: "퇴근이 정상적으로 처리되었습니다.",
     checkout_fail: "퇴근 처리에 실패했습니다. 다시 시도해주세요.",
-    already_checked_out: "이미 퇴근 처리가 되어 있습니다."
+    already_check_out: "이미 퇴근 처리가 되어 있습니다."
   };
   const code = "${attendanceResult}";
   if (code) alert(messages[code] || "처리 결과를 알 수 없습니다.");

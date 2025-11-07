@@ -5,13 +5,15 @@ import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Comment;
 
-import egovframework.let.attendance.dto.RegistEmployeeDto;
+import egovframework.let.attendance.dto.request.RegistEmployeeDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -60,6 +62,9 @@ public class Employee {
 	@Column(name = "employment_type", length = 20, nullable = false)
 	@Comment("고용 형태(정규직, 계약직 등)")
 	private String employmentType;
+
+	@OneToOne(mappedBy = "employee", fetch = FetchType.LAZY)
+	private LeaveBalance leaveBalance;
 
 	@PrePersist
 	public void prePersist() {
