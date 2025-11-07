@@ -64,12 +64,13 @@ public class AttendanceServiceImpl implements AttendanceService {
 				return "already_check_in";
 			}
 
-			LocalDateTime now = LocalDateTime.now(ZONE);
+			Date now = new Date();
+			LocalTime nowTime = now.toInstant().atZone(ZONE).toLocalTime();
 
 			Attendance a = Attendance.builder().empId(emp.getId()).workDate(today).checkIn(now).build();
 
 			// 지각 판정
-			String status = now.toLocalTime().isAfter(WORK_START) ? "LATE" : "PRESENT";
+			String status = nowTime.isAfter(WORK_START) ? "LATE" : "PRESENT";
 			a.setStatus(status);
 			a.setOvertimeMinutes(0);
 
@@ -97,18 +98,23 @@ public class AttendanceServiceImpl implements AttendanceService {
 				return "already_check_out";
 			}
 
-			LocalDateTime now = LocalDateTime.now(ZONE);
+			Date now = new Date();
+			LocalTime nowTime = now.toInstant().atZone(ZONE).toLocalTime();
+
 			a.setCheckOut(now);
 
 			// 조퇴 판정
-			if (now.toLocalTime().isBefore(WORK_END)) {
+			if (nowTime.isBefore(WORK_END)) {
 				a.setStatus("EARLY_LEAVE");
 			} else {
 				// 연장근로 계산
 				LocalDateTime endBase = LocalDateTime.ofInstant(today.toInstant(), ZONE).withHour(WORK_END.getHour())
 						.withMinute(WORK_END.getMinute());
-				long overtime = Duration.between(endBase, now).toMinutes();
+				LocalDateTime nowLocal = now.toInstant().atZone(ZONE).toLocalDateTime();
+				long overtime = Duration.between(endBase, nowLocal).toMinutes();
+
 				a.setOvertimeMinutes((int) Math.max(0, overtime));
+
 				if (!"LATE".equals(a.getStatus())) {
 					a.setStatus("PRESENT");
 				}

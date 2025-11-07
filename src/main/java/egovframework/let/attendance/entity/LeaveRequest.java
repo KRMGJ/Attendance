@@ -1,6 +1,5 @@
 package egovframework.let.attendance.entity;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -64,7 +63,11 @@ public class LeaveRequest {
 	@Builder.Default
 	@Column(name = "created_at", nullable = false)
 	@Comment("신청일시")
-	private LocalDateTime createdAt = LocalDateTime.now();
+	private Date createdAt = new Date();
+
+	@Column(name = "approver", length = 100)
+	@Comment("승인자")
+	private String approver;
 
 	@ManyToOne
 	@JoinColumn(name = "emp_id", referencedColumnName = "id", insertable = false, updatable = false)

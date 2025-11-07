@@ -1,12 +1,12 @@
 package egovframework.let.attendance.common;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 public class Utils {
 
-	public static String formatDate(LocalDateTime date) {
+	public static String formatDate(Date date) {
 		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-		return date.format(fmt);
+		return date.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime().format(fmt);
 	}
 }

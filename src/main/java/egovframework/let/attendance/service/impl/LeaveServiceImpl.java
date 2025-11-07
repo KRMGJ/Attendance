@@ -1,17 +1,22 @@
 package egovframework.let.attendance.service.impl;
 
+import static egovframework.let.attendance.common.Utils.formatDate;
+
 import java.time.LocalDate;
 import java.time.Year;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import egovframework.let.attendance.dto.request.NewLeaveDto;
+import egovframework.let.attendance.dto.response.LeaveRequestListDto;
 import egovframework.let.attendance.entity.Employee;
 import egovframework.let.attendance.entity.LeaveBalance;
 import egovframework.let.attendance.entity.LeaveRequest;
@@ -96,6 +101,38 @@ public class LeaveServiceImpl implements LeaveService {
 			log.error("Error processing leave request for userEmail {}: {}", userEmail, e.getMessage());
 			return "휴가 신청 중 오류가 발생했습니다.";
 		}
+	}
+
+	/**
+	 * 나의 휴가 신청 내역 조회
+	 */
+	@Override
+	@Transactional(readOnly = true)
+	public List<LeaveRequestListDto> myRequests(String userEmail) {
+		List<LeaveRequestListDto> requests = null;
+		try {
+			Employee emp = employeeRepository.findByEmail(userEmail)
+					.orElseThrow(() -> new IllegalStateException("직원 정보 없음"));
+
+			List<LeaveRequest> leaveRequests = leaveRequestRepository.findByEmpIdOrderByStartDateDesc(emp.getId());
+
+			requests = leaveRequests.stream().map(lr -> {
+				LeaveRequestListDto dto = new LeaveRequestListDto();
+				dto.setType(lr.getType());
+				dto.setStartDate(formatDate(lr.getStartDate()));
+				dto.setEndDate(formatDate(lr.getEndDate()));
+				dto.setDays(lr.getDays());
+				dto.setReason(lr.getReason());
+				dto.setStatus(lr.getStatus());
+				dto.setCreatedAt(lr.getCreatedAt());
+				dto.setApprover(lr.getApprover());
+				return dto;
+			}).collect(Collectors.toList());
+
+		} catch (Exception e) {
+			log.error("Error fetching leave requests for userEmail {}: {}", userEmail, e.getMessage());
+		}
+		return requests;
 	}
 
 }

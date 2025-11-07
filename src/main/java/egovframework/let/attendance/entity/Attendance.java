@@ -1,6 +1,5 @@
 package egovframework.let.attendance.entity;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -46,11 +45,11 @@ public class Attendance {
 	@Builder.Default
 	@Column(name = "check_in")
 	@Comment("출근 시간")
-	private LocalDateTime checkIn = LocalDateTime.now();
+	private Date checkIn = new Date();
 
 	@Column(name = "check_out")
 	@Comment("퇴근 시간")
-	private LocalDateTime checkOut;
+	private Date checkOut;
 
 	@Column(length = 20, nullable = false)
 	@Comment("근무 상태(정상, 지각, 조퇴, 결근 등)")
