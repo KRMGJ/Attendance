@@ -63,6 +63,10 @@ public class Employee {
 	@Comment("고용 형태(정규직, 계약직 등)")
 	private String employmentType;
 
+	@Column(name = "status", length = 20, nullable = false)
+	@Comment("고용 상태(재직중, 휴직중, 퇴사 등)")
+	private String status;
+
 	@OneToOne(mappedBy = "employee", fetch = FetchType.LAZY)
 	private LeaveBalance leaveBalance;
 

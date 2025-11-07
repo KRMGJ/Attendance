@@ -1,5 +1,7 @@
 package egovframework.let.attendance.service.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,5 +47,30 @@ public class EmployeeServiceImpl implements EmployeeService {
 		} catch (Exception e) {
 			log.error("Error registering employee: {}", e.getMessage());
 		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<Employee> getAllEmployees() {
+		List<Employee> employees = null;
+		try {
+			employees = employeeRepository.findAllByOrderByHireDateDesc();
+		} catch (Exception e) {
+			log.error("Error retrieving all employees: {}", e.getMessage());
+		}
+		return employees;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Employee getEmployeeDetail(String id) {
+		Employee employee = null;
+		try {
+			employee = employeeRepository.findById(id)
+					.orElseThrow(() -> new IllegalStateException("Employee not found"));
+		} catch (Exception e) {
+			log.error("Error retrieving employee detail for ID {}: {}", id, e.getMessage());
+		}
+		return employee;
 	}
 }

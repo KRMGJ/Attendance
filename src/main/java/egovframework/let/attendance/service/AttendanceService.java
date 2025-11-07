@@ -3,6 +3,9 @@ package egovframework.let.attendance.service;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+
+import egovframework.let.attendance.dto.request.AdminAttendanceSearch;
 import egovframework.let.attendance.dto.response.AttendanceListDto;
 import egovframework.let.attendance.dto.response.AttendanceViewDto;
 
@@ -48,4 +51,12 @@ public interface AttendanceService {
 	 * @return 출퇴근 기록 리스트
 	 */
 	List<AttendanceListDto> getMyAttendance(String userEmail, LocalDate from, LocalDate to);
+
+	/**
+	 * 관리자 출퇴근 기록 조회
+	 * 
+	 * @param cond 검색 조건
+	 * @return 출퇴근 기록 페이지
+	 */
+	Page<AttendanceListDto> list(AdminAttendanceSearch cond);
 }
