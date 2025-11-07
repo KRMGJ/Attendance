@@ -7,7 +7,7 @@
 		<div class="flex gap-2">
 			<a href="<c:url value='/employee/edit.do?id=${employee.id}'/>"
 				class="px-3 py-2 rounded-md bg-gray-900 text-white">수정</a> <a
-				href="<c:url value='/employee/list.do'/>"
+				href="<c:url value='/admin/employee/list.do'/>"
 				class="px-3 py-2 rounded-md border">목록</a>
 		</div>
 	</div>
@@ -40,10 +40,10 @@
 			</dd>
 		</c:if>
 
-		<c:if test="${not empty employee.createdAt}">
+		<c:if test="${not empty employee.hireDate}">
 			<dt class="text-gray-500">등록일</dt>
 			<dd class="md:col-span-2">
-				<c:out value="${employee.createdAt}" />
+				<c:out value="${employee.hireDate}" />
 			</dd>
 		</c:if>
 	</dl>
