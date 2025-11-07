@@ -16,4 +16,6 @@ public interface AttendanceRepository extends JpaRepository<Attendance, String>,
 	boolean existsByEmpIdAndWorkDate(String empId, LocalDate workDate);
 
 	List<Attendance> findTop7ByEmpIdOrderByWorkDateDesc(String empId);
+
+	List<Attendance> findTop100ByEmpIdOrderByWorkDateDesc(String empId);
 }

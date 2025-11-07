@@ -12,7 +12,9 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import egovframework.let.attendance.dto.response.AttendanceListDto;
 import egovframework.let.attendance.dto.response.AttendanceViewDto;
 import egovframework.let.attendance.entity.Attendance;
 import egovframework.let.attendance.entity.Employee;
@@ -113,6 +115,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 	 * 오늘 출퇴근 정보 조회
 	 */
 	@Override
+	@Transactional(readOnly = true)
 	public AttendanceViewDto getToday(String empId) {
 		LocalDate today = LocalDate.now(ZONE);
 		AttendanceViewDto attendance = null;
@@ -135,6 +138,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 	 * 최근 출퇴근 정보 조회
 	 */
 	@Override
+	@Transactional(readOnly = true)
 	public List<AttendanceViewDto> getRecent(String empId) {
 		List<AttendanceViewDto> recent = null;
 		try {
@@ -149,6 +153,38 @@ public class AttendanceServiceImpl implements AttendanceService {
 			log.error("Error fetching recent attendance for empId {}: {}", empId, e.getMessage());
 		}
 		return recent;
+	}
+
+	/**
+	 * 나의 출퇴근 기록 조회
+	 */
+	@Override
+	@Transactional(readOnly = true)
+	public List<AttendanceListDto> getMyAttendance(String userEmail, LocalDate from, LocalDate to) {
+		List<AttendanceListDto> attendanceList = null;
+		try {
+			Employee emp = loadEmployeeByUsername(userEmail);
+			if (from != null || to != null) {
+				List<Attendance> records = attendanceRepository.findMyRange(emp.getId(), from, to);
+				attendanceList = records.stream()
+						.map(a -> AttendanceListDto.builder().id(a.getId()).empId(a.getEmpId())
+								.workDate(a.getWorkDate()).checkIn(formatDate(a.getCheckIn()))
+								.checkOut(a.getCheckOut() != null ? formatDate(a.getCheckOut()) : null)
+								.status(a.getStatus()).overtimeMinutes(a.getOvertimeMinutes()).employee(emp).build())
+						.collect(Collectors.toList());
+			} else {
+				List<Attendance> records = attendanceRepository.findTop100ByEmpIdOrderByWorkDateDesc(emp.getId());
+				attendanceList = records.stream()
+						.map(a -> AttendanceListDto.builder().id(a.getId()).empId(a.getEmpId())
+								.workDate(a.getWorkDate()).checkIn(formatDate(a.getCheckIn()))
+								.checkOut(a.getCheckOut() != null ? formatDate(a.getCheckOut()) : null)
+								.status(a.getStatus()).overtimeMinutes(a.getOvertimeMinutes()).employee(emp).build())
+						.collect(Collectors.toList());
+			}
+		} catch (Exception e) {
+			log.error("Error fetching attendance records for user {}: {}", userEmail, e.getMessage());
+		}
+		return attendanceList;
 	}
 
 }

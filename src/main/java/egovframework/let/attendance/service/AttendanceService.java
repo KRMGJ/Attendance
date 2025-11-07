@@ -1,7 +1,9 @@
 package egovframework.let.attendance.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
+import egovframework.let.attendance.dto.response.AttendanceListDto;
 import egovframework.let.attendance.dto.response.AttendanceViewDto;
 
 public interface AttendanceService {
@@ -36,4 +38,14 @@ public interface AttendanceService {
 	 * @return 최근 출퇴근 정보 리스트
 	 */
 	List<AttendanceViewDto> getRecent(String empId);
+
+	/**
+	 * 나의 출퇴근 기록 조회
+	 * 
+	 * @param userEmail 사용자 이메일
+	 * @param from      시작 날짜
+	 * @param to        종료 날짜
+	 * @return 출퇴근 기록 리스트
+	 */
+	List<AttendanceListDto> getMyAttendance(String userEmail, LocalDate from, LocalDate to);
 }

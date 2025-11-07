@@ -66,4 +66,14 @@ public class AttendanceRepositoryImpl implements AttendanceRepositoryCustom {
 		return new PageImpl<>(content, pageable, total);
 	}
 
+	@Override
+	public List<Attendance> findMyRange(String empId, LocalDate from, LocalDate to) {
+		StringBuilder jpql = new StringBuilder("select a from Attendance a " + "join fetch a.employee e "
+				+ "where e.empId = :empId " + "and a.workDate between :from and :to " + "order by a.workDate asc");
+		TypedQuery<Attendance> query = entityManager.createQuery(jpql.toString(), Attendance.class);
+		query.setParameter("empId", empId);
+		query.setParameter("from", from);
+		query.setParameter("to", to);
+		return query.getResultList();
+	}
 }

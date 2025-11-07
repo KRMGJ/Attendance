@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import egovframework.let.attendance.entity.LeaveBalance;
 import egovframework.let.attendance.repository.LeaveRepository;
@@ -21,6 +22,7 @@ public class LeaveServiceImpl implements LeaveService {
 	 * 남은 휴가 일수 조회
 	 */
 	@Override
+	@Transactional(readOnly = true)
 	public LeaveBalance getRemaining(String empId) {
 		int currentYear = Year.now().getValue();
 		Optional<LeaveBalance> leaveBalance = null;

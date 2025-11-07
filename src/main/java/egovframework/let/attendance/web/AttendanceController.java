@@ -1,15 +1,20 @@
 package egovframework.let.attendance.web;
 
 import java.security.Principal;
+import java.time.LocalDate;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import egovframework.let.attendance.dto.response.AttendanceListDto;
 import egovframework.let.attendance.service.AttendanceService;
 
 @Controller
@@ -38,5 +43,20 @@ public class AttendanceController {
 		String result = attendanceService.checkOut(principal.getName());
 		attributes.addFlashAttribute("attendanceResult", result);
 		return "redirect:/main.do";
+	}
+
+	@RequestMapping(value = "/my.do", method = RequestMethod.GET)
+	public String myAttendance(Principal principal, @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to, Model model) {
+
+		String email = principal.getName();
+
+		List<AttendanceListDto> rows = attendanceService.getMyAttendance(email, from, to);
+		model.addAttribute("myAttendance", rows);
+
+		model.addAttribute("from", from);
+		model.addAttribute("to", to);
+
+		return "attendance/my";
 	}
 }
