@@ -3,10 +3,10 @@ package egovframework.let.attendance.service.impl;
 import static egovframework.let.attendance.common.Utils.formatDate;
 
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,6 +46,11 @@ public class AttendanceServiceImpl implements AttendanceService {
 				.orElseThrow(() -> new IllegalArgumentException("직원 정보를 찾을 수 없음: " + username));
 	}
 
+	private Date getTodayDate() {
+		LocalDateTime todayMidnight = LocalDateTime.now(ZONE).withHour(0).withMinute(0).withSecond(0).withNano(0);
+		return Date.from(todayMidnight.atZone(ZONE).toInstant());
+	}
+
 	/**
 	 * 출근 처리
 	 */
@@ -54,7 +59,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 		try {
 			Employee emp = loadEmployeeByUsername(username);
 
-			LocalDate today = LocalDate.now(ZONE);
+			Date today = getTodayDate();
 			if (attendanceRepository.existsByEmpIdAndWorkDate(emp.getId(), today)) {
 				return "already_check_in";
 			}
@@ -84,7 +89,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 		try {
 			Employee emp = loadEmployeeByUsername(username);
 
-			LocalDate today = LocalDate.now(ZONE);
+			Date today = getTodayDate();
 			Attendance a = attendanceRepository.findByEmpIdAndWorkDate(emp.getId(), today)
 					.orElseThrow(() -> new IllegalStateException("출근 기록 없음"));
 
@@ -100,7 +105,8 @@ public class AttendanceServiceImpl implements AttendanceService {
 				a.setStatus("EARLY_LEAVE");
 			} else {
 				// 연장근로 계산
-				LocalDateTime endBase = LocalDateTime.of(today, WORK_END);
+				LocalDateTime endBase = LocalDateTime.ofInstant(today.toInstant(), ZONE).withHour(WORK_END.getHour())
+						.withMinute(WORK_END.getMinute());
 				long overtime = Duration.between(endBase, now).toMinutes();
 				a.setOvertimeMinutes((int) Math.max(0, overtime));
 				if (!"LATE".equals(a.getStatus())) {
@@ -121,7 +127,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 	@Override
 	@Transactional(readOnly = true)
 	public AttendanceViewDto getToday(String empId) {
-		LocalDate today = LocalDate.now(ZONE);
+		Date today = getTodayDate();
 		AttendanceViewDto attendance = null;
 		try {
 			Attendance att = attendanceRepository.findByEmpIdAndWorkDate(empId, today).orElseGet(() -> {
@@ -164,7 +170,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public List<AttendanceListDto> getMyAttendance(String userEmail, LocalDate from, LocalDate to) {
+	public List<AttendanceListDto> getMyAttendance(String userEmail, Date from, Date to) {
 		List<AttendanceListDto> attendanceList = null;
 		try {
 			Employee emp = loadEmployeeByUsername(userEmail);

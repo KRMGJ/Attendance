@@ -31,9 +31,9 @@ public class RootController {
 	 */
 	@RequestMapping(value = "/main.do", method = RequestMethod.GET)
 	public String home(Model model, Principal principal) {
-		if (principal == null) {
-			return "redirect:/login.do";
-		}
+		/*
+		 * if (principal == null) { return "redirect:/login.do"; }
+		 */
 		String username = principal.getName();
 		Employee emp = employeeRepository.findByEmail(username)
 				.orElseThrow(() -> new IllegalArgumentException("직원 정보를 찾을 수 없음: " + username));

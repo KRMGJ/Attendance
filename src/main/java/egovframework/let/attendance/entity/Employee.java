@@ -1,12 +1,14 @@
 package egovframework.let.attendance.entity;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
@@ -70,6 +72,9 @@ public class Employee {
 
 	@OneToOne(mappedBy = "employee", fetch = FetchType.LAZY)
 	private LeaveBalance leaveBalance;
+
+	@OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
+	private List<LeaveRequest> leaveRequests;
 
 	@PrePersist
 	public void prePersist() {

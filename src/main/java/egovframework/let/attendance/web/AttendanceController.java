@@ -1,7 +1,7 @@
 package egovframework.let.attendance.web;
 
 import java.security.Principal;
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -46,8 +46,8 @@ public class AttendanceController {
 	}
 
 	@RequestMapping(value = "/my.do", method = RequestMethod.GET)
-	public String myAttendance(Principal principal, @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to, Model model) {
+	public String myAttendance(Principal principal, @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date from,
+			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date to, Model model) {
 
 		String email = principal.getName();
 

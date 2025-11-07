@@ -6,7 +6,6 @@ import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -25,44 +24,50 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Entity
-@Table(name = "attendance")
-public class Attendance {
-
+@Table(name = "leave_request")
+@Builder
+public class LeaveRequest {
 	@Id
 	@Column(length = 36)
-	@Comment("근태 기록 식별자(UUID)")
+	@Comment("휴가신청ID")
 	private String id;
 
 	@Column(name = "emp_id", nullable = false, length = 36)
-	@Comment("직원 식별자(EMPLOYEE.ID 참조)")
+	@Comment("사원ID")
 	private String empId;
 
-	@Column(name = "work_date", nullable = false)
-	@Comment("근무 날짜")
-	private Date workDate;
+	@Column(length = 20, nullable = false)
+	@Comment("휴가유형")
+	private String type; // ANNUAL, SICK
 
-	@Builder.Default
-	@Column(name = "check_in")
-	@Comment("출근 시간")
-	private LocalDateTime checkIn = LocalDateTime.now();
+	@Column(name = "start_date", nullable = false)
+	@Comment("시작일")
+	private Date startDate;
 
-	@Column(name = "check_out")
-	@Comment("퇴근 시간")
-	private LocalDateTime checkOut;
+	@Column(name = "end_date", nullable = false)
+	@Comment("종료일")
+	private Date endDate;
+
+	@Column(nullable = false)
+	@Comment("신청 일수")
+	private int days; // 신청 일수(휴일 제외는 정책에 맞춰 조정)
+
+	@Column(length = 500)
+	@Comment("사유")
+	private String reason;
 
 	@Column(length = 20, nullable = false)
-	@Comment("근무 상태(정상, 지각, 조퇴, 결근 등)")
-	private String status;
+	@Comment("상태")
+	private String status; // PENDING, APPROVED, REJECTED
 
 	@Builder.Default
-	@Column(name = "overtime_minutes", nullable = false)
-	@Comment("초과 근무 시간(분 단위)")
-	private int overtimeMinutes = 0;
+	@Column(name = "created_at", nullable = false)
+	@Comment("신청일시")
+	private LocalDateTime createdAt = LocalDateTime.now();
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "emp_id", insertable = false, updatable = false)
+	@ManyToOne
+	@JoinColumn(name = "emp_id", referencedColumnName = "id", insertable = false, updatable = false)
 	private Employee employee;
 
 	@PrePersist

@@ -54,6 +54,11 @@ public class LeaveBalance {
 	private Employee employee;
 
 	@Transient
+	public int setUsed(int days) {
+		return this.used + days;
+	}
+
+	@Transient
 	public int getRemaining() {
 		return total - used;
 	}

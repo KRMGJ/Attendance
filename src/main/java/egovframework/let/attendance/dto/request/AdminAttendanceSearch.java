@@ -1,6 +1,6 @@
 package egovframework.let.attendance.dto.request;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,8 +13,8 @@ import lombok.Setter;
 @Builder
 public class AdminAttendanceSearch {
 	private String q;
-	private LocalDate from;
-	private LocalDate to;
+	private Date from;
+	private Date to;
 	@Builder.Default
 	private int page = 0;
 	@Builder.Default

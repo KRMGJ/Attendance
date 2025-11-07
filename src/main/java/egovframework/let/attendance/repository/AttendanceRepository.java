@@ -1,6 +1,6 @@
 package egovframework.let.attendance.repository;
 
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,9 +11,9 @@ import egovframework.let.attendance.entity.Attendance;
 
 @Repository
 public interface AttendanceRepository extends JpaRepository<Attendance, String>, AttendanceRepositoryCustom {
-	Optional<Attendance> findByEmpIdAndWorkDate(String empId, LocalDate workDate);
+	Optional<Attendance> findByEmpIdAndWorkDate(String empId, Date workDate);
 
-	boolean existsByEmpIdAndWorkDate(String empId, LocalDate workDate);
+	boolean existsByEmpIdAndWorkDate(String empId, Date workDate);
 
 	List<Attendance> findTop7ByEmpIdOrderByWorkDateDesc(String empId);
 

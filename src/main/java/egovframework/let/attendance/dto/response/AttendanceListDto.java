@@ -1,6 +1,6 @@
 package egovframework.let.attendance.dto.response;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 import egovframework.let.attendance.entity.Employee;
 import lombok.AllArgsConstructor;
@@ -15,7 +15,7 @@ import lombok.Setter;
 public class AttendanceListDto {
 	private String id;
 	private String empId;
-	private LocalDate workDate;
+	private Date workDate;
 	private String checkIn;
 	private String checkOut;
 	private String status;

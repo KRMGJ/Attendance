@@ -1,6 +1,6 @@
 package egovframework.let.attendance.service;
 
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -50,7 +50,7 @@ public interface AttendanceService {
 	 * @param to        종료 날짜
 	 * @return 출퇴근 기록 리스트
 	 */
-	List<AttendanceListDto> getMyAttendance(String userEmail, LocalDate from, LocalDate to);
+	List<AttendanceListDto> getMyAttendance(String userEmail, Date from, Date to);
 
 	/**
 	 * 관리자 출퇴근 기록 조회

@@ -1,6 +1,6 @@
-package egovframework.let.attendance.repository;
+package egovframework.let.attendance.repository.impl;
 
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 
 import egovframework.let.attendance.dto.request.AdminAttendanceSearch;
 import egovframework.let.attendance.entity.Attendance;
+import egovframework.let.attendance.repository.AttendanceRepositoryCustom;
 
 public class AttendanceRepositoryImpl implements AttendanceRepositoryCustom {
 
@@ -35,13 +36,13 @@ public class AttendanceRepositoryImpl implements AttendanceRepositoryCustom {
 			countJpql.append("and (lower(e.name) like :kw or lower(e.email) like :kw) ");
 			params.put("kw", "%" + cond.getQ().toLowerCase() + "%");
 		}
-		LocalDate from = cond.getFrom();
+		Date from = cond.getFrom();
 		if (from != null) {
 			jpql.append("and a.workDate >= :from ");
 			countJpql.append("and a.workDate >= :from ");
 			params.put("from", from);
 		}
-		LocalDate to = cond.getTo();
+		Date to = cond.getTo();
 		if (to != null) {
 			jpql.append("and a.workDate <= :to ");
 			countJpql.append("and a.workDate <= :to ");
@@ -67,7 +68,7 @@ public class AttendanceRepositoryImpl implements AttendanceRepositoryCustom {
 	}
 
 	@Override
-	public List<Attendance> findMyRange(String empId, LocalDate from, LocalDate to) {
+	public List<Attendance> findMyRange(String empId, Date from, Date to) {
 		StringBuilder jpql = new StringBuilder("select a from Attendance a " + "join fetch a.employee e "
 				+ "where e.empId = :empId " + "and a.workDate between :from and :to " + "order by a.workDate asc");
 		TypedQuery<Attendance> query = entityManager.createQuery(jpql.toString(), Attendance.class);
