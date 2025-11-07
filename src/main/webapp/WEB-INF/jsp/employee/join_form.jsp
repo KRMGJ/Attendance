@@ -33,8 +33,19 @@
 			<div class="col-span-2 flex justify-end gap-2 mt-2">
 				<a href="<c:url value='/employee/list.do'/>"
 					class="px-4 py-2 rounded-md border">취소</a>
-				<button class="px-4 py-2 rounded-md bg-gray-900 text-white">등록</button>
+				<button type="submit" id="joinBtn" class="px-4 py-2 rounded-md bg-gray-900 text-white">등록</button>
 			</div>
 		</form>
 	</div>
 </div>
+<c:if test="${not empty result}">
+<script>
+	const result = "${result}";
+	if (result === "success") {
+	    alert("직원 등록이 완료되었습니다.");
+	    window.location.href = "<c:url value='/employee/list.do'/>";
+	} else if (result === "fail") {
+	    alert("직원 등록에 실패했습니다. 다시 시도해주세요.");
+	}
+</script>
+</c:if>
