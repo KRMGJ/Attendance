@@ -31,6 +31,12 @@ public class AttendanceServiceImpl implements AttendanceService {
 	@Autowired
 	private EmployeeRepository employeeRepository;
 
+	private Employee loadEmployeeByUsername(String username) {
+		// username을 이메일로 사용 중이라는 전제
+		return employeeRepository.findByEmail(username)
+				.orElseThrow(() -> new IllegalArgumentException("직원 정보를 찾을 수 없음: " + username));
+	}
+
 	@Override
 	public List<AttendanceVO> selectAttendanceList(AttendanceVO vo) {
 		// TODO Auto-generated method stub
@@ -100,10 +106,30 @@ public class AttendanceServiceImpl implements AttendanceService {
 		return "checkout_success";
 	}
 
-	private Employee loadEmployeeByUsername(String username) {
-		// username을 이메일로 사용 중이라는 전제
-		return employeeRepository.findByEmail(username)
-				.orElseThrow(() -> new IllegalArgumentException("직원 정보를 찾을 수 없음: " + username));
+	@Override
+	public Attendance getToday(String empId) {
+		LocalDate today = LocalDate.now(ZONE);
+		Attendance attendance = null;
+		try {
+			attendance = attendanceRepository.findByEmpIdAndWorkDate(empId, today).orElseGet(() -> {
+				Attendance empty = Attendance.builder().empId(empId).workDate(today).status("NONE").build();
+				return empty;
+			});
+		} catch (Exception e) {
+			log.error("Error fetching today's attendance for empId {}: {}", empId, e.getMessage());
+		}
+		return attendance;
+	}
+
+	@Override
+	public List<Attendance> getRecent(String empId) {
+		List<Attendance> recent = null;
+		try {
+			recent = attendanceRepository.findTop7ByEmpIdOrderByWorkDateDesc(empId);
+		} catch (Exception e) {
+			log.error("Error fetching recent attendance for empId {}: {}", empId, e.getMessage());
+		}
+		return recent;
 	}
 
 }

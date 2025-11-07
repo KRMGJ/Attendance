@@ -32,8 +32,8 @@ public class RootController {
 				.orElseThrow(() -> new IllegalArgumentException("직원 정보를 찾을 수 없음: " + username));
 
 		model.addAttribute("empName", emp.getName());
-//		model.addAttribute("today", attendanceService.getToday(emp.getId()));
-//		model.addAttribute("recentAttendance", attendanceService.getRecent(emp.getId()));
+		model.addAttribute("today", attendanceService.getToday(emp.getId()));
+		model.addAttribute("recentAttendance", attendanceService.getRecent(emp.getId()));
 //		model.addAttribute("leave", leaveService.getRemaining(emp.getId()));
 		return "main/dashboard";
 	}
