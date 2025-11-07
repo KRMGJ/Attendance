@@ -1,5 +1,8 @@
 package egovframework.let.attendance.service.impl;
 
+import static egovframework.let.attendance.common.Enums.EARLY_LEAVE;
+import static egovframework.let.attendance.common.Enums.LATE;
+import static egovframework.let.attendance.common.Enums.PRESENT;
 import static egovframework.let.attendance.common.Utils.formatDate;
 
 import java.time.Duration;
@@ -70,7 +73,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 			Attendance a = Attendance.builder().empId(emp.getId()).workDate(today).checkIn(now).build();
 
 			// 지각 판정
-			String status = nowTime.isAfter(WORK_START) ? "LATE" : "PRESENT";
+			String status = nowTime.isAfter(WORK_START) ? LATE : PRESENT;
 			a.setStatus(status);
 			a.setOvertimeMinutes(0);
 
@@ -105,7 +108,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
 			// 조퇴 판정
 			if (nowTime.isBefore(WORK_END)) {
-				a.setStatus("EARLY_LEAVE");
+				a.setStatus(EARLY_LEAVE);
 			} else {
 				// 연장근로 계산
 				LocalDateTime endBase = LocalDateTime.ofInstant(today.toInstant(), ZONE).withHour(WORK_END.getHour())
@@ -115,8 +118,8 @@ public class AttendanceServiceImpl implements AttendanceService {
 
 				a.setOvertimeMinutes((int) Math.max(0, overtime));
 
-				if (!"LATE".equals(a.getStatus())) {
-					a.setStatus("PRESENT");
+				if (!LATE.equals(a.getStatus())) {
+					a.setStatus(PRESENT);
 				}
 			}
 			attendanceRepository.save(a);

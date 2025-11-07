@@ -49,6 +49,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 		}
 	}
 
+	/**
+	 * 전체 직원 조회
+	 */
 	@Override
 	@Transactional(readOnly = true)
 	public List<Employee> getAllEmployees() {
@@ -61,13 +64,16 @@ public class EmployeeServiceImpl implements EmployeeService {
 		return employees;
 	}
 
+	/**
+	 * 직원 상세 조회
+	 */
 	@Override
 	@Transactional(readOnly = true)
 	public Employee getEmployeeDetail(String id) {
 		Employee employee = null;
 		try {
 			employee = employeeRepository.findById(id)
-					.orElseThrow(() -> new IllegalStateException("Employee not found"));
+					.orElseThrow(() -> new IllegalStateException("직원 정보를 찾을 수 없음: " + id));
 		} catch (Exception e) {
 			log.error("Error retrieving employee detail for ID {}: {}", id, e.getMessage());
 		}

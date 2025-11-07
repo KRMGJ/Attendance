@@ -1,5 +1,7 @@
 package egovframework.let.attendance.service.impl;
 
+import static egovframework.let.attendance.common.Enums.ANNUAL;
+import static egovframework.let.attendance.common.Enums.PENDING;
 import static egovframework.let.attendance.common.Utils.formatDateOnly;
 
 import java.time.LocalDate;
@@ -82,7 +84,7 @@ public class LeaveServiceImpl implements LeaveService {
 			}
 
 			int days = calcDays(start, end);
-			if (dto.getType() == "ANNUAL") {
+			if (dto.getType() == ANNUAL) {
 				LeaveBalance bal = leaveBalanceRepository.findByEmpId(emp.getId())
 						.orElseThrow(() -> new IllegalStateException("휴가 잔액 정보 없음"));
 				if (bal.getRemaining() < days) {
@@ -93,7 +95,7 @@ public class LeaveServiceImpl implements LeaveService {
 			}
 
 			LeaveRequest req = LeaveRequest.builder().empId(emp.getId()).type(dto.getType()).startDate(start)
-					.endDate(end).days(days).reason(dto.getReason()).status("PENDING").build();
+					.endDate(end).days(days).reason(dto.getReason()).status(PENDING).build();
 
 			leaveRequestRepository.save(req);
 			return "휴가 신청이 완료되었습니다.";

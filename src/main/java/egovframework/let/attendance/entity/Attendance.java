@@ -46,10 +46,9 @@ public class Attendance {
 	private Date workDate;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Builder.Default
 	@Column(name = "check_in")
 	@Comment("출근 시간")
-	private Date checkIn = new Date();
+	private Date checkIn;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "check_out")

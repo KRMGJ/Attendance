@@ -72,7 +72,7 @@ public class Employee {
 	@Builder.Default
 	@Column(name = "status", length = 20, nullable = false)
 	@Comment("고용 상태(재직중, 휴직중, 퇴사 등)")
-	private String status = "재직중";
+	private String status = "재직 중";
 
 	@OneToOne(mappedBy = "employee", fetch = FetchType.LAZY)
 	private LeaveBalance leaveBalance;
