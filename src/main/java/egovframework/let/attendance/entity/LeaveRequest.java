@@ -10,6 +10,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.Comment;
 
@@ -40,10 +42,12 @@ public class LeaveRequest {
 	@Comment("휴가유형")
 	private String type; // ANNUAL, SICK
 
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "start_date", nullable = false)
 	@Comment("시작일")
 	private Date startDate;
 
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "end_date", nullable = false)
 	@Comment("종료일")
 	private Date endDate;
@@ -60,6 +64,7 @@ public class LeaveRequest {
 	@Comment("상태")
 	private String status; // PENDING, APPROVED, REJECTED
 
+	@Temporal(TemporalType.TIMESTAMP)
 	@Builder.Default
 	@Column(name = "created_at", nullable = false)
 	@Comment("신청일시")

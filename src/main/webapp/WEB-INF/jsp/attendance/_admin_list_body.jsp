@@ -1,5 +1,7 @@
 <%@ page contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="ui" uri="http://egovframework.gov/ctl/ui" %>
 <div class="bg-white border rounded-xl p-6 shadow-sm">
 	<form class="grid md:grid-cols-5 gap-3 mb-4" method="get">
 		<input name="q" value="${param.q}"
@@ -35,4 +37,22 @@
 			</tbody>
 		</table>
 	</div>
+	<div class="mt-4 flex justify-center">
+		<ui:pagination paginationInfo="${paginationInfo}" type="text" jsFunction="linkPage"/>
+	</div>
 </div>
+<script>
+  function linkPage(pageNo) {
+    const q = '${fn:escapeXml(paramQ)}';
+    const from = '${paramFrom}';
+    const to = '${paramTo}';
+    const size = '${size}';
+    const params = new URLSearchParams();
+    if (q) params.set('q', q);
+    if (from) params.set('from', from);
+    if (to) params.set('to', to);
+    if (size) params.set('size', size);
+    params.set('page', pageNo);
+    location.href = '/admin/attendance/list.do?' + params.toString();
+  }
+</script>

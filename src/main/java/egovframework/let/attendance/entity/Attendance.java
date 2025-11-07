@@ -11,6 +11,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.Comment;
 
@@ -38,15 +40,18 @@ public class Attendance {
 	@Comment("직원 식별자(EMPLOYEE.ID 참조)")
 	private String empId;
 
+	@Temporal(TemporalType.DATE)
 	@Column(name = "work_date", nullable = false)
 	@Comment("근무 날짜")
 	private Date workDate;
 
+	@Temporal(TemporalType.TIMESTAMP)
 	@Builder.Default
 	@Column(name = "check_in")
 	@Comment("출근 시간")
 	private Date checkIn = new Date();
 
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "check_out")
 	@Comment("퇴근 시간")
 	private Date checkOut;

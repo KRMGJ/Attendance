@@ -1,6 +1,6 @@
 package egovframework.let.attendance.entity;
 
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,6 +12,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.Comment;
 
@@ -52,14 +54,16 @@ public class Employee {
 	@Comment("직급 또는 직책")
 	private String position;
 
+	@Temporal(TemporalType.TIMESTAMP)
 	@Builder.Default
 	@Column(name = "hire_date", nullable = false)
 	@Comment("입사일")
-	private LocalDate hireDate = LocalDate.now();
+	private Date hireDate = new Date();
 
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "resign_date")
 	@Comment("퇴사일")
-	private LocalDate resignDate;
+	private Date resignDate;
 
 	@Column(name = "employment_type", length = 20, nullable = false)
 	@Comment("고용 형태(정규직, 계약직 등)")

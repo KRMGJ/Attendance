@@ -1,12 +1,18 @@
 package egovframework.let.attendance.web;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.egovframe.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,23 +33,35 @@ public class AdminController {
 	@Autowired
 	private EmployeeService employeeService;
 
+	@InitBinder
+	public void initBinder(WebDataBinder binder) {
+		SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
+		fmt.setLenient(false);
+		binder.registerCustomEditor(Date.class, new CustomDateEditor(fmt, true)); // allowEmpty=true
+	}
+
 	/**
 	 * 출퇴근 기록 조회
 	 */
 	@RequestMapping(value = "/attendance/list.do", method = RequestMethod.GET)
 	public String list(@RequestParam(value = "q", required = false) String q,
-			@RequestParam(value = "from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date from,
-			@RequestParam(value = "to", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date to,
-			@RequestParam(value = "page", defaultValue = "0") int page,
+			@RequestParam(value = "from", required = false) Date from,
+			@RequestParam(value = "to", required = false) Date to,
+			@RequestParam(value = "page", defaultValue = "1") int page,
 			@RequestParam(value = "size", defaultValue = "20") int size, Model model) {
 
-		AdminAttendanceSearch cond = AdminAttendanceSearch.builder().q(q).from(from).to(to).page(page).size(size)
-				.build();
+		Date toEnd = to != null ? endOfDay(to) : null;
 
-		List<AttendanceListDto> list = attendanceService.list(cond).getContent();
-		model.addAttribute("list", list);
-		model.addAttribute("total", attendanceService.list(cond).getTotalElements());
-		model.addAttribute("page", page);
+		AdminAttendanceSearch cond = AdminAttendanceSearch.builder().q(q).from(from).to(toEnd)
+				.page(Math.max(page - 1, 0)).size(size).build();
+
+		Page<AttendanceListDto> list = attendanceService.list(cond);
+
+		model.addAttribute("list", list.getContent());
+		model.addAttribute("paginationInfo", buildPi(page, size, (int) list.getTotalElements()));
+		model.addAttribute("paramQ", q);
+		model.addAttribute("paramFrom", from);
+		model.addAttribute("paramTo", to);
 		model.addAttribute("size", size);
 		return "attendance/admin_list";
 	}
@@ -56,6 +74,25 @@ public class AdminController {
 		List<Employee> list = employeeService.getAllEmployees();
 		model.addAttribute("employees", list);
 		return "employee/list";
+	}
+
+	private Date endOfDay(Date d) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(d);
+		c.set(Calendar.HOUR_OF_DAY, 23);
+		c.set(Calendar.MINUTE, 59);
+		c.set(Calendar.SECOND, 59);
+		c.set(Calendar.MILLISECOND, 999);
+		return c.getTime();
+	}
+
+	private PaginationInfo buildPi(int page, int size, int total) {
+		PaginationInfo pi = new PaginationInfo();
+		pi.setCurrentPageNo(page);
+		pi.setRecordCountPerPage(size);
+		pi.setPageSize(10);
+		pi.setTotalRecordCount(total);
+		return pi;
 	}
 
 }

@@ -1,6 +1,6 @@
 package egovframework.let.attendance.service.impl;
 
-import static egovframework.let.attendance.common.Utils.formatDate;
+import static egovframework.let.attendance.common.Utils.formatDateOnly;
 
 import java.time.LocalDate;
 import java.time.Year;
@@ -119,8 +119,8 @@ public class LeaveServiceImpl implements LeaveService {
 			requests = leaveRequests.stream().map(lr -> {
 				LeaveRequestListDto dto = new LeaveRequestListDto();
 				dto.setType(lr.getType());
-				dto.setStartDate(formatDate(lr.getStartDate()));
-				dto.setEndDate(formatDate(lr.getEndDate()));
+				dto.setStartDate(formatDateOnly(lr.getStartDate()));
+				dto.setEndDate(formatDateOnly(lr.getEndDate()));
 				dto.setDays(lr.getDays());
 				dto.setReason(lr.getReason());
 				dto.setStatus(lr.getStatus());

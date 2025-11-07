@@ -9,4 +9,9 @@ public class Utils {
 		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		return date.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime().format(fmt);
 	}
+
+	public static String formatDateOnly(Date date) {
+		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		return date.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime().format(fmt);
+	}
 }
