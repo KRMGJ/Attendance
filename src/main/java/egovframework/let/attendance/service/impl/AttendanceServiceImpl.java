@@ -18,7 +18,6 @@ import egovframework.let.attendance.entity.Employee;
 import egovframework.let.attendance.repository.AttendanceRepository;
 import egovframework.let.attendance.repository.EmployeeRepository;
 import egovframework.let.attendance.service.AttendanceService;
-import egovframework.let.attendance.service.AttendanceVO;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -38,12 +37,6 @@ public class AttendanceServiceImpl implements AttendanceService {
 		// username을 이메일로 사용 중이라는 전제
 		return employeeRepository.findByEmail(username)
 				.orElseThrow(() -> new IllegalArgumentException("직원 정보를 찾을 수 없음: " + username));
-	}
-
-	@Override
-	public List<AttendanceVO> selectAttendanceList(AttendanceVO vo) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/**

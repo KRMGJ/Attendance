@@ -5,8 +5,6 @@ import java.util.List;
 import egovframework.let.attendance.dto.response.AttendanceViewDto;
 
 public interface AttendanceService {
-	List<AttendanceVO> selectAttendanceList(AttendanceVO vo);
-
 	/**
 	 * 출근 처리
 	 * 
