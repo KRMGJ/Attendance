@@ -1,11 +1,12 @@
 package egovframework.let.attendance.service.impl;
 
+import static egovframework.let.attendance.common.Utils.formatDate;
+
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -113,7 +114,6 @@ public class AttendanceServiceImpl implements AttendanceService {
 	 */
 	@Override
 	public AttendanceViewDto getToday(String empId) {
-		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		LocalDate today = LocalDate.now(ZONE);
 		AttendanceViewDto attendance = null;
 		try {
@@ -122,8 +122,8 @@ public class AttendanceServiceImpl implements AttendanceService {
 				return empty;
 			});
 			attendance = AttendanceViewDto.builder().workDate(att.getWorkDate().toString())
-					.checkIn(att.getCheckIn() != null ? att.getCheckIn().format(fmt) : null)
-					.checkOut(att.getCheckOut() != null ? att.getCheckOut().format(fmt) : null).status(att.getStatus())
+					.checkIn(att.getCheckIn() != null ? formatDate(att.getCheckIn()) : null)
+					.checkOut(att.getCheckOut() != null ? formatDate(att.getCheckOut()) : null).status(att.getStatus())
 					.build();
 		} catch (Exception e) {
 			log.error("Error fetching today's attendance for empId {}: {}", empId, e.getMessage());
@@ -136,14 +136,13 @@ public class AttendanceServiceImpl implements AttendanceService {
 	 */
 	@Override
 	public List<AttendanceViewDto> getRecent(String empId) {
-		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		List<AttendanceViewDto> recent = null;
 		try {
 			List<Attendance> att = attendanceRepository.findTop7ByEmpIdOrderByWorkDateDesc(empId);
 			recent = att.stream()
 					.map(a -> AttendanceViewDto.builder().workDate(a.getWorkDate().toString())
-							.checkIn(a.getCheckIn() != null ? a.getCheckIn().format(fmt) : null)
-							.checkOut(a.getCheckOut() != null ? a.getCheckOut().format(fmt) : null)
+							.checkIn(a.getCheckIn() != null ? formatDate(a.getCheckIn()) : null)
+							.checkOut(a.getCheckOut() != null ? formatDate(a.getCheckOut()) : null)
 							.status(a.getStatus()).build())
 					.collect(Collectors.toList());
 		} catch (Exception e) {

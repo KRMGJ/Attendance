@@ -22,11 +22,11 @@
 			</p>
 			<div class="flex gap-2">
 				<form method="post" action="<c:url value='/attendance/checkin.do'/>">
-					<button type="submit" id="checkinBtn" class="px-4 py-2 rounded-md bg-emerald-600 text-white">출근</button>
+					<button class="px-4 py-2 rounded-md bg-emerald-600 text-white">출근</button>
 				</form>
 				<form method="post"
 					action="<c:url value='/attendance/checkout.do'/>">
-					<button type="submit" id="checkoutBtn" class="px-4 py-2 rounded-md bg-rose-600 text-white">퇴근</button>
+					<button class="px-4 py-2 rounded-md bg-rose-600 text-white">퇴근</button>
 				</form>
 			</div>
 		</div>

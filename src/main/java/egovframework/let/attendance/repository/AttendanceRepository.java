@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import egovframework.let.attendance.entity.Attendance;
 
 @Repository
-public interface AttendanceRepository extends JpaRepository<Attendance, String> {
+public interface AttendanceRepository extends JpaRepository<Attendance, String>, AttendanceRepositoryCustom {
 	Optional<Attendance> findByEmpIdAndWorkDate(String empId, LocalDate workDate);
 
 	boolean existsByEmpIdAndWorkDate(String empId, LocalDate workDate);
