@@ -23,6 +23,9 @@ public class AdminServiceImpl implements AdminService {
 	@Autowired
 	private AttendanceRepository attendanceRepository;
 
+	/**
+	 * 관리자 출퇴근 기록 조회
+	 */
 	@Override
 	@Transactional(readOnly = true)
 	public Page<AttendanceListDto> list(AdminAttendanceSearch cond) {

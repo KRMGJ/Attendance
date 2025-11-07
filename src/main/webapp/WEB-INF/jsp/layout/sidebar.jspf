@@ -12,7 +12,7 @@
 		<div class="mt-3 text-xs uppercase text-gray-500 px-3">근태</div>
 		<a href="<c:url value='/attendance/my.do'/>"
 			class="block px-3 py-2 rounded hover:bg-gray-100">내 근태</a> <a
-			href="<c:url value='/attendance/admin/list.do'/>"
+			href="<c:url value='/admin/attendance/list.do'/>"
 			class="block px-3 py-2 rounded hover:bg-gray-100">근태 관리</a>
 		<div class="mt-3 text-xs uppercase text-gray-500 px-3">휴가</div>
 		<a href="<c:url value='/leave/requests.do'/>"

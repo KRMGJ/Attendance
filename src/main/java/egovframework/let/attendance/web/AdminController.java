@@ -22,7 +22,7 @@ public class AdminController {
 	@Autowired
 	private AdminService adminService;
 
-	@RequestMapping(value = "/employee/list.do", method = RequestMethod.GET)
+	@RequestMapping(value = "/attendance/list.do", method = RequestMethod.GET)
 	public String list(@RequestParam(value = "q", required = false) String q,
 			@RequestParam(value = "from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
 			@RequestParam(value = "to", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
