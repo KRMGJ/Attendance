@@ -24,16 +24,25 @@
 				</tr>
 			</thead>
 			<tbody>
-				<c:forEach var="row" items="${list}">
-					<tr class="border-t">
-						<td class="px-4 py-2"><c:out value="${row.employee.name}" /></td>
-						<td class="px-4 py-2"><c:out value="${row.workDate}" /></td>
-						<td class="px-4 py-2"><c:out value="${row.checkIn}" /></td>
-						<td class="px-4 py-2"><c:out value="${row.checkOut}" /></td>
-						<td class="px-4 py-2"><c:out value="${row.status}" /></td>
-						<td class="px-4 py-2"><c:out value="${row.overtimeMinutes}" /></td>
-					</tr>
-				</c:forEach>
+			<c:choose>
+					<c:when test="${empty list}">
+						<tr>
+							<td class="px-4 py-2 text-center" colspan="6">조회된 근태 기록이 없습니다.</td>
+						</tr>
+					</c:when>
+					<c:otherwise>
+						<c:forEach var="row" items="${list}">
+							<tr class="border-t">
+								<td class="px-4 py-2"><c:out value="${row.employee.name}" /></td>
+								<td class="px-4 py-2"><c:out value="${row.workDate}" /></td>
+								<td class="px-4 py-2"><c:out value="${empty row.checkIn ? '-' : row.checkIn}" /></td>
+								<td class="px-4 py-2"><c:out value="${empty row.checkOut ? '-' : row.checkOut}" /></td>
+								<td class="px-4 py-2"><c:out value="${row.status}" /></td>
+								<td class="px-4 py-2"><c:out value="${row.overtimeMinutes}" /></td>
+							</tr>
+						</c:forEach>
+					</c:otherwise>
+				</c:choose>
 			</tbody>
 		</table>
 	</div>

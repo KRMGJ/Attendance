@@ -17,15 +17,24 @@
 			</tr>
 		</thead>
 		<tbody>
-			<c:forEach var="row" items="${myAttendance}">
-				<tr class="border-t">
-					<td class="px-4 py-2"><c:out value="${row.workDate}" /></td>
-					<td class="px-4 py-2"><c:out value="${row.checkIn}" /></td>
-					<td class="px-4 py-2"><c:out value="${row.checkOut}" /></td>
-					<td class="px-4 py-2"><c:out value="${row.status}" /></td>
-					<td class="px-4 py-2"><c:out value="${row.overtimeMinutes}" /></td>
-				</tr>
-			</c:forEach>
+			<c:choose>
+				<c:when test="${not empty myAttendance}">
+					<c:forEach var="row" items="${myAttendance}">
+						<tr class="border-t">
+							<td class="px-4 py-2"><c:out value="${row.workDate}" /></td>
+							<td class="px-4 py-2"><c:out value="${empty row.checkIn ? '-' : row.checkIn}" /></td>
+							<td class="px-4 py-2"><c:out value="${empty row.checkOut ? '-' : row.checkOut}" /></td>
+							<td class="px-4 py-2"><c:out value="${row.status}" /></td>
+							<td class="px-4 py-2"><c:out value="${row.overtimeMinutes}" /></td>
+						</tr>
+					</c:forEach>
+				</c:when>
+				<c:otherwise>
+					<tr>
+						<td class="px-4 py-2 text-center" colspan="5">근태 기록이 없습니다.</td>
+					</tr>
+				</c:otherwise>
+			</c:choose>
 		</tbody>
 	</table>
 </div>

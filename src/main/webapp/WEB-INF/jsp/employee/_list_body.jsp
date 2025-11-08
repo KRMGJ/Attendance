@@ -18,20 +18,30 @@ request.setAttribute("pageTitle", "직원 목록");
 					<th class="px-4 py-2 text-left">이메일</th>
 					<th class="px-4 py-2 text-left">직급</th>
 					<th class="px-4 py-2 text-left">상태</th>
-					<th class="px-4 py-2"></th>
+					<th class="px-4 py-2 text-left">고용 형태</th>
 				</tr>
 			</thead>
 			<tbody>
-				<c:forEach var="e" items="${employees}">
-					<tr class="border-t">
-						<td class="px-4 py-2"><c:out value="${e.name}" /></td>
-						<td class="px-4 py-2"><c:out value="${e.email}" /></td>
-						<td class="px-4 py-2"><c:out value="${e.position}" /></td>
-						<td class="px-4 py-2"><c:out value="${e.status}" /></td>
-						<td class="px-4 py-2 text-right"><a class="underline"
-							href="<c:url value='/employee/detail.do?id=${e.id}'/>">보기</a></td>
-					</tr>
-				</c:forEach>
+				<c:choose>
+					<c:when test="${not empty employees}">
+						<c:forEach var="e" items="${employees}">
+							<tr class="border-t">
+								<td class="px-4 py-2"><c:out value="${e.name}" /></td>
+								<td class="px-4 py-2"><c:out value="${e.email}" /></td>
+								<td class="px-4 py-2"><c:out value="${e.position}" /></td>
+								<td class="px-4 py-2"><c:out value="${e.status}" /></td>
+								<td class="px-4 py-2"><c:out value="${e.employmentType}" /></td>
+								<td class="px-4 py-2 text-right"><a class="underline"
+									href="<c:url value='/employee/detail.do?id=${e.id}'/>">보기</a></td>
+							</tr>
+						</c:forEach>
+					</c:when>
+					<c:otherwise>
+						<tr>
+							<td class="px-4 py-2 text-center" colspan="5">등록된 직원이 없습니다.</td>
+						</tr>
+					</c:otherwise>
+				</c:choose>
 			</tbody>
 		</table>
 	</div>

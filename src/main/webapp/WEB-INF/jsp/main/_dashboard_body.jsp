@@ -16,9 +16,19 @@
 			<h3 class="font-semibold mb-2">오늘 근태</h3>
 			<p class="text-sm mb-3 text-gray-600">
 				출근:
-				<c:out value="${today.checkIn}" />
+				<c:choose>
+					<c:when test="${not empty today.checkIn}">
+						<c:out value="${today.checkIn}" />
+					</c:when>
+					<c:otherwise>-</c:otherwise>
+				</c:choose>
 				/ 퇴근:
-				<c:out value="${today.checkOut}" />
+				<c:choose>
+					<c:when test="${not empty today.checkOut}">
+						<c:out value="${today.checkOut}" />
+					</c:when>
+					<c:otherwise>-</c:otherwise>
+				</c:choose>
 			</p>
 			<div class="flex gap-2">
 				<form method="post" action="<c:url value='/attendance/checkin.do'/>">
@@ -56,14 +66,23 @@
 					</tr>
 				</thead>
 				<tbody>
-					<c:forEach var="a" items="${recentAttendance}">
+				<c:choose>
+					<c:when test="${not empty recentAttendance}">
+						<c:forEach var="a" items="${recentAttendance}">
+							<tr class="border-t">
+								<td class="px-4 py-2"><c:out value="${empty a.workDate ? '-' : a.workDate}" /></td>
+								<td class="px-4 py-2"><c:out value="${empty a.checkIn ? '-' : a.checkIn}" /></td>
+								<td class="px-4 py-2"><c:out value="${empty a.checkOut ? '-' : a.checkOut}" /></td>
+								<td class="px-4 py-2"><c:out value="${a.status}" /></td>
+							</tr>
+						</c:forEach>
+					</c:when>
+					<c:otherwise>
 						<tr class="border-t">
-							<td class="px-4 py-2"><c:out value="${a.workDate}" /></td>
-							<td class="px-4 py-2"><c:out value="${a.checkIn}" /></td>
-							<td class="px-4 py-2"><c:out value="${a.checkOut}" /></td>
-							<td class="px-4 py-2"><c:out value="${a.status}" /></td>
+							<td class="px-4 py-2 text-center" colspan="4">최근 근태 기록이 없습니다.</td>
 						</tr>
-					</c:forEach>
+					</c:otherwise>
+				</c:choose>
 				</tbody>
 			</table>
 		</div>

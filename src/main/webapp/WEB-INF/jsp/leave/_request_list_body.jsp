@@ -15,14 +15,23 @@
 			</tr>
 		</thead>
 		<tbody>
-			<c:forEach var="r" items="${requests}">
-				<tr class="border-t">
-					<td class="px-4 py-2"><c:out value="${r.startDate}" /> ~ <c:out value="${r.endDate}" /></td>
-					<td class="px-4 py-2"><c:out value="${r.type}" /></td>
-					<td class="px-4 py-2"><c:out value="${r.status}" /></td>
-					<td class="px-4 py-2"><c:out value="${r.approver}" /></td>
-				</tr>
-			</c:forEach>
+			<c:choose>
+			    <c:when test="${not empty requests}">
+					<c:forEach var="r" items="${requests}">
+						<tr class="border-t">
+							<td class="px-4 py-2"><c:out value="${r.startDate}" /> ~ <c:out value="${r.endDate}" /></td>
+							<td class="px-4 py-2"><c:out value="${r.type}" /></td>
+							<td class="px-4 py-2"><c:out value="${r.status}" /></td>
+							<td class="px-4 py-2"><c:out value="${empty r.approver ? '-' : r.approver}" /></td>
+						</tr>
+					</c:forEach>
+				</c:when>
+				<c:otherwise>
+					<tr>
+						<td class="px-4 py-2 text-center" colspan="4">휴가 신청 기록이 없습니다.</td>
+					</tr>
+				</c:otherwise>
+			</c:choose>
 		</tbody>
 	</table>
 </div>
