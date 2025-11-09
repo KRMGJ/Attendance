@@ -63,9 +63,16 @@
 	<listener>
 		<listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
 	</listener>
-
-
 	<!-- security end -->
+	
+	<filter>
+    	<filter-name>noCacheFilter</filter-name>
+    	<filter-class>egovframework.let.attendance.common.NoCacheFilter</filter-class>
+	</filter>
+	<filter-mapping>
+    	<filter-name>noCacheFilter</filter-name>
+    	<url-pattern>/*</url-pattern>
+	</filter-mapping>
 
 	<context-param>
 		<param-name>contextConfigLocation</param-name>

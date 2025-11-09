@@ -5,9 +5,13 @@
 		<h1 class="text-xl font-semibold">전자정부 근태관리</h1>
 		<div class="flex items-center gap-3">
 			<c:if test="${not empty sessionScope.SPRING_SECURITY_CONTEXT}">
-				<span class="text-sm text-gray-600"> <c:out
-						value="${sessionScope.empName}" /> 님
-				</span>
+				<span class="text-sm text-gray-600"><c:out value="${sessionScope.empName}" /> 님</span>
+				<span id="sid" style="">${pageContext.session.id}</span>
+		        <div class="flex items-center gap-2" id="sess-box">
+          			<span class="text-xs text-gray-500">남은시간</span>
+          			<span id="sess-remaining" class="text-sm font-mono px-2 py-0.5 rounded bg-gray-100">--:--</span>
+          			<button id="sess-extend" type="button" class="px-2 py-1 rounded-md border text-sm">연장</button>
+        		</div>
 				<form action="<c:url value='/logout.do'/>" method="post">
 					<button class="px-3 py-1.5 rounded-md border text-sm">로그아웃</button>
 				</form>
@@ -19,3 +23,11 @@
 		</div>
 	</div>
 </header>
+<c:if test="${pageContext.request.userPrincipal != null}">
+	<script src="<c:url value='/js/layout/session-timer.js'/>"></script>
+</c:if>
+
+<c:if test="${pageContext.request.userPrincipal != null}">
+  <!-- 개발 중만 노출 -->
+  <span id="sid" style="display:none">${pageContext.session.id}</span>
+</c:if>

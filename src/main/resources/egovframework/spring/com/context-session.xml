@@ -24,7 +24,7 @@
 		<property name="ignoreFailedDrops" value="true"/>
 		<property name="scripts">
 			<list>
-				<value>classpath:sql/security_schema.sql</value> <!-- 직접 생성한 파일 경로 -->
+				<value>classpath:sql/security_schema.sql</value>
 			</list>
 		</property>
 	</bean>
@@ -37,6 +37,16 @@
     
 	<bean class="org.springframework.session.jdbc.config.annotation.web.http.JdbcHttpSessionConfiguration">
     	<property name="maxInactiveIntervalInSeconds" value="1800"/> <!-- 30분 -->
-  </bean>
+  	</bean>
+  	
+	<bean id="cookieSerializer" class="org.springframework.session.web.http.DefaultCookieSerializer">
+	    <property name="cookieName" value="JSESSIONID"/>
+	    <property name="cookiePath" value="/"/>
+	    <property name="sameSite" value="Lax"/>
+	    <property name="useBase64Encoding" value="false"/>
+	</bean>
+	<bean id="httpSessionIdResolver" class="org.springframework.session.web.http.CookieHttpSessionIdResolver">
+	    <property name="cookieSerializer" ref="cookieSerializer"/>
+	</bean>
 
 </beans>

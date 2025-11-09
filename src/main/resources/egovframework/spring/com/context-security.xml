@@ -30,10 +30,12 @@
 
 	<security:http use-expressions="true">
 		<security:csrf disabled="true" />
-		<security:intercept-url pattern="/**" access="permitAll" />
-<!-- 		<security:intercept-url pattern="/login.do" access="permitAll" />
-		<security:intercept-url pattern="/employee/join.do" access="permitAll" />
-		<security:intercept-url pattern="/**" access="isAuthenticated()" /> -->
+		<security:intercept-url pattern="/login.do"  access="permitAll"/>
+		<security:intercept-url pattern="/signup.do" access="permitAll"/>
+		<security:intercept-url pattern="/auth/session/**" access="permitAll"/>
+
+		<!-- 나머지는 인증 필요 -->
+		<security:intercept-url pattern="/**" access="isAuthenticated()"/>
 		<security:form-login login-page="/login.do"
 							 login-processing-url="/loginProcess.do" 
 							 default-target-url="/main.do"
@@ -48,6 +50,10 @@
 			<security:concurrency-control max-sessions="1" error-if-maximum-exceeded="false" />
 		</security:session-management>
 	</security:http>
+	
+	<bean id="unauthorizedEntryPoint" class="org.springframework.security.web.authentication.HttpStatusEntryPoint">
+    	<constructor-arg value="UNAUTHORIZED"/>
+	</bean>
 
 	<!-- URL에 세미콜론(semicolon)허용 여부(기본값/false) -->
 	<bean id="egovStrictHttpFirewall" class="org.springframework.security.web.firewall.StrictHttpFirewall">
