@@ -144,6 +144,7 @@ public class LeaveServiceImpl implements LeaveService {
 				dto.setStatus(lr.getStatus());
 				dto.setCreatedAt(lr.getCreatedAt());
 				dto.setApprover(lr.getApprover());
+				dto.setApprovedAt(lr.getApprovedAt() != null ? formatDateOnly(lr.getApprovedAt()) : null);
 				return dto;
 			}).collect(Collectors.toList());
 

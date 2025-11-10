@@ -24,4 +24,5 @@ public class LeaveRequestListDto {
 	private String status;
 	private Date createdAt;
 	private String approver;
+	private String approvedAt;
 }

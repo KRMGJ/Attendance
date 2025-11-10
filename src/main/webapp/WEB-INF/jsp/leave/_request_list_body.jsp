@@ -10,8 +10,9 @@
 			<tr>
 				<th class="px-4 py-2 text-left">기간</th>
 				<th class="px-4 py-2 text-left">구분</th>
-				<th class="px-4 py-2 text-left">상태</th>
 				<th class="px-4 py-2 text-left">승인자</th>
+				<th class="px-4 py-2 text-left">승인 일시</th>
+				<th class="px-4 py-2 text-left">상태</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -21,8 +22,9 @@
 						<tr class="border-t">
 							<td class="px-4 py-2"><c:out value="${r.startDate}" /> ~ <c:out value="${r.endDate}" /></td>
 							<td class="px-4 py-2"><c:out value="${r.type}" /></td>
-							<td class="px-4 py-2"><c:out value="${r.status}" /></td>
 							<td class="px-4 py-2"><c:out value="${empty r.approver ? '-' : r.approver}" /></td>
+							<td class="px-4 py-2"><c:out value="${empty r.approvedAt ? '-' : r.approvedAt}" /></td>
+							<td class="px-4 py-2"><c:out value="${r.status}" /></td>
 						</tr>
 					</c:forEach>
 				</c:when>
