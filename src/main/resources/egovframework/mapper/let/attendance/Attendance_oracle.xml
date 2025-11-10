@@ -27,17 +27,23 @@
 		<result property="department" column="department" />
 		<result property="headcount" column="headcount" />
 		<result property="workDays" column="work_days" />
-		<result property="totalMinutes" column="total_minutes" javaType="int" />
-		<result property="totalOvertime" column="total_overtime" javaType="int" />
-		<result property="nightOvertime" column="night_overtime" javaType="int" />
-		<result property="weekendOvertime" column="weekend_overtime" javaType="int" />
+		<result property="totalMinutes" column="total_minutes"
+			javaType="int" />
+		<result property="totalOvertime" column="total_overtime"
+			javaType="int" />
+		<result property="nightOvertime" column="night_overtime"
+			javaType="int" />
+		<result property="weekendOvertime" column="weekend_overtime"
+			javaType="int" />
 		<result property="lateCount" column="late_cnt" />
 		<result property="earlyLeaveCount" column="early_leave_cnt" />
 		<result property="absentCount" column="absent_days" />
 		<result property="leaveDays" column="total_leave_days" />
 		<result property="sickLeaveDays" column="sick_leave_days" />
-		<result property="avgMinutes" column="avg_minutes" javaType="int" />
-		<result property="avgOvertimePerCapita" column="avg_overtime_pc" javaType="int" />
+		<result property="avgMinutes" column="avg_minutes"
+			javaType="int" />
+		<result property="avgOvertimePerCapita"
+			column="avg_overtime_pc" javaType="int" />
 	</resultMap>
 
 	<!-- 관리자용 출퇴근기록 조회 -->
@@ -118,81 +124,108 @@
 		ASC
 	</select>
 
-	<select id="selectMonthlyDeptReport" parameterType="map"
-		resultMap="MonthlyDeptReportMap">
-		WITH A AS (
-		SELECT NVL(TRIM(e.department), '-') AS dept,
-		a.emp_id,
-		TRUNC(a.work_date) AS work_date,
-		a.check_in, a.check_out, a.status,
-		NVL(a.overtime_minutes,0) AS overtime_minutes
+	<select id="selectMonthlyDeptReport" parameterType="map" resultMap="MonthlyDeptReportMap">
+		WITH
+		A AS (
+		/* 근태 원천: 부서 키 정규화 */
+		SELECT
+		NVL(TRIM(e.department), '-') AS dept,
+			a.emp_id,
+			TRUNC(a.work_date) AS work_date,
+			a.check_in, a.check_out,
+			a.status,
+			NVL(a.overtime_minutes,0) AS overtime_minutes
 		FROM ATTENDANCE a
 		JOIN EMPLOYEE e ON e.id = a.emp_id
-		WHERE TRUNC(a.work_date) BETWEEN TRUNC(#{start,jdbcType=DATE}) AND
-		TRUNC(#{end,jdbcType=DATE})
+		WHERE TRUNC(a.work_date) BETWEEN TRUNC(CAST(#{start,jdbcType=DATE} AS DATE))
+		AND TRUNC(CAST(#{end, jdbcType=DATE} AS DATE))
 		),
 		L AS (
-		/* 승인된 휴가 총일수(병가 포함) */
-		SELECT NVL(TRIM(e.department), '-') AS dept,
-		SUM(GREATEST(0,
-		LEAST(TRUNC(CAST(l.end_date AS DATE)), TRUNC(CAST(#{end,jdbcType=DATE} AS DATE)))
-		- GREATEST(TRUNC(CAST(l.start_date AS DATE)),
-		TRUNC(CAST(#{start,jdbcType=DATE} AS DATE))) + 1
-		)) AS total_leave_days
-		FROM LEAVE_REQUEST l
-		JOIN EMPLOYEE e ON e.id = l.emp_id
-		WHERE TRIM(l.status) IN ('APPROVED','승인 완료')
-		AND TRUNC(CAST(l.start_date AS DATE)) &gt;= TRUNC(CAST(#{end,jdbcType=DATE}
-		AS DATE))
-		AND TRUNC(CAST(l.end_date AS DATE)) >= TRUNC(CAST(#{start,jdbcType=DATE}
-		AS DATE))
-		GROUP BY NVL(TRIM(e.department), '-')
+			/* 승인된 휴가: 총일수 + 병가일수 */
+			SELECT NVL(TRIM(e.department), '-') AS dept,
+				SUM(
+					GREATEST(
+						0,
+						( LEAST(TRUNC(CAST(l.end_date AS DATE)), TRUNC(CAST(#{end, jdbcType=DATE} AS DATE)))
+						- GREATEST(TRUNC(CAST(l.start_date AS DATE)), TRUNC(CAST(#{start,jdbcType=DATE} AS DATE))) + 1 )
+						)
+					) AS total_leave_days,
+				SUM(
+					CASE WHEN TRIM(l.type) IN ('병가','SICK') THEN
+						GREATEST(
+							0,
+							( LEAST(TRUNC(CAST(l.end_date AS DATE)), TRUNC(CAST(#{end, jdbcType=DATE} AS DATE)))
+							- GREATEST(TRUNC(CAST(l.start_date AS DATE)), TRUNC(CAST(#{start,jdbcType=DATE} AS DATE))) + 1 )
+						    )
+						ELSE 0 END
+					) AS sick_leave_days
+			FROM LEAVE_REQUEST l
+			JOIN EMPLOYEE e ON e.id = l.emp_id
+			WHERE TRIM(l.status) IN ('APPROVED','승인 완료')
+				AND TRUNC(CAST(l.start_date AS DATE)) &lt;= TRUNC(CAST(#{end, jdbcType=DATE} AS DATE))
+				AND TRUNC(CAST(l.end_date AS DATE)) >= TRUNC(CAST(#{start,jdbcType=DATE} AS DATE))
+			GROUP BY NVL(TRIM(e.department), '-')
 		),
 		D AS (
-		/* 결근 일수 합산 포함 */
-		SELECT dept,
-		COUNT(DISTINCT emp_id) AS headcount,
-		COUNT(CASE WHEN status IN ('정상 출근','지각','조퇴','PRESENT','LATE','EARLY_LEAVE')
-		THEN 1 END) AS work_days,
-		SUM(CASE WHEN status IN ('정상 출근','지각','조퇴','PRESENT','LATE','EARLY_LEAVE')
-		THEN NVL(TRUNC((CAST(check_out AS DATE) - CAST(check_in AS DATE)) * 24
-		* 60), 0)
-		ELSE 0 END) AS total_minutes,
-		SUM(NVL(TRUNC(overtime_minutes),0)) AS total_overtime,
-		SUM(CASE WHEN
-		((check_out IS NOT NULL AND TO_NUMBER(TO_CHAR(check_out,'HH24')) BETWEEN 22 AND
-		23)
-		OR (check_in IS NOT NULL AND TO_NUMBER(TO_CHAR(check_in,'HH24')) BETWEEN
-		0 AND 5))
-		THEN NVL(TRUNC(overtime_minutes),0) ELSE 0 END) AS night_overtime,
-		SUM(CASE WHEN TO_CHAR(work_date,'DY','NLS_DATE_LANGUAGE=ENGLISH') IN
-		('SAT','SUN')
-		THEN NVL(TRUNC(overtime_minutes),0) ELSE 0 END) AS weekend_overtime,
-		SUM(CASE WHEN status IN ('지각','LATE') THEN 1 ELSE 0 END) AS late_cnt,
-		SUM(CASE WHEN status IN ('조퇴','EARLY_LEAVE') THEN 1 ELSE 0 END) AS
-		early_leave_cnt,
-		SUM(CASE WHEN status IN ('결근','ABSENT') THEN 1 ELSE 0 END) AS absent_days
+			/* 근무·연장·지각·조퇴·결근 집계 */
+			SELECT dept AS department,
+				COUNT(DISTINCT emp_id) AS headcount,
+				COUNT(CASE WHEN status IN ('정상 출근','지각','조퇴','PRESENT','LATE','EARLY_LEAVE') THEN 1 END) AS work_days,
+
+			/* 총 근무분(분) */
+			SUM(CASE WHEN status IN ('정상 출근','지각','조퇴','PRESENT','LATE','EARLY_LEAVE')
+				THEN NVL(TRUNC((CAST(check_out AS DATE) - CAST(check_in AS DATE)) * 24 * 60), 0)
+				ELSE 0 END) AS total_minutes,
+
+			/* 총 연장(분) */
+			SUM(NVL(TRUNC(overtime_minutes),0)) AS total_overtime,
+
+			/* 야간 연장(22~05) */
+			SUM(CASE WHEN
+				( (check_out IS NOT NULL AND TO_NUMBER(TO_CHAR(check_out,'HH24')) BETWEEN 22 AND 23)
+					OR (check_in IS NOT NULL AND TO_NUMBER(TO_CHAR(check_in ,'HH24')) BETWEEN 0 AND 5) )
+				THEN NVL(TRUNC(overtime_minutes),0) ELSE 0 END) AS night_overtime,
+
+			/* 주말 연장(토/일) */
+			SUM(CASE WHEN TO_CHAR(work_date,'DY','NLS_DATE_LANGUAGE=ENGLISH') IN ('SAT','SUN')
+				THEN NVL(TRUNC(overtime_minutes),0) ELSE 0 END) AS weekend_overtime,
+
+			SUM(CASE WHEN status IN ('지각','LATE') THEN 1 ELSE 0 END) AS late_cnt,
+			SUM(CASE WHEN status IN ('조퇴','EARLY_LEAVE') THEN 1 ELSE 0 END) AS early_leave_cnt,
+
+			/* 결근 일수(= absent_days) */
+			SUM(CASE WHEN status IN ('결근','ABSENT') THEN 1 ELSE 0 END) AS absent_days
 		FROM A
 		GROUP BY dept
 		),
-		C AS (SELECT dept FROM D UNION SELECT dept FROM L)
+		C AS (
+			/* 결과에 포함할 부서 집합 */
+			SELECT department AS dept FROM D
+			UNION
+			SELECT dept FROM L
+		)
 		SELECT
-		c.dept AS department,
-		NVL(d.headcount,0) AS headcount,
-		NVL(d.work_days,0) AS work_days,
-		NVL(d.total_minutes,0) AS total_minutes,
-		NVL(d.total_overtime,0) AS total_overtime,
-		NVL(d.night_overtime,0) AS night_overtime,
-		NVL(d.weekend_overtime,0) AS weekend_overtime,
-		NVL(d.late_cnt,0) AS late_cnt,
-		NVL(d.early_leave_cnt,0) AS early_leave_cnt,
-		NVL(d.absent_days,0) AS absent_days, -- 결근 일수 = 건수
-		NVL(l.total_leave_days,0) AS total_leave_days -- 승인 휴가 총일수 = 일수
+			c.dept AS department,
+			NVL(d.headcount,0) AS headcount,
+			NVL(d.work_days,0) AS work_days,
+			NVL(d.total_minutes,0) AS total_minutes,
+			NVL(d.total_overtime,0) AS total_overtime,
+			NVL(d.night_overtime,0) AS night_overtime,
+			NVL(d.weekend_overtime,0) AS weekend_overtime,
+			NVL(d.late_cnt,0) AS late_cnt,
+			NVL(d.early_leave_cnt,0) AS early_leave_cnt,
+			NVL(d.absent_days,0) AS absent_days,
+			NVL(l.total_leave_days,0) AS total_leave_days,
+			NVL(l.sick_leave_days,0) AS sick_leave_days,
+
+			/* 파생 평균(분) */
+			CASE WHEN NVL(d.headcount,0) > 0
+				THEN FLOOR(NVL(d.total_minutes,0) / d.headcount) ELSE 0 END AS avg_minutes,
+			CASE WHEN NVL(d.headcount,0) > 0
+				THEN FLOOR(NVL(d.total_overtime,0) / d.headcount) ELSE 0 END AS avg_overtime_pc
 		FROM C c
-		LEFT JOIN D d ON d.dept = c.dept
+		LEFT JOIN D d ON d.department = c.dept
 		LEFT JOIN L l ON l.dept = c.dept
 		ORDER BY c.dept
 	</select>
-
-
 </mapper>
