@@ -13,4 +13,6 @@ public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Stri
 	List<LeaveRequest> findByEmpIdOrderByIdDesc(String empId);
 
 	Optional<LeaveRequest> findByIdAndEmpId(String id, String empId);
+
+	List<LeaveRequest> findByStatusOrderByCreatedAtAsc(String status);
 }

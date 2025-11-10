@@ -1,5 +1,8 @@
 package egovframework.let.attendance.web;
 
+import static egovframework.let.attendance.common.Enums.PENDING;
+
+import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -20,8 +23,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import egovframework.let.attendance.dto.request.AdminAttendanceSearch;
 import egovframework.let.attendance.dto.response.AttendanceListDto;
 import egovframework.let.attendance.entity.Employee;
+import egovframework.let.attendance.entity.LeaveRequest;
+import egovframework.let.attendance.repository.LeaveRequestRepository;
 import egovframework.let.attendance.service.AttendanceService;
 import egovframework.let.attendance.service.EmployeeService;
+import egovframework.let.attendance.service.LeaveService;
 
 @Controller
 @RequestMapping("/admin")
@@ -32,6 +38,12 @@ public class AdminController {
 
 	@Autowired
 	private EmployeeService employeeService;
+
+	@Autowired
+	private LeaveService leaveService;
+
+	@Autowired
+	private LeaveRequestRepository leaveRequestRepository;
 
 	@InitBinder
 	public void initBinder(WebDataBinder binder) {
@@ -74,6 +86,25 @@ public class AdminController {
 		List<Employee> list = employeeService.getAllEmployees();
 		model.addAttribute("employees", list);
 		return "employee/list";
+	}
+
+	@RequestMapping(value = "/leave/pending.do", method = RequestMethod.GET)
+	public String pending(Model model) {
+		List<LeaveRequest> pending = leaveRequestRepository.findByStatusOrderByCreatedAtAsc(PENDING);
+		model.addAttribute("pending", pending);
+		return "leave/admin_approve";
+	}
+
+	@RequestMapping(value = "/leave/approve.do", method = RequestMethod.POST)
+	public String approve(@RequestParam String id, Principal principal) {
+		leaveService.approve(id, principal.getName());
+		return "redirect:/leave/admin/pending.do?ok=approved";
+	}
+
+	@RequestMapping(value = "/leave/reject.do", method = RequestMethod.POST)
+	public String reject(@RequestParam String id, Principal principal) {
+		leaveService.reject(id, principal.getName());
+		return "redirect:/leave/admin/pending.do?ok=rejected";
 	}
 
 	private Date endOfDay(Date d) {

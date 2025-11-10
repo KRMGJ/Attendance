@@ -2,6 +2,6 @@
 <jsp:useBean id="pageTitle" scope="request" class="java.lang.String" />
 <%
 request.setAttribute("pageTitle", "휴가 신청 승인");
-request.setAttribute("content", "/WEB-INF/jsp/leave/_admin_approive_body.jsp");
+request.setAttribute("content", "/WEB-INF/jsp/leave/_admin_approve_body.jsp");
 %>
 <%@ include file="/WEB-INF/jsp/layout/layout.jsp" %>

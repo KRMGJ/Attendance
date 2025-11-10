@@ -19,7 +19,7 @@
 			class="block px-3 py-2 rounded hover:bg-gray-100">휴가 신청 목록</a> <a
 			href="<c:url value='/leave/new.do'/>"
 			class="block px-3 py-2 rounded hover:bg-gray-100">휴가 신청</a> <a
-			href="<c:url value='/leave/admin/approve.do'/>"
+			href="<c:url value='/admin/leave/pending.do'/>"
 			class="block px-3 py-2 rounded hover:bg-gray-100">휴가 승인</a>
 		<div class="mt-3 text-xs uppercase text-gray-500 px-3">리포트</div>
 		<a href="<c:url value='/report/monthly.do'/>"
