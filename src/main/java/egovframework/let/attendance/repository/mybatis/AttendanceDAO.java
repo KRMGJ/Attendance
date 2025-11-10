@@ -8,6 +8,7 @@ import java.util.Map;
 import org.egovframe.rte.psl.dataaccess.EgovAbstractMapper;
 import org.springframework.stereotype.Repository;
 
+import egovframework.let.attendance.dto.response.MonthlyDeptReportDto;
 import egovframework.let.attendance.entity.Attendance;
 
 @Repository
@@ -39,4 +40,11 @@ public class AttendanceDAO extends EgovAbstractMapper {
 		return selectList("egovframework.let.attendance.repository.mybatis.AttendanceDAO.findMyRange", param);
 	}
 
+	public List<MonthlyDeptReportDto> selectMonthlyDeptReport(Date start, Date end) {
+		Map<String, Object> param = new HashMap<>();
+		param.put("start", start);
+		param.put("end", end);
+		return selectList("egovframework.let.attendance.repository.mybatis.AttendanceDAO.selectMonthlyDeptReport",
+				param);
+	}
 }

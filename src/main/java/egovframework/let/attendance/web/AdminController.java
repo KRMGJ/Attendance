@@ -3,6 +3,7 @@ package egovframework.let.attendance.web;
 import static egovframework.let.attendance.common.Enums.PENDING;
 
 import java.security.Principal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import egovframework.let.attendance.dto.request.AdminAttendanceSearch;
 import egovframework.let.attendance.dto.response.AttendanceListDto;
+import egovframework.let.attendance.dto.response.MonthlyDeptReportDto;
 import egovframework.let.attendance.entity.Employee;
 import egovframework.let.attendance.entity.LeaveRequest;
 import egovframework.let.attendance.repository.LeaveRequestRepository;
@@ -114,6 +116,45 @@ public class AdminController {
 	public String reject(@RequestParam String id, Principal principal) {
 		leaveService.reject(id, principal.getName());
 		return "redirect:/leave/admin/pending.do?ok=rejected";
+	}
+
+	/**
+	 * 부서별 월간 보고서
+	 */
+	@RequestMapping(value = "/report/monthly.do", method = RequestMethod.GET)
+	public String monthly(@RequestParam(value = "ym", required = false) String ym, Model model) throws Exception {
+		Date start = firstDayOfMonth(ym);
+		Date end = lastMomentOfMonth(start);
+		List<MonthlyDeptReportDto> report = attendanceService.getMonthlyDeptReport(start, end);
+		model.addAttribute("report", report);
+		model.addAttribute("ym", ymValue(start));
+		return "report/monthly";
+	}
+
+	private Date firstDayOfMonth(String ym) throws ParseException {
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.MILLISECOND, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.HOUR_OF_DAY, 0);
+		if (ym == null || ym.isEmpty()) {
+			cal.set(Calendar.DAY_OF_MONTH, 1);
+			return cal.getTime();
+		}
+		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd");
+		return f.parse(ym + "-01");
+	}
+
+	private Date lastMomentOfMonth(Date start) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(start);
+		cal.add(Calendar.MONTH, 1);
+		cal.add(Calendar.MILLISECOND, -1);
+		return cal.getTime();
+	}
+
+	private String ymValue(Date start) {
+		return new SimpleDateFormat("yyyy-MM").format(start);
 	}
 
 	private Date endOfDay(Date d) {

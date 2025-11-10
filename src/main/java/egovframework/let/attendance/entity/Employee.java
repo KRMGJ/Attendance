@@ -54,6 +54,10 @@ public class Employee {
 	@Comment("직급 또는 직책")
 	private String position;
 
+	@Column(length = 50)
+	@Comment("부서 이름")
+	private String department;
+
 	@Temporal(TemporalType.TIMESTAMP)
 	@Builder.Default
 	@Column(name = "hire_date", nullable = false)

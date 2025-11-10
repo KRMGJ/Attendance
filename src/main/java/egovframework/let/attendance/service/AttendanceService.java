@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import egovframework.let.attendance.dto.request.AdminAttendanceSearch;
 import egovframework.let.attendance.dto.response.AttendanceListDto;
 import egovframework.let.attendance.dto.response.AttendanceViewDto;
+import egovframework.let.attendance.dto.response.MonthlyDeptReportDto;
 
 public interface AttendanceService {
 	/**
@@ -59,4 +60,13 @@ public interface AttendanceService {
 	 * @return 출퇴근 기록 페이지
 	 */
 	Page<AttendanceListDto> list(AdminAttendanceSearch cond);
+
+	/**
+	 * 부서별 월간 보고서 조회
+	 * 
+	 * @param start 시작 날짜
+	 * @param end   종료 날짜
+	 * @return 부서별 월간 보고서 리스트
+	 */
+	List<MonthlyDeptReportDto> getMonthlyDeptReport(Date start, Date end);
 }

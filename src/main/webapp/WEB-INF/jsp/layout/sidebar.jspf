@@ -22,7 +22,7 @@
 			href="<c:url value='/admin/leave/pending.do'/>"
 			class="block px-3 py-2 rounded hover:bg-gray-100">휴가 승인</a>
 		<div class="mt-3 text-xs uppercase text-gray-500 px-3">리포트</div>
-		<a href="<c:url value='/report/monthly.do'/>"
+		<a href="<c:url value='/admin/report/monthly.do'/>"
 			class="block px-3 py-2 rounded hover:bg-gray-100">월별 통계</a>
 	</nav>
 </aside>

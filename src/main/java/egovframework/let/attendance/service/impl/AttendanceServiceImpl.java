@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import egovframework.let.attendance.dto.request.AdminAttendanceSearch;
 import egovframework.let.attendance.dto.response.AttendanceListDto;
 import egovframework.let.attendance.dto.response.AttendanceViewDto;
+import egovframework.let.attendance.dto.response.MonthlyDeptReportDto;
 import egovframework.let.attendance.entity.Attendance;
 import egovframework.let.attendance.entity.Employee;
 import egovframework.let.attendance.repository.AttendanceRepository;
@@ -241,4 +242,11 @@ public class AttendanceServiceImpl implements AttendanceService {
 		return dtos;
 	}
 
+	/**
+	 * 부서별 월간 보고서 조회
+	 */
+	@Override
+	public List<MonthlyDeptReportDto> getMonthlyDeptReport(Date start, Date end) {
+		return attendanceDAO.selectMonthlyDeptReport(start, end);
+	}
 }
