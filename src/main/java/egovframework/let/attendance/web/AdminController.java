@@ -88,6 +88,9 @@ public class AdminController {
 		return "employee/list";
 	}
 
+	/**
+	 * 휴가 신청 승인 대기 목록 조회
+	 */
 	@RequestMapping(value = "/leave/pending.do", method = RequestMethod.GET)
 	public String pending(Model model) {
 		List<LeaveRequest> pending = leaveRequestRepository.findByStatusOrderByCreatedAtAsc(PENDING);
@@ -95,12 +98,18 @@ public class AdminController {
 		return "leave/admin_approve";
 	}
 
+	/**
+	 * 휴가 신청 승인
+	 */
 	@RequestMapping(value = "/leave/approve.do", method = RequestMethod.POST)
 	public String approve(@RequestParam String id, Principal principal) {
 		leaveService.approve(id, principal.getName());
 		return "redirect:/leave/admin/pending.do?ok=approved";
 	}
 
+	/**
+	 * 휴가 신청 거절
+	 */
 	@RequestMapping(value = "/leave/reject.do", method = RequestMethod.POST)
 	public String reject(@RequestParam String id, Principal principal) {
 		leaveService.reject(id, principal.getName());

@@ -4,6 +4,7 @@ import static egovframework.let.attendance.common.Enums.EARLY_LEAVE;
 import static egovframework.let.attendance.common.Enums.LATE;
 import static egovframework.let.attendance.common.Enums.PRESENT;
 import static egovframework.let.attendance.common.Utils.formatDate;
+import static egovframework.let.attendance.common.Utils.formatDateOnly;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -200,7 +201,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 				List<Attendance> records = attendanceDAO.findMyRange(emp.getId(), from, to);
 				attendanceList = records.stream()
 						.map(a -> AttendanceListDto.builder().id(a.getId()).empId(a.getEmpId())
-								.workDate(a.getWorkDate()).checkIn(formatDate(a.getCheckIn()))
+								.workDate(formatDateOnly(a.getWorkDate())).checkIn(formatDate(a.getCheckIn()))
 								.checkOut(a.getCheckOut() != null ? formatDate(a.getCheckOut()) : null)
 								.status(a.getStatus()).overtimeMinutes(a.getOvertimeMinutes()).employee(emp).build())
 						.collect(Collectors.toList());
@@ -208,7 +209,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 				List<Attendance> records = attendanceRepository.findTop100ByEmpIdOrderByWorkDateDesc(emp.getId());
 				attendanceList = records.stream()
 						.map(a -> AttendanceListDto.builder().id(a.getId()).empId(a.getEmpId())
-								.workDate(a.getWorkDate()).checkIn(formatDate(a.getCheckIn()))
+								.workDate(formatDateOnly(a.getWorkDate())).checkIn(formatDate(a.getCheckIn()))
 								.checkOut(a.getCheckOut() != null ? formatDate(a.getCheckOut()) : null)
 								.status(a.getStatus()).overtimeMinutes(a.getOvertimeMinutes()).employee(emp).build())
 						.collect(Collectors.toList());
@@ -230,7 +231,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 			Pageable pageable = PageRequest.of(cond.getPage(), cond.getSize());
 			Page<Attendance> result = attendanceRepository.searchForAdmin(cond, pageable);
 			dtos = result.map(attendance -> AttendanceListDto.builder().id(attendance.getId())
-					.empId(attendance.getEmpId()).workDate(attendance.getWorkDate())
+					.empId(attendance.getEmpId()).workDate(formatDateOnly(attendance.getWorkDate()))
 					.checkIn(formatDate(attendance.getCheckIn())).checkOut(formatDate(attendance.getCheckOut()))
 					.status(attendance.getStatus()).overtimeMinutes(attendance.getOvertimeMinutes())
 					.employee(attendance.getEmployee()).build());
