@@ -40,7 +40,7 @@ public class Attendance {
 	@Comment("직원 식별자(EMPLOYEE.ID 참조)")
 	private String empId;
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "work_date", nullable = false)
 	@Comment("근무 날짜")
 	private Date workDate;

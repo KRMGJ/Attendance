@@ -37,6 +37,7 @@ public class LeaveController {
 		return "redirect:/leave/new.do";
 	}
 
+	/** 나의 휴가 신청 내역 조회 */
 	@RequestMapping(value = "/requests.do", method = RequestMethod.GET)
 	public String list(Principal principal, Model model) {
 		List<LeaveRequestListDto> rows = leaveService.myRequests(principal.getName());

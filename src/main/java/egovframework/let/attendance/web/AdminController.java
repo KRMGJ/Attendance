@@ -106,7 +106,7 @@ public class AdminController {
 	@RequestMapping(value = "/leave/approve.do", method = RequestMethod.POST)
 	public String approve(@RequestParam String id, Principal principal) {
 		leaveService.approve(id, principal.getName());
-		return "redirect:/leave/admin/pending.do?ok=approved";
+		return "redirect:/admin/leave/pending.do?ok=approved";
 	}
 
 	/**
@@ -115,7 +115,7 @@ public class AdminController {
 	@RequestMapping(value = "/leave/reject.do", method = RequestMethod.POST)
 	public String reject(@RequestParam String id, Principal principal) {
 		leaveService.reject(id, principal.getName());
-		return "redirect:/leave/admin/pending.do?ok=rejected";
+		return "redirect:/admin/leave/pending.do?ok=rejected";
 	}
 
 	/**

@@ -38,8 +38,7 @@
 				</c:when>
 				<c:otherwise>
 					<tr>
-						<td class="px-4 py-2 text-center" colspan="5">승인 대기 중인 휴가 신청이
-							없습니다.</td>
+						<td class="px-4 py-2 text-center" colspan="5">승인 대기 중인 휴가 신청이 없습니다.</td>
 					</tr>
 				</c:otherwise>
 			</c:choose>
