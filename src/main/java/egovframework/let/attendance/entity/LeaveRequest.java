@@ -40,7 +40,7 @@ public class LeaveRequest {
 
 	@Column(length = 20, nullable = false)
 	@Comment("휴가유형")
-	private String type; // ANNUAL, SICK
+	private String type;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "start_date", nullable = false)
@@ -62,7 +62,7 @@ public class LeaveRequest {
 
 	@Column(length = 20, nullable = false)
 	@Comment("상태")
-	private String status; // PENDING, APPROVED, REJECTED
+	private String status;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Builder.Default

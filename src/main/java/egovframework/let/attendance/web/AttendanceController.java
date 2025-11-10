@@ -45,6 +45,9 @@ public class AttendanceController {
 		return "redirect:/main.do";
 	}
 
+	/**
+	 * 나의 출퇴근 기록 조회
+	 */
 	@RequestMapping(value = "/my.do", method = RequestMethod.GET)
 	public String myAttendance(Principal principal, @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date from,
 			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date to, Model model) {
