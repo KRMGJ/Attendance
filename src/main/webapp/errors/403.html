@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>403 - 접근이 거부되었습니다</title>
+<style>
+body {
+	font-family: sans-serif;
+	background: #f9fafb;
+	margin: 0;
+	padding: 0;
+	text-align: center;
+}
+
+.wrap {
+	max-width: 480px;
+	margin: 10% auto;
+	background: white;
+	border: 1px solid #e5e7eb;
+	border-radius: 12px;
+	padding: 40px;
+}
+
+h1 {
+	font-size: 48px;
+	margin: 0 0 10px;
+	color: #b91c1c;
+}
+
+p {
+	color: #6b7280;
+	margin-bottom: 30px;
+}
+
+.btns {
+	display: flex;
+	justify-content: center;
+	gap: 10px;
+}
+
+a, button {
+	cursor: pointer;
+	border: none;
+	outline: none;
+	font-size: 14px;
+	padding: 10px 20px;
+	border-radius: 6px;
+	text-decoration: none;
+}
+
+a {
+	background: #b91c1c;
+	color: white;
+}
+
+a:hover {
+	background: #7f1d1d;
+}
+
+button {
+	background: #e5e7eb;
+	color: #111827;
+}
+
+button:hover {
+	background: #d1d5db;
+}
+</style>
+</head>
+<body>
+	<div class="wrap">
+		<h1>403</h1>
+		<p>이 페이지에 접근할 권한이 없습니다.</p>
+		<div class="btns">
+			<a href="/">홈으로</a>
+			<button onclick="history.back()">뒤로가기</button>
+		</div>
+	</div>
+</body>
+</html>

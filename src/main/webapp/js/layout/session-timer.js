@@ -44,7 +44,9 @@
 					: JSON.parse(await res.text());
 				return data;
 			})
-			.catch(() => ({ auth: false }));
+			.catch((e) => (
+				console.error('Failed to fetch session remaining time:', e), null
+			));
 	}
 
 	/**

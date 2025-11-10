@@ -37,7 +37,10 @@
         <Logger name="org.springframework.transaction" level="DEBUG" additivity="false">
             <AppenderRef ref="console" />
         </Logger>
-        <Logger name="org.springframework.security" level="INFO" additivity="false">
+        <Logger name="org.springframework.security" level="DEBUG" additivity="false">
+            <AppenderRef ref="console" />
+        </Logger>
+        <Logger name="org.springframework.security.web" level="TRACE" additivity="false">
             <AppenderRef ref="console" />
         </Logger>
 
