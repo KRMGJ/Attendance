@@ -74,6 +74,11 @@ public class LeaveRequest {
 	@Comment("승인자")
 	private String approver;
 
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "approved_at")
+	@Comment("승인일시")
+	private Date approvedAt;
+
 	@ManyToOne
 	@JoinColumn(name = "emp_id", referencedColumnName = "id", insertable = false, updatable = false)
 	private Employee employee;

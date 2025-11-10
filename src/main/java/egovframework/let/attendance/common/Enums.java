@@ -25,4 +25,5 @@ public interface Enums {
 	public static String PENDING = "승인 대기";
 	public static String APPROVED = "승인 완료";
 	public static String REJECTED = "반려";
+	public static String CANCELED = "취소";
 }

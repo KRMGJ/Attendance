@@ -27,6 +27,7 @@ import egovframework.let.attendance.entity.Attendance;
 import egovframework.let.attendance.entity.Employee;
 import egovframework.let.attendance.repository.AttendanceRepository;
 import egovframework.let.attendance.repository.EmployeeRepository;
+import egovframework.let.attendance.repository.mybatis.AttendanceDAO;
 import egovframework.let.attendance.service.AttendanceService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,6 +37,9 @@ public class AttendanceServiceImpl implements AttendanceService {
 	private static final ZoneId ZONE = ZoneId.of("Asia/Seoul");
 	private static final LocalTime WORK_START = LocalTime.of(9, 0);
 	private static final LocalTime WORK_END = LocalTime.of(18, 0);
+
+	@Autowired
+	private AttendanceDAO attendanceDAO;
 
 	@Autowired
 	private AttendanceRepository attendanceRepository;
@@ -193,7 +197,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 		try {
 			Employee emp = loadEmployeeByUsername(userEmail);
 			if (from != null || to != null) {
-				List<Attendance> records = attendanceRepository.findMyRange(emp.getId(), from, to);
+				List<Attendance> records = attendanceDAO.findMyRange(emp.getId(), from, to);
 				attendanceList = records.stream()
 						.map(a -> AttendanceListDto.builder().id(a.getId()).empId(a.getEmpId())
 								.workDate(a.getWorkDate()).checkIn(formatDate(a.getCheckIn()))

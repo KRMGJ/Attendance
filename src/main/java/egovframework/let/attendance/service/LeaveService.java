@@ -31,4 +31,28 @@ public interface LeaveService {
 	 * @return 휴가 신청 내역 리스트
 	 */
 	List<LeaveRequestListDto> myRequests(String userEmail);
+
+	/**
+	 * 휴가 신청 취소
+	 * 
+	 * @param id    휴가 신청 ID
+	 * @param empId 직원 ID
+	 */
+	void cancel(String id, String empId);
+
+	/**
+	 * 휴가 신청 승인
+	 * 
+	 * @param id               휴가 신청 ID
+	 * @param approverUsername 승인자 사용자 이름
+	 */
+	void approve(String id, String approverUsername);
+
+	/**
+	 * 휴가 신청 거절
+	 * 
+	 * @param id               휴가 신청 ID
+	 * @param approverUsername 승인자 사용자 이름
+	 */
+	void reject(String id, String approverUsername);
 }

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="egovframework.let.attendance.repository.mybatis.AttendanceDAO">
+
+	<!-- Attendance + Employee 연계 매핑 -->
+	<resultMap id="AttendanceWithEmpMap" type="egovframework.let.attendance.entity.Attendance">
+		<id property="id" column="a_id" />
+		<result property="empId" column="a_emp_id" />
+		<result property="workDate" column="a_work_date" />
+		<result property="checkIn" column="a_check_in" />
+		<result property="checkOut" column="a_check_out" />
+		<result property="status" column="a_status" />
+		<result property="overtimeMinutes" column="a_overtime_minutes" />
+		<association property="employee" javaType="egovframework.let.attendance.entity.Employee">
+			<id property="id" column="e_id" />
+			<result property="name" column="e_name" />
+			<result property="email" column="e_email" />
+		</association>
+	</resultMap>
+
+	<!-- 관리자용 출퇴근기록 조회 -->	
+	<select id="countAdmin" resultType="long">
+		SELECT COUNT(1)
+		FROM ATTENDANCE a
+		JOIN EMPLOYEE e ON e.id = a.emp_id
+		<where>
+			<if test="kw != null and kw != ''">
+				AND (LOWER(e.name) LIKE #{kw} OR LOWER(e.email) LIKE #{kw})
+			</if>
+			<if test="from != null">
+				AND a.work_date &gt;= #{from}
+			</if>
+			<if test="to != null">
+				AND a.work_date &lt;= #{to}
+			</if>
+		</where>
+	</select>
+
+	<!-- 관리자용 출퇴근기록 페이징 조회 -->
+	<select id="selectAdminPage" resultMap="AttendanceWithEmpMap">
+		SELECT * FROM (
+		SELECT t.*, ROWNUM rn FROM (
+		SELECT
+		a.id AS a_id,
+		a.emp_id AS a_emp_id,
+		a.work_date AS a_work_date,
+		a.check_in AS a_check_in,
+		a.check_out AS a_check_out,
+		a.status AS a_status,
+		a.overtime_minutes AS a_overtime_minutes,
+		e.id AS e_id,
+		e.name AS e_name,
+		e.email AS e_email
+		FROM ATTENDANCE a
+		JOIN EMPLOYEE e ON e.id = a.emp_id
+		<where>
+			<if test="kw != null and kw != ''">
+				AND (LOWER(e.name) LIKE #{kw} OR LOWER(e.email) LIKE #{kw})
+			</if>
+			<if test="from != null">
+				AND a.work_date &gt;= #{from}
+			</if>
+			<if test="to != null">
+				AND a.work_date &lt;= #{to}
+			</if>
+		</where>
+		ORDER BY a.work_date DESC, e.name ASC
+		) t
+		WHERE ROWNUM &lt;= #{offset} + #{limit}
+		)
+		WHERE rn &gt; #{offset}
+	</select>
+
+	<!-- 개인용 출퇴근기록 기간 조회 -->
+	<select id="findMyRange" resultMap="AttendanceWithEmpMap">
+		SELECT
+		a.id AS a_id, a.emp_id AS a_emp_id, a.work_date AS a_work_date,
+		a.check_in AS a_check_in, a.check_out AS a_check_out,
+		a.status AS a_status, a.overtime_minutes AS a_overtime_minutes,
+		e.id AS e_id, e.name AS e_name, e.email AS e_email
+		FROM ATTENDANCE a
+		JOIN EMPLOYEE e ON e.id = a.emp_id
+		WHERE e.emp_id = #{empId}
+		AND a.work_date BETWEEN #{from} AND #{to}
+		ORDER BY a.work_date ASC
+	</select>
+
+</mapper>

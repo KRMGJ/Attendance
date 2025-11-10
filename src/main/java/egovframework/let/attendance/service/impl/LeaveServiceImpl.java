@@ -1,7 +1,11 @@
 package egovframework.let.attendance.service.impl;
 
 import static egovframework.let.attendance.common.Enums.ANNUAL;
+import static egovframework.let.attendance.common.Enums.APPROVED;
+import static egovframework.let.attendance.common.Enums.CANCELED;
 import static egovframework.let.attendance.common.Enums.PENDING;
+import static egovframework.let.attendance.common.Enums.REJECTED;
+import static egovframework.let.attendance.common.Enums.SICK;
 import static egovframework.let.attendance.common.Utils.formatDateOnly;
 
 import java.time.LocalDate;
@@ -25,12 +29,16 @@ import egovframework.let.attendance.entity.LeaveRequest;
 import egovframework.let.attendance.repository.EmployeeRepository;
 import egovframework.let.attendance.repository.LeaveBalanceRepository;
 import egovframework.let.attendance.repository.LeaveRequestRepository;
+import egovframework.let.attendance.repository.mybatis.LeaveRequestDAO;
 import egovframework.let.attendance.service.LeaveService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 public class LeaveServiceImpl implements LeaveService {
+	@Autowired
+	private LeaveRequestDAO leaveRequestDAO;
+
 	@Autowired
 	private EmployeeRepository employeeRepository;
 
@@ -42,8 +50,9 @@ public class LeaveServiceImpl implements LeaveService {
 
 	/**
 	 * 시작일과 종료일 사이의 일수 계산 (양 끝일 포함)
+	 * 
 	 * @param start 시작일
-	 * @param end 종료일
+	 * @param end   종료일
 	 */
 	private int calcDays(Date start, Date end) {
 		LocalDate s = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
@@ -81,26 +90,28 @@ public class LeaveServiceImpl implements LeaveService {
 			Date start = dto.getStartDate();
 			Date end = dto.getEndDate();
 			if (start == null || end == null || end.before(start)) {
-				return "기간이 올바르지 않습니다.";
+				throw new IllegalArgumentException("기간이 올바르지 않습니다.");
 			}
 
-			if (leaveRequestRepository.countOverlap(emp.getId(), start, end) > 0) {
-				return "이미 신청된 휴가와 기간이 겹칩니다.";
+			if (leaveRequestDAO.countOverlap(emp.getId(), start, end) > 0) {
+				throw new IllegalStateException("이미 신청된 휴가와 기간이 겹칩니다.");
 			}
 
 			int days = calcDays(start, end);
+
 			if (dto.getType() == ANNUAL) {
-				LeaveBalance bal = leaveBalanceRepository.findByEmpId(emp.getId())
+				int year = start.toInstant().atZone(ZoneId.systemDefault()).getYear();
+				LeaveBalance bal = leaveBalanceRepository.findByEmpIdAndYear(emp.getId(), year)
 						.orElseThrow(() -> new IllegalStateException("휴가 잔액 정보 없음"));
 				if (bal.getRemaining() < days) {
-					return "연차 잔액 부족";
+					throw new IllegalStateException("연차 잔액 부족");
 				}
-				bal.setUsed(days);
-				leaveBalanceRepository.save(bal);
 			}
 
-			LeaveRequest req = LeaveRequest.builder().empId(emp.getId()).type(dto.getType()).startDate(start)
-					.endDate(end).days(days).reason(dto.getReason()).status(PENDING).build();
+			String type = ANNUAL.equals(dto.getType()) ? ANNUAL : SICK;
+
+			LeaveRequest req = LeaveRequest.builder().empId(emp.getId()).type(type).startDate(start).endDate(end)
+					.days(days).reason(dto.getReason()).status(PENDING).build();
 
 			leaveRequestRepository.save(req);
 			return "휴가 신청이 완료되었습니다.";
@@ -121,7 +132,7 @@ public class LeaveServiceImpl implements LeaveService {
 			Employee emp = employeeRepository.findByEmail(userEmail)
 					.orElseThrow(() -> new IllegalStateException("직원 정보 없음"));
 
-			List<LeaveRequest> leaveRequests = leaveRequestRepository.findByEmpIdOrderByStartDateDesc(emp.getId());
+			List<LeaveRequest> leaveRequests = leaveRequestRepository.findByEmpIdOrderByIdDesc(emp.getId());
 
 			requests = leaveRequests.stream().map(lr -> {
 				LeaveRequestListDto dto = new LeaveRequestListDto();
@@ -140,6 +151,67 @@ public class LeaveServiceImpl implements LeaveService {
 			log.error("Error fetching leave requests for userEmail {}: {}", userEmail, e.getMessage());
 		}
 		return requests;
+	}
+
+	/**
+	 * 휴가 신청 승인
+	 */
+	@Override
+	public void approve(String id, String approverUsername) {
+		LeaveRequest lr = leaveRequestRepository.findById(id)
+				.orElseThrow(() -> new IllegalArgumentException("신청이 존재하지 않습니다."));
+		if (!PENDING.equals(lr.getStatus())) {
+			throw new IllegalStateException("승인할 수 없는 상태입니다.");
+		}
+
+		// 연차면 해당 연도 잔액 차감
+		if (lr.getType() == ANNUAL) {
+			int year = lr.getStartDate().toInstant().atZone(ZoneId.systemDefault()).getYear();
+			LeaveBalance bal = leaveBalanceRepository.findByEmpIdAndYear(lr.getEmpId(), year)
+					.orElseThrow(() -> new IllegalStateException("휴가 잔액 정보 없음"));
+			if (bal.getRemaining() < lr.getDays()) {
+				throw new IllegalStateException("연차 잔액 부족");
+			}
+			bal.setUsed(bal.getUsed() + lr.getDays());
+			leaveBalanceRepository.save(bal);
+		}
+
+		lr.setStatus(APPROVED);
+		lr.setApprover(approverUsername);
+		lr.setApprovedAt(new Date());
+		leaveRequestRepository.save(lr);
+	}
+
+	/**
+	 * 휴가 신청 거절
+	 */
+	@Override
+	public void reject(String id, String approverUsername) {
+		LeaveRequest lr = leaveRequestRepository.findById(id)
+				.orElseThrow(() -> new IllegalArgumentException("신청이 존재하지 않습니다."));
+		if (!PENDING.equals(lr.getStatus())) {
+			throw new IllegalStateException("반려할 수 없는 상태입니다.");
+		}
+		lr.setStatus(REJECTED);
+		lr.setApprover(approverUsername);
+		lr.setApprovedAt(new Date());
+		leaveRequestRepository.save(lr);
+	}
+
+	/**
+	 * 휴가 신청 취소
+	 */
+	@Override
+	public void cancel(String id, String empId) {
+		LeaveRequest lr = leaveRequestRepository.findByIdAndEmpId(id, empId)
+				.orElseThrow(() -> new IllegalArgumentException("해당 신청이 존재하지 않습니다."));
+		if (!PENDING.equals(lr.getStatus())) {
+			throw new IllegalStateException("취소할 수 없는 상태입니다.");
+		}
+		lr.setStatus(CANCELED);
+		lr.setApprover(null);
+		lr.setApprovedAt(null);
+		leaveRequestRepository.save(lr);
 	}
 
 }
