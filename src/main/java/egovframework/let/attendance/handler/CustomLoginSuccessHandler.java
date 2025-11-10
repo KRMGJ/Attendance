@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -11,13 +12,18 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import egovframework.let.attendance.entity.Employee;
+import egovframework.let.attendance.entity.SessionLimit;
 import egovframework.let.attendance.repository.EmployeeRepository;
+import egovframework.let.attendance.repository.SessionLimitRepository;
 
 @Component
 public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 
 	@Autowired
 	private EmployeeRepository employeeRepository;
+
+	@Autowired
+	private SessionLimitRepository sessionLimitRepository;
 
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -26,9 +32,15 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 		String username = authentication.getName();
 		Employee emp = employeeRepository.findByEmail(username).orElse(null);
 
+		HttpSession session = request.getSession(true);
+
 		if (emp != null) {
-			request.getSession().setAttribute("empName", emp.getName());
+			session.setAttribute("empName", emp.getName());
 		}
+
+		SessionLimit limit = SessionLimit.create(session.getId(), username, 30);
+		sessionLimitRepository.save(limit);
+
 		response.sendRedirect(request.getContextPath() + "/main.do");
 	}
 }

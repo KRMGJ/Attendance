@@ -40,6 +40,11 @@ public class LeaveServiceImpl implements LeaveService {
 	@Autowired
 	private LeaveRequestRepository leaveRequestRepository;
 
+	/**
+	 * 시작일과 종료일 사이의 일수 계산 (양 끝일 포함)
+	 * @param start 시작일
+	 * @param end 종료일
+	 */
 	private int calcDays(Date start, Date end) {
 		LocalDate s = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 		LocalDate e = end.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
