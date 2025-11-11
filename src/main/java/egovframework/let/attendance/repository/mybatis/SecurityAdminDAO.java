@@ -69,4 +69,12 @@ public class SecurityAdminDAO extends EgovAbstractMapper {
 		param.put("child", child);
 		return delete("egovframework.let.attendance.repository.mybatis.SecurityAdminDAO.deleteRoleHierarchy", param);
 	}
+
+	public List<Map<String, Object>> selectRoleHierarchyTree() {
+		return selectList("egovframework.let.attendance.repository.mybatis.SecurityAdminDAO.selectRoleHierarchyTree");
+	}
+
+	public List<Map<String, Object>> selectRoleClosure() {
+		return selectList("egovframework.let.attendance.repository.mybatis.SecurityAdminDAO.selectRoleClosure");
+	}
 }

@@ -101,4 +101,14 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	public void deleteHierarchy(String parent, String child) {
 		securityAdminDAO.deleteRoleHierarchy(parent, child);
 	}
+
+	@Override
+	public List<Map<String, Object>> listRoleHierarchyTree() {
+		return securityAdminDAO.selectRoleHierarchyTree();
+	}
+
+	@Override
+	public List<Map<String, Object>> listRoleClosure() {
+		return securityAdminDAO.selectRoleClosure();
+	}
 }

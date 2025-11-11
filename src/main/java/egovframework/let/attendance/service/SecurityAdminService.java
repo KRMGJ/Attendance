@@ -66,6 +66,10 @@ public interface SecurityAdminService {
 	 */
 	List<Map<String, Object>> listRoleHierarchy();
 
+	List<Map<String, Object>> listRoleHierarchyTree(); // ROLE, PARENT, DEPTH, IS_ROOT
+
+	List<Map<String, Object>> listRoleClosure(); // PARENT, CHILD
+
 	/**
 	 * ROLE_HIERARCHY 추가
 	 * 

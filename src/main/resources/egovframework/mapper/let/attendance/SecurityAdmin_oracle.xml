@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="egovframework.let.attendance.repository.mybatis.SecurityAdminDAO">
+<mapper
+	namespace="egovframework.let.attendance.repository.mybatis.SecurityAdminDAO">
 
 	<select id="selectUsers" parameterType="string" resultType="map">
 		SELECT USERNAME, EMAIL, ENABLED, CREATED_AT FROM USERS
@@ -13,30 +14,36 @@
 	</select>
 
 	<select id="selectAllRoles" resultType="string">
-		SELECT DISTINCT AUTHORITY FROM AUTHORITIES ORDER BY AUTHORITY
+		SELECT AUTHORITY FROM
+		ROLE_MASTER ORDER BY AUTHORITY
 	</select>
 
 	<select id="selectUserRoles" parameterType="string"
 		resultType="string">
-		SELECT AUTHORITY FROM AUTHORITIES WHERE USERNAME = #{username}
+		SELECT AUTHORITY FROM AUTHORITIES WHERE USERNAME =
+		#{username}
 	</select>
 
 	<delete id="deleteAllUserRoles" parameterType="string">
-		DELETE FROM AUTHORITIES WHERE USERNAME = #{username}
+		DELETE FROM
+		AUTHORITIES WHERE USERNAME = #{username}
 	</delete>
 
 	<insert id="insertUserRole">
-		INSERT INTO AUTHORITIES (USERNAME, AUTHORITY) VALUES (#{username},
+		INSERT INTO AUTHORITIES (USERNAME, AUTHORITY) VALUES
+		(#{username},
 		#{authority})
 	</insert>
 
 	<select id="selectRoleUrls" resultType="map">
-		SELECT AUTHORITY, ROLE_PATTERN, ROLE_SORT FROM ROLE_URL ORDER BY ROLE_SORT,
+		SELECT AUTHORITY,
+		ROLE_PATTERN, ROLE_SORT FROM ROLE_URL ORDER BY ROLE_SORT,
 		ROLE_PATTERN
 	</select>
 
 	<insert id="insertRoleUrl">
-		INSERT INTO ROLE_URL (AUTHORITY, ROLE_PATTERN, ROLE_SORT)
+		INSERT INTO ROLE_URL (AUTHORITY, ROLE_PATTERN,
+		ROLE_SORT)
 		VALUES (#{authority}, #{pattern}, #{sort})
 	</insert>
 
@@ -46,17 +53,81 @@
 	</delete>
 
 	<select id="selectRoleHierarchy" resultType="map">
-		SELECT PARENT_ROLE, CHILD_ROLE FROM ROLE_HIERARCHY ORDER BY PARENT_ROLE,
+		SELECT PARENT_ROLE,
+		CHILD_ROLE FROM ROLE_HIERARCHY ORDER BY PARENT_ROLE,
 		CHILD_ROLE
 	</select>
 
+	<select id="selectRoleHierarchyTree" resultType="map">
+		WITH used AS (
+		SELECT parent_role AS r FROM ROLE_HIERARCHY
+		UNION
+		SELECT child_role AS r
+		FROM ROLE_HIERARCHY
+		),
+		roots AS (
+		SELECT parent_role AS role FROM
+		ROLE_HIERARCHY
+		MINUS
+		SELECT child_role FROM ROLE_HIERARCHY
+		),
+		orphans AS (
+		SELECT m.AUTHORITY AS role
+		FROM ROLE_MASTER m
+		LEFT JOIN used u ON u.r =
+		m.AUTHORITY
+		WHERE u.r IS NULL
+		),
+		forest AS (
+		SELECT role, CAST(NULL AS
+		VARCHAR2(50)) AS parent, 0 AS depth, 1 AS is_root,
+		role AS sort_key
+		FROM roots
+		UNION ALL
+		SELECT child_role AS role, parent_role AS parent,
+		LEVEL AS depth, 0 AS is_root,
+		SYS_CONNECT_BY_PATH(child_role,'/') AS
+		sort_key
+		FROM ROLE_HIERARCHY
+		START WITH parent_role IN (SELECT role FROM
+		roots)
+		CONNECT BY PRIOR child_role = parent_role
+		UNION ALL
+		SELECT role,
+		CAST(NULL AS VARCHAR2(50)) AS parent, 0 AS depth, 1 AS is_root,
+		role AS
+		sort_key
+		FROM orphans
+		)
+		SELECT role AS ROLE, parent AS PARENT, depth AS
+		DEPTH, is_root AS IS_ROOT
+		FROM forest
+		ORDER BY sort_key
+	</select>
+
+	<!-- 상속 폐쇄(부모→모든 하위) 매트릭스용 -->
+	<select id="selectRoleClosure" resultType="map">
+		SELECT DISTINCT
+		CONNECT_BY_ROOT parent_role AS PARENT,
+		child_role AS CHILD
+		FROM
+		ROLE_HIERARCHY
+		START WITH parent_role IN (SELECT DISTINCT parent_role
+		FROM ROLE_HIERARCHY)
+		CONNECT BY PRIOR child_role = parent_role
+		ORDER BY
+		PARENT, CHILD
+	</select>
+
 	<insert id="insertRoleHierarchy">
-		INSERT INTO ROLE_HIERARCHY (PARENT_ROLE, CHILD_ROLE) VALUES (#{parent},
+		INSERT INTO ROLE_HIERARCHY (PARENT_ROLE, CHILD_ROLE)
+		VALUES (#{parent},
 		#{child})
 	</insert>
 
 	<delete id="deleteRoleHierarchy">
-		DELETE FROM ROLE_HIERARCHY WHERE PARENT_ROLE=#{parent} AND
+		DELETE FROM ROLE_HIERARCHY WHERE
+		PARENT_ROLE=#{parent} AND
 		CHILD_ROLE=#{child}
 	</delete>
 

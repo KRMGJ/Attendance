@@ -72,7 +72,9 @@ public class SecurityAdminController {
 	 */
 	@RequestMapping(value = "/role-hierarchy.do", method = RequestMethod.GET)
 	public String roleHierarchy(Model model) {
-		model.addAttribute("rows", securityAdminService.listRoleHierarchy());
+		model.addAttribute("tree", securityAdminService.listRoleHierarchyTree());
+		model.addAttribute("closure", securityAdminService.listRoleClosure());
+		model.addAttribute("edges", securityAdminService.listRoleHierarchy());
 		model.addAttribute("allRoles", securityAdminService.listAllRoles());
 		return "security/role_hierarchy";
 	}
