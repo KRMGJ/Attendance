@@ -1,5 +1,9 @@
 package egovframework.let.attendance.service.impl;
 
+import static egovframework.let.attendance.common.Enums.FULL_TIME;
+import static egovframework.let.attendance.common.Enums.INTERN;
+import static egovframework.let.attendance.common.Enums.PART_TIME;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +39,19 @@ public class EmployeeServiceImpl implements EmployeeService {
 	public void register(RegistEmployeeDto dto) {
 		try {
 			String encodedPassword = passwordEncoder.encode(dto.getPassword());
+			String type = null;
+			if (dto.getEmploymentType().equals("FULL_TIME")) {
+				type = FULL_TIME;
+			} else if (dto.getEmploymentType().equals("PART_TIME")) {
+				type = PART_TIME;
+			} else if (dto.getEmploymentType().equals("INTERN")) {
+				type = INTERN;
+			} else {
+				throw new IllegalArgumentException("Invalid employment type: " + dto.getEmploymentType());
+			}
 
 			Employee employee = Employee.builder().name(dto.getName()).email(dto.getEmail()).password(encodedPassword)
-					.position(dto.getPosition()).employmentType(dto.getEmploymentType()).build();
+					.position(dto.getPosition()).employmentType(type).build();
 			employeeRepository.save(employee);
 
 			jdbcTemplate.update("INSERT INTO USERS (USERNAME, PASSWORD, EMAIL, ENABLED) VALUES (?, ?, ?, 1)",
