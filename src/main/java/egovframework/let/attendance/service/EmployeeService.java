@@ -30,7 +30,19 @@ public interface EmployeeService {
 	 */
 	Employee getEmployeeDetail(String id);
 
+	/**
+	 * 직원 뷰 로드
+	 * 
+	 * @param id 직원 ID
+	 * @return 직원 뷰 DTO
+	 */
 	EmployeeViewDto loadView(String id);
 
+	/**
+	 * 직원 정보 수정
+	 * 
+	 * @param cmd           수정할 직원 정보 DTO
+	 * @param actorUsername 수정하는 사용자의 사용자 이름
+	 */
 	void edit(EditEmployeeDto cmd, String actorUsername);
 }

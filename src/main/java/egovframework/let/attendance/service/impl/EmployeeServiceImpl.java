@@ -101,11 +101,17 @@ public class EmployeeServiceImpl implements EmployeeService {
 		return employee;
 	}
 
+	/**
+	 * 직원 뷰 로드
+	 */
 	@Override
 	public EmployeeViewDto loadView(String id) {
 		return employeeDAO.selectViewById(id);
 	}
 
+	/**
+	 * 직원 정보 수정
+	 */
 	@Override
 	public void edit(EditEmployeeDto dto, String actorUsername) {
 		if (employeeDAO.canEdit(dto.getId(), actorUsername) == 0) {

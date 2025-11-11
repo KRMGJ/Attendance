@@ -58,6 +58,9 @@ public class EmployeeController {
 		return "employee/detail";
 	}
 
+	/**
+	 * 사원 정보 수정 폼
+	 */
 	@RequestMapping(value = "/edit.do", method = RequestMethod.GET)
 	public String editForm(@RequestParam("id") String id, Model model) {
 		EmployeeViewDto v = employeeService.loadView(id);
@@ -65,6 +68,9 @@ public class EmployeeController {
 		return "employee/edit"; // 질문에 준 JSP
 	}
 
+	/**
+	 * 사원 정보 수정 처리
+	 */
 	@RequestMapping(value = "/edit.do", method = RequestMethod.POST)
 	public String editSubmit(EditEmployeeDto dto, Model model, Principal principal) {
 		employeeService.edit(dto, principal.getName());
