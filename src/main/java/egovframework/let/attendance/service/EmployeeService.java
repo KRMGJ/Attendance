@@ -28,7 +28,7 @@ public interface EmployeeService {
 	 * @param id 직원 ID
 	 * @return 직원 상세 정보
 	 */
-	Employee getEmployeeDetail(String id);
+	EmployeeViewDto getEmployeeDetail(String id);
 
 	/**
 	 * 직원 뷰 로드

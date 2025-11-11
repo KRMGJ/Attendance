@@ -14,7 +14,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import egovframework.let.attendance.dto.request.EditEmployeeDto;
 import egovframework.let.attendance.dto.request.RegistEmployeeDto;
 import egovframework.let.attendance.dto.response.EmployeeViewDto;
-import egovframework.let.attendance.entity.Employee;
 import egovframework.let.attendance.service.EmployeeService;
 
 @Controller
@@ -53,7 +52,7 @@ public class EmployeeController {
 	 */
 	@RequestMapping(value = "/detail.do", method = RequestMethod.GET)
 	public String employeeDetail(@RequestParam String id, Model model) {
-		Employee employee = employeeService.getEmployeeDetail(id);
+		EmployeeViewDto employee = employeeService.getEmployeeDetail(id);
 		model.addAttribute("employee", employee);
 		return "employee/detail";
 	}

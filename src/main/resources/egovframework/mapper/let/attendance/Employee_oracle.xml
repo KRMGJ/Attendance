@@ -9,13 +9,14 @@
 		<result property="email" column="EMAIL" />
 		<result property="position" column="POSITION" />
 		<result property="employmentType" column="EMPLOYMENT_TYPE" />
+		<result property="status" column="STATUS" />
 		<result property="hireDate" column="HIRE_DATE" jdbcType="TIMESTAMP" />
 		<result property="resignDate" column="RESIGN_DATE" jdbcType="TIMESTAMP" />
 		<result property="updatedAt" column="UPDATED_AT" jdbcType="TIMESTAMP" />
 	</resultMap>
 
 	<select id="selectViewById" parameterType="string" resultMap="EmployeeViewMap">
-		SELECT ID, NAME, EMAIL, POSITION, EMPLOYMENT_TYPE, HIRE_DATE, RESIGN_DATE,
+		SELECT ID, NAME, EMAIL, POSITION, EMPLOYMENT_TYPE, STATUS, HIRE_DATE, RESIGN_DATE,
 		UPDATED_AT
 		FROM EMPLOYEE
 		WHERE ID = #{id}
@@ -27,7 +28,6 @@
 		WHERE EMAIL = #{email} AND ID &lt;&gt; #{id}
 	</select>
 
-	<!-- 본인 또는 ADMIN만 수정 가능: USERS/AUTHORITIES 테이블을 사용 -->
 	<select id="canEdit" resultType="int">
 		SELECT CASE
 		WHEN EXISTS (

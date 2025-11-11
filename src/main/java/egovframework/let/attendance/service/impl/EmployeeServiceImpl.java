@@ -3,6 +3,7 @@ package egovframework.let.attendance.service.impl;
 import static egovframework.let.attendance.common.Enums.FULL_TIME;
 import static egovframework.let.attendance.common.Enums.INTERN;
 import static egovframework.let.attendance.common.Enums.PART_TIME;
+import static egovframework.let.attendance.common.Utils.formatDateOnly;
 
 import java.util.Date;
 import java.util.List;
@@ -90,11 +91,15 @@ public class EmployeeServiceImpl implements EmployeeService {
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public Employee getEmployeeDetail(String id) {
-		Employee employee = null;
+	public EmployeeViewDto getEmployeeDetail(String id) {
+		EmployeeViewDto employee = null;
 		try {
-			employee = employeeRepository.findById(id)
+			Employee emp = employeeRepository.findById(id)
 					.orElseThrow(() -> new IllegalStateException("직원 정보를 찾을 수 없음: " + id));
+			employee = EmployeeViewDto.builder().id(emp.getId()).name(emp.getName()).email(emp.getEmail())
+					.position(emp.getPosition()).employmentType(emp.getEmploymentType()).status(emp.getStatus())
+					.hireDate(formatDateOnly(emp.getHireDate())).resignDate(formatDateOnly(emp.getResignDate()))
+					.updatedAt(formatDateOnly(emp.getUpdatedAt())).build();
 		} catch (Exception e) {
 			log.error("Error retrieving employee detail for ID {}: {}", id, e.getMessage());
 		}
