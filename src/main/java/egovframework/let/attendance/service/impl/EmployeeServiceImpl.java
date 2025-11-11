@@ -4,6 +4,7 @@ import static egovframework.let.attendance.common.Enums.FULL_TIME;
 import static egovframework.let.attendance.common.Enums.INTERN;
 import static egovframework.let.attendance.common.Enums.PART_TIME;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +13,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import egovframework.let.attendance.dto.request.EditEmployeeDto;
 import egovframework.let.attendance.dto.request.RegistEmployeeDto;
+import egovframework.let.attendance.dto.response.EmployeeViewDto;
 import egovframework.let.attendance.entity.Employee;
 import egovframework.let.attendance.repository.EmployeeRepository;
+import egovframework.let.attendance.repository.mybatis.EmployeeDAO;
 import egovframework.let.attendance.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,6 +29,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	@Autowired
 	private EmployeeRepository employeeRepository;
+
+	@Autowired
+	private EmployeeDAO employeeDAO;
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -92,5 +99,46 @@ public class EmployeeServiceImpl implements EmployeeService {
 			log.error("Error retrieving employee detail for ID {}: {}", id, e.getMessage());
 		}
 		return employee;
+	}
+
+	@Override
+	public EmployeeViewDto loadView(String id) {
+		return employeeDAO.selectViewById(id);
+	}
+
+	@Override
+	public void edit(EditEmployeeDto dto, String actorUsername) {
+		if (employeeDAO.canEdit(dto.getId(), actorUsername) == 0) {
+			throw new SecurityException("수정 권한 없음");
+		}
+
+		// 이메일 중복 방지
+		if (employeeDAO.existsByEmailExcludingId(dto.getEmail(), dto.getId()) > 0) {
+			throw new IllegalArgumentException("이메일이 중복됩니다.");
+		}
+
+		String type = null;
+		if (dto.getEmploymentType().equals("FULL_TIME")) {
+			type = FULL_TIME;
+		} else if (dto.getEmploymentType().equals("PART_TIME")) {
+			type = PART_TIME;
+		} else if (dto.getEmploymentType().equals("INTERN")) {
+			type = INTERN;
+		} else {
+			throw new IllegalArgumentException("Invalid employment type: " + dto.getEmploymentType());
+		}
+		dto.setUpdatedAt(new Date());
+		dto.setEmploymentType(type);
+		employeeDAO.updateProfile(dto);
+
+		// 비밀번호 변경은 입력이 있을 때만
+		if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
+			if (!dto.getPassword().equals(dto.getPasswordConfirm())) {
+				throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+			}
+			String encoded = passwordEncoder.encode(dto.getPassword());
+			employeeDAO.updatePassword(dto.getId(), encoded, dto.getUpdatedAt());
+		}
+
 	}
 }

@@ -73,6 +73,11 @@ public class Employee {
 	@Comment("퇴사일")
 	private Date resignDate;
 
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "updated_at")
+	@Comment("정보 수정일")
+	private Date updatedAt;
+
 	@Column(name = "employment_type", length = 20, nullable = false)
 	@Comment("고용 형태(정규직, 계약직 등)")
 	private String employmentType;

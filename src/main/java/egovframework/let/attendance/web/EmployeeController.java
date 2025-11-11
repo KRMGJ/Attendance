@@ -1,5 +1,7 @@
 package egovframework.let.attendance.web;
 
+import java.security.Principal;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,7 +11,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import egovframework.let.attendance.dto.request.EditEmployeeDto;
 import egovframework.let.attendance.dto.request.RegistEmployeeDto;
+import egovframework.let.attendance.dto.response.EmployeeViewDto;
 import egovframework.let.attendance.entity.Employee;
 import egovframework.let.attendance.service.EmployeeService;
 
@@ -52,6 +56,19 @@ public class EmployeeController {
 		Employee employee = employeeService.getEmployeeDetail(id);
 		model.addAttribute("employee", employee);
 		return "employee/detail";
+	}
+
+	@RequestMapping(value = "/edit.do", method = RequestMethod.GET)
+	public String editForm(@RequestParam("id") String id, Model model) {
+		EmployeeViewDto v = employeeService.loadView(id);
+		model.addAttribute("employee", v);
+		return "employee/edit"; // 질문에 준 JSP
+	}
+
+	@RequestMapping(value = "/edit.do", method = RequestMethod.POST)
+	public String editSubmit(EditEmployeeDto dto, Model model, Principal principal) {
+		employeeService.edit(dto, principal.getName());
+		return "redirect:/employee/detail.do?id=" + dto.getId();
 	}
 
 }

@@ -2,7 +2,9 @@ package egovframework.let.attendance.service;
 
 import java.util.List;
 
+import egovframework.let.attendance.dto.request.EditEmployeeDto;
 import egovframework.let.attendance.dto.request.RegistEmployeeDto;
+import egovframework.let.attendance.dto.response.EmployeeViewDto;
 import egovframework.let.attendance.entity.Employee;
 
 public interface EmployeeService {
@@ -27,4 +29,8 @@ public interface EmployeeService {
 	 * @return 직원 상세 정보
 	 */
 	Employee getEmployeeDetail(String id);
+
+	EmployeeViewDto loadView(String id);
+
+	void edit(EditEmployeeDto cmd, String actorUsername);
 }
