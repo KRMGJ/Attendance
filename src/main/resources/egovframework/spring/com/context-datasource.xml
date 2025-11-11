@@ -23,10 +23,13 @@
 		<property name="jdbcUrl" value="${Globals.Url}"/>
 		<property name="username" value="${Globals.UserName}"/>
 		<property name="password" value="${Globals.Password}"/>
-		<property name="maximumPoolSize" value="20"/>
-		<property name="connectionTestQuery" value="SELECT 1 FROM DUAL"/>
-		<!-- 선택: 세션 NLS -->
-		<property name="connectionInitSql" value="ALTER SESSION SET NLS_DATE_FORMAT='YYYY-MM-DD'"/>
+		<property name="maximumPoolSize" value="${Globals.MaximumPoolSize}"/>
+		<property name="minimumIdle" value="${Globals.MinimumIdle}"/>
+		<property name="idleTimeout" value="${Globals.IdleTimeout}"/>
+		<property name="maxLifetime" value="${Globals.MaxLifetime}"/>
+		<property name="connectionTimeout" value="${Globals.ConnectionTimeout}"/>
+		<property name="connectionTestQuery" value="${Globals.ConnectionTestQuery}"/>
+		<property name="connectionInitSql" value="${Globals.ConnectionInitSql}"/>
 	</bean>
     
     <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">

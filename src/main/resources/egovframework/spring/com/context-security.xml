@@ -31,7 +31,7 @@
 	<security:http use-expressions="true">
 		<security:csrf disabled="true" />
 		<security:intercept-url pattern="/login.do"  access="permitAll"/>
-		<security:intercept-url pattern="/signup.do" access="permitAll"/>
+		<security:intercept-url pattern="/employee/join.do" access="permitAll"/>
 		<!-- <security:intercept-url pattern="/auth/session/**" access="permitAll"/> -->
 		<security:intercept-url pattern="/**" access="isAuthenticated()"/>
 		<security:form-login login-page="/login.do"
