@@ -1,5 +1,17 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+
+<c:set var="reqUri" value="${empty requestScope['javax.servlet.forward.request_uri']
+    ? pageContext.request.requestURI
+    : requestScope['javax.servlet.forward.request_uri']}" />
+
+<c:set var="adminSecPrefix" value="${pageContext.request.contextPath}/admin/security" />
+
+<c:set var="isActive" value="${fn:startsWith(reqUri, adminSecPrefix)}" />
+
+
 <aside class="w-64 bg-white border-r hidden md:block">
 	<nav class="p-4 space-y-1">
 		<a href="<c:url value='/main.do'/>"
@@ -24,5 +36,25 @@
 		<div class="mt-3 text-xs uppercase text-gray-500 px-3">리포트</div>
 		<a href="<c:url value='/admin/report/monthly.do'/>"
 			class="block px-3 py-2 rounded hover:bg-gray-100">월별 통계</a>
+
+		<!-- 보안 메뉴: ROLE_ADMIN만 노출 -->
+		<%-- <sec:authorize access="hasRole('ROLE_ADMIN')"> --%>
+			<div class="mt-3 text-xs uppercase text-gray-500 px-3">보안</div>
+
+			<a href="<c:url value='/admin/security/users.do'/>"
+				class="block px-3 py-2 rounded hover:bg-gray-100
+                <c:if test='${fn:endsWith(reqUri, "/admin/security/users.do")}'> bg-gray-100 font-semibold</c:if>">
+				사용자 권한 부여 </a>
+
+			<a href="<c:url value='/admin/security/role-url.do'/>"
+				class="block px-3 py-2 rounded hover:bg-gray-100
+                <c:if test='${fn:endsWith(reqUri, "/admin/security/role-url.do")}'> bg-gray-100 font-semibold</c:if>">
+				URL ↔ 권한 매핑 </a>
+
+			<a href="<c:url value='/admin/security/role-hierarchy.do'/>"
+				class="block px-3 py-2 rounded hover:bg-gray-100
+                <c:if test='${fn:endsWith(reqUri, "/admin/security/role-hierarchy.do")}'> bg-gray-100 font-semibold</c:if>">
+				권한 계층 </a>
+		<%-- </sec:authorize> --%>
 	</nav>
 </aside>

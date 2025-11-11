@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="egovframework.let.attendance.repository.mybatis.SecurityAdminDAO">
+
+	<select id="selectUsers" parameterType="string" resultType="map">
+		SELECT USERNAME, EMAIL, ENABLED, CREATED_AT FROM USERS
+		<if test="_parameter != null and _parameter != ''">
+			WHERE USERNAME LIKE '%'||#{_parameter}||'%' OR EMAIL LIKE
+			'%'||#{_parameter}||'%'
+		</if>
+		ORDER BY CREATED_AT DESC
+	</select>
+
+	<select id="selectAllRoles" resultType="string">
+		SELECT DISTINCT AUTHORITY FROM AUTHORITIES ORDER BY AUTHORITY
+	</select>
+
+	<select id="selectUserRoles" parameterType="string"
+		resultType="string">
+		SELECT AUTHORITY FROM AUTHORITIES WHERE USERNAME = #{username}
+	</select>
+
+	<delete id="deleteAllUserRoles" parameterType="string">
+		DELETE FROM AUTHORITIES WHERE USERNAME = #{username}
+	</delete>
+
+	<insert id="insertUserRole">
+		INSERT INTO AUTHORITIES (USERNAME, AUTHORITY) VALUES (#{username},
+		#{authority})
+	</insert>
+
+	<select id="selectRoleUrls" resultType="map">
+		SELECT AUTHORITY, ROLE_PATTERN, ROLE_SORT FROM ROLE_URL ORDER BY ROLE_SORT,
+		ROLE_PATTERN
+	</select>
+
+	<insert id="insertRoleUrl">
+		INSERT INTO ROLE_URL (AUTHORITY, ROLE_PATTERN, ROLE_SORT)
+		VALUES (#{authority}, #{pattern}, #{sort})
+	</insert>
+
+	<delete id="deleteRoleUrl">
+		DELETE FROM ROLE_URL WHERE AUTHORITY=#{authority} AND
+		ROLE_PATTERN=#{pattern}
+	</delete>
+
+	<select id="selectRoleHierarchy" resultType="map">
+		SELECT PARENT_ROLE, CHILD_ROLE FROM ROLE_HIERARCHY ORDER BY PARENT_ROLE,
+		CHILD_ROLE
+	</select>
+
+	<insert id="insertRoleHierarchy">
+		INSERT INTO ROLE_HIERARCHY (PARENT_ROLE, CHILD_ROLE) VALUES (#{parent},
+		#{child})
+	</insert>
+
+	<delete id="deleteRoleHierarchy">
+		DELETE FROM ROLE_HIERARCHY WHERE PARENT_ROLE=#{parent} AND
+		CHILD_ROLE=#{child}
+	</delete>
+
+</mapper>
