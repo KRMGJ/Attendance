@@ -28,5 +28,5 @@
     </task:scheduled-tasks>
 
     <!-- 작업에서 @Async 쓸 경우 -->
-    <task:annotation-driven executor="leaveTaskExecutor" scheduler="leaveTaskScheduler"/>
+    <!-- <task:annotation-driven executor="leaveTaskExecutor" scheduler="leaveTaskScheduler"/> -->
 </beans>

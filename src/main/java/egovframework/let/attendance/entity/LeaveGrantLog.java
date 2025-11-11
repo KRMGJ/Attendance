@@ -5,8 +5,12 @@ import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
+import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -51,6 +55,15 @@ public class LeaveGrantLog {
 	@Column(name = "granted_at", nullable = false)
 	@Comment("지급일시")
 	private Date grantedAt;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "emp_id", referencedColumnName = "id", insertable = false, updatable = false)
+	private Employee employee;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumns({ @JoinColumn(name = "emp_id", referencedColumnName = "emp_id", insertable = false, updatable = false),
+			@JoinColumn(name = "year", referencedColumnName = "year", insertable = false, updatable = false) })
+	private LeaveBalance leaveBalance;
 
 	@PrePersist
 	public void prePersist() {

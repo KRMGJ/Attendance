@@ -4,7 +4,10 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -32,6 +35,10 @@ public class SessionLimit {
 	@Comment("세션ID")
 	private String sessionId;
 
+	@Column(name = "emp_id", length = 36)
+	@Comment("직원 식별자(UUID)")
+	private String empId;
+
 	@Column(nullable = false, length = 100)
 	@Comment("사용자명")
 	private String username;
@@ -40,6 +47,10 @@ public class SessionLimit {
 	@Column(nullable = false)
 	@Comment("만료일시")
 	private Date expiresAt;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "emp_id", referencedColumnName = "id", insertable = false, updatable = false)
+	private Employee employee;
 
 	public static SessionLimit create(String sessionId, String username, long minutes) {
 		return SessionLimit.builder().sessionId(sessionId).username(username)

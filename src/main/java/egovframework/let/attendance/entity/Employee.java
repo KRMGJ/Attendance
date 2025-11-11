@@ -1,5 +1,6 @@
 package egovframework.let.attendance.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -10,7 +11,6 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -82,11 +82,21 @@ public class Employee {
 	@Comment("고용 상태(재직중, 휴직중, 퇴사 등)")
 	private String status = "재직 중";
 
-	@OneToOne(mappedBy = "employee", fetch = FetchType.LAZY)
-	private LeaveBalance leaveBalance;
-
+	@Builder.Default
 	@OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
-	private List<LeaveRequest> leaveRequests;
+	private List<Attendance> attendances = new ArrayList<>();
+
+	@Builder.Default
+	@OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
+	private List<LeaveRequest> leaveRequests = new ArrayList<>();
+
+	@Builder.Default
+	@OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
+	private List<LeaveBalance> leaveBalances = new ArrayList<>();
+
+	@Builder.Default
+	@OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
+	private List<LeaveGrantLog> leaveGrantLogs = new ArrayList<>();
 
 	@PrePersist
 	public void prePersist() {

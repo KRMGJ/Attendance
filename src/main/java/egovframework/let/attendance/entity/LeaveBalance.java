@@ -7,7 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -54,7 +54,7 @@ public class LeaveBalance {
 	@Comment("사용한 연차 일수")
 	private int used;
 
-	@OneToOne
+	@ManyToOne
 	@JoinColumn(name = "emp_id", referencedColumnName = "id", insertable = false, updatable = false)
 	private Employee employee;
 
