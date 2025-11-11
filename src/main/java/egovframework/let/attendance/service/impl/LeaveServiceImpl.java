@@ -12,9 +12,13 @@ import java.time.LocalDate;
 import java.time.Year;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.TimeZone;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +33,7 @@ import egovframework.let.attendance.entity.LeaveRequest;
 import egovframework.let.attendance.repository.EmployeeRepository;
 import egovframework.let.attendance.repository.LeaveBalanceRepository;
 import egovframework.let.attendance.repository.LeaveRequestRepository;
+import egovframework.let.attendance.repository.mybatis.LeaveBalanceDAO;
 import egovframework.let.attendance.repository.mybatis.LeaveRequestDAO;
 import egovframework.let.attendance.service.LeaveService;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +43,9 @@ import lombok.extern.slf4j.Slf4j;
 public class LeaveServiceImpl implements LeaveService {
 	@Autowired
 	private LeaveRequestDAO leaveRequestDAO;
+
+	@Autowired
+	private LeaveBalanceDAO leaveBalanceDAO;
 
 	@Autowired
 	private EmployeeRepository employeeRepository;
@@ -165,7 +173,6 @@ public class LeaveServiceImpl implements LeaveService {
 			throw new IllegalStateException("승인할 수 없는 상태입니다.");
 		}
 
-		// 연차면 해당 연도 잔액 차감
 		if (lr.getType() == ANNUAL) {
 			int year = lr.getStartDate().toInstant().atZone(ZoneId.systemDefault()).getYear();
 			LeaveBalance bal = leaveBalanceRepository.findByEmpIdAndYear(lr.getEmpId(), year)
@@ -213,6 +220,126 @@ public class LeaveServiceImpl implements LeaveService {
 		lr.setApprover(null);
 		lr.setApprovedAt(null);
 		leaveRequestRepository.save(lr);
+	}
+
+	/**
+	 * 전월 개근자에게 월 1일 연차 부여
+	 */
+	@Override
+	public void grantMonthlyAccrualIfEligible(Date targetDate) {
+		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"));
+		cal.setTime(targetDate);
+		// 전월로 이동
+		cal.add(Calendar.MONTH, -1);
+		int y = cal.get(Calendar.YEAR);
+		int m = cal.get(Calendar.MONTH) + 1;
+
+		// 1년 미만 + 전월 개근자
+		List<String> empIds = leaveBalanceDAO.selectFirstYearFullAttendanceEmployees(y, m);
+		for (String empId : empIds) {
+			Integer year = y;
+			String upsertId = UUID.randomUUID().toString();
+			leaveBalanceDAO.upsertLeaveBalance(upsertId, empId, year);
+
+			int monthlyGranted = leaveBalanceDAO.countMonthlyGranted(empId, year);
+			if (monthlyGranted < 11) {
+				leaveBalanceDAO.addQuota(empId, year, 1);
+				String logId = UUID.randomUUID().toString();
+				leaveBalanceDAO.insertGrantLog(logId, empId, year, "MONTHLY_1D", 1, new Date());
+			}
+		}
+	}
+
+	/**
+	 * 전월 월차 부여 중복 처리 방지
+	 */
+	@Override
+	public void ensureLastMonthMonthlyAccrualClosed() {
+		leaveBalanceDAO.fixMonthlyAccrualDuplicate(new Date());
+	}
+
+	/**
+	 * 입사기준 연차 부여
+	 */
+	@Override
+	public void grantAnnualByAnniversary(Date today) {
+		List<Map<String, Object>> targets = leaveBalanceDAO.selectEmployeesWithAnniversaryToday(today);
+		for (Map<String, Object> row : targets) {
+			String empId = (String) row.get("empId");
+			Date hireDate = (Date) row.get("hireDate");
+			int years = diffYears(hireDate, today);
+			if (years < 1) {
+				continue;
+			}
+
+			int base = 15;
+			int extra = Math.max(0, (years - 1) / 2);
+			int grant = Math.min(25, base + extra);
+
+			Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"));
+			cal.setTime(today);
+			int year = cal.get(Calendar.YEAR);
+
+			String upsertId = UUID.randomUUID().toString();
+			leaveBalanceDAO.upsertLeaveBalance(upsertId, empId, year);
+			leaveBalanceDAO.setAnnualQuota(empId, year, grant);
+
+			String logId = UUID.randomUUID().toString();
+			leaveBalanceDAO.insertGrantLog(logId, empId, year, "ANNUAL_RESET", grant, today);
+		}
+	}
+
+	/**
+	 * 달력기준 연차 부여
+	 */
+	@Override
+	public void grantAnnualByCalendarYear(int year) {
+		List<Map<String, Object>> emps = leaveBalanceDAO.selectActiveEmployeesOnYear(year);
+		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"));
+		cal.set(Calendar.YEAR, year);
+		cal.set(Calendar.MONTH, Calendar.JANUARY);
+		cal.set(Calendar.DAY_OF_MONTH, 1);
+		Date ref = cal.getTime();
+
+		for (Map<String, Object> row : emps) {
+			String empId = (String) row.get("empId");
+			Date hireDate = (Date) row.get("hireDate");
+			int years = diffYears(hireDate, ref);
+			if (years < 1) {
+				continue;
+			}
+
+			int base = 15;
+			int extra = Math.max(0, (years - 1) / 2);
+			int grant = Math.min(25, base + extra);
+
+			String upsertId = UUID.randomUUID().toString();
+			leaveBalanceDAO.upsertLeaveBalance(upsertId, empId, year);
+			leaveBalanceDAO.setAnnualQuota(empId, year, grant);
+
+			String logId = UUID.randomUUID().toString();
+			leaveBalanceDAO.insertGrantLog(logId, empId, year, "ANNUAL_RESET", grant, ref);
+		}
+	}
+
+	/**
+	 * 두 날짜 사이의 연도 차이 계산
+	 * 
+	 * @param from 시작 날짜
+	 * @param to   종료 날짜
+	 * @return 연도 차이
+	 */
+	private int diffYears(Date from, Date to) {
+		Calendar a = Calendar.getInstance();
+		a.setTime(from);
+		Calendar b = Calendar.getInstance();
+		b.setTime(to);
+		int diff = b.get(Calendar.YEAR) - a.get(Calendar.YEAR);
+		if (b.get(Calendar.MONTH) < a.get(Calendar.MONTH) || (b.get(Calendar.MONTH) == a.get(Calendar.MONTH)
+				&& b.get(Calendar.DAY_OF_MONTH) < a.get(Calendar.DAY_OF_MONTH))) {
+			diff--;
+		}
+		return diff;
 	}
 
 }

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+          http://www.springframework.org/schema/task  http://www.springframework.org/schema/task/spring-task.xsd">
+
+    <!-- 스케줄러 스레드풀 -->
+    <task:executor id="leaveTaskExecutor" pool-size="4"/>
+
+    <!-- 일정 관리자 -->
+    <task:scheduler id="leaveTaskScheduler" pool-size="2"/>
+
+    <!-- 빈 주입 -->
+    <bean id="leaveGrantJob" class="egovframework.let.attendance.common.LeaveGrantJob"/>
+
+    <!-- 스케줄 등록 -->
+    <task:scheduled-tasks scheduler="leaveTaskScheduler">
+        <!-- 매일 03:15: 전일 기준 월만근 검사 → 입사 1년 미만 월차 1일 부여 -->
+        <task:scheduled ref="leaveGrantJob" method="runDailyMonthlyAccrual" cron="0 15 3 * * *"/>
+        <!-- 매월 01일 03:30: 전월 집계 확정(중복 방지용 세이프가드) -->
+        <task:scheduled ref="leaveGrantJob" method="runMonthlySafeguard" cron="0 30 3 1 * *"/>
+        <!-- 매일 04:00: 입사기념일 도래자 연차(법정 15일+가산) 갱신 -->
+        <task:scheduled ref="leaveGrantJob" method="runAnniversaryAnnualGrant" cron="0 0 4 * * *"/>
+        <!-- 매년 01-01 04:30: 캘린더 기준 정책 사용 시 일괄 갱신 -->
+        <task:scheduled ref="leaveGrantJob" method="runCalendarAnnualGrant" cron="0 30 4 1 1 *"/>
+    </task:scheduled-tasks>
+
+    <!-- 작업에서 @Async 쓸 경우 -->
+    <task:annotation-driven executor="leaveTaskExecutor" scheduler="leaveTaskScheduler"/>
+</beans>

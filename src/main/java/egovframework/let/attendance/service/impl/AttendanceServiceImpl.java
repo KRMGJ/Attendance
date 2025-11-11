@@ -178,7 +178,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 		try {
 			List<Attendance> att = attendanceRepository.findTop7ByEmpIdOrderByWorkDateDesc(empId);
 			recent = att.stream()
-					.map(a -> AttendanceViewDto.builder().workDate(a.getWorkDate().toString())
+					.map(a -> AttendanceViewDto.builder().workDate(formatDateOnly(a.getWorkDate()))
 							.checkIn(a.getCheckIn() != null ? formatDate(a.getCheckIn()) : null)
 							.checkOut(a.getCheckOut() != null ? formatDate(a.getCheckOut()) : null)
 							.status(a.getStatus()).build())

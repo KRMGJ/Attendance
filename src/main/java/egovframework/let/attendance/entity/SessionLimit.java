@@ -23,6 +23,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Table(name = "session_limit")
+@org.hibernate.annotations.Table(appliesTo = "session_limit", comment = "세션 제한 관리 테이블")
 @Builder
 public class SessionLimit {
 

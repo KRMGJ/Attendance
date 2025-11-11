@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="egovframework.let.attendance.repository.mybatis.LeaveBalanceDAO">
+
+	<!-- 1년 미만 + 전월 개근자 -->
+	<select id="selectFirstYearFullAttendanceEmployees" resultType="long">
+		<!-- /* y: #{year}, m: #{month} */ -->
+		SELECT e.id
+		FROM employee e
+		WHERE e.resign_date IS NULL
+		<!-- /* 입사 1년 미만 */ -->
+		AND MONTHS_BETWEEN(
+		ADD_MONTHS(TRUNC(TO_DATE(#{year}||LPAD(#{month},2,'0')||'01','YYYYMMDD'),'MM'),
+		1) - 1,
+		e.hire_date ) &lt; 12
+		/* 전월 결근/지각/조퇴 없으면 개근으로 간주 */
+		AND NOT EXISTS (
+		SELECT 1
+		FROM attendance a
+		WHERE a.emp_id = e.id
+		AND TO_CHAR(a.work_date,'YYYY') = #{year}
+		AND TO_CHAR(a.work_date,'MM') = LPAD(#{month},2,'0')
+		AND a.status IN ('LATE','ABSENT','EARLY_LEAVE')
+		)
+	</select>
+
+	<select id="countMonthlyGranted" resultType="int">
+		SELECT COUNT(1)
+		FROM leave_grant_log
+		WHERE emp_id = #{empId}
+		AND year = #{year}
+		AND reason = 'MONTHLY_1D'
+	</select>
+
+	<!-- 연차 1일 가산: leave_balance.total += days -->
+	<update id="addQuota">
+		UPDATE leave_balance
+		SET total = total + #{days}
+		WHERE emp_id = #{empId}
+		AND year = #{year}
+	</update>
+
+	<insert id="insertGrantLog">
+		INSERT INTO leave_grant_log (id, emp_id, year, reason, days, granted_at)
+		VALUES (#{id}, #{empId}, #{year}, #{reason}, #{days}, #{grantedAt})
+	</insert>
+
+	<!-- 입사기념일 기준 연차 총량 재설정 -->
+	<update id="setAnnualQuota">
+		UPDATE leave_balance
+		SET total = #{grant}
+		WHERE emp_id = #{empId}
+		AND year = #{year}
+	</update>
+
+	<!-- 연도별 leave_balance upsert -->
+	<insert id="upsertLeaveBalance">
+		MERGE INTO leave_balance b
+		USING (SELECT #{empId} emp_id, #{year} year FROM dual) s
+		ON (b.emp_id = s.emp_id AND b.year = s.year)
+		WHEN NOT MATCHED THEN
+		INSERT (id, emp_id, year, total, used)
+		VALUES (#{id}, #{empId}, #{year}, 0, 0)
+	</insert>
+
+	<!-- 오늘이 입사기념일인 재직자 -->
+	<select id="selectEmployeesWithAnniversaryToday"
+		resultType="map">
+		SELECT e.id AS empId, e.hire_date AS hireDate
+		FROM employee e
+		WHERE e.resign_date IS NULL
+		AND TO_CHAR(e.hire_date,'MMDD') = TO_CHAR(SYSDATE,'MMDD')
+	</select>
+
+	<!-- 해당 연도 1월 1일 기준 재직자(그 날짜에 이미 재직) -->
+	<select id="selectActiveEmployeesOnYear" resultType="map">
+		SELECT e.id AS empId, e.hire_date AS hireDate
+		FROM employee e
+		WHERE e.resign_date IS NULL
+		AND e.hire_date &lt;= TO_DATE(#{year}||'0101','YYYYMMDD')
+	</select>
+
+	<!-- 보정용 자리(조직 규칙에 맞게 구현) -->
+	<update id="fixMonthlyAccrualDuplicate">
+		UPDATE leave_balance SET total = total WHERE 1=1
+	</update>
+
+</mapper>

@@ -30,5 +30,11 @@
         <aop:pointcut id="requiredTx" expression="execution(* egovframework.let..impl.*Impl.*(..)) or execution(* egovframework.com..*Impl.*(..))"/>
         <aop:advisor advice-ref="txAdvice" pointcut-ref="requiredTx" />
     </aop:config>
+    
+      <aop:config>
+        <aop:pointcut id="leaveSchedulerOps"
+            expression="execution(* egovframework.let.attendance.common.LeaveGrantJob.*(..))"/>
+        <aop:advisor pointcut-ref="leaveSchedulerOps" advice-ref="txAdvice"/>
+    </aop:config>
 
 </beans>

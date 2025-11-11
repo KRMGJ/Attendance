@@ -8,12 +8,14 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.Comment;
 
@@ -30,7 +32,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "employee")
+@Table(name = "employee", indexes = { @Index(name = "ix_employee_email", columnList = "email") }, uniqueConstraints = {
+		@UniqueConstraint(name = "uk_employee_email", columnNames = { "email" }) })
+@org.hibernate.annotations.Table(appliesTo = "employee", comment = "직원 정보 테이블")
 public class Employee {
 
 	@Id

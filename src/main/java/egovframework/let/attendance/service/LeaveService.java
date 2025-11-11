@@ -1,5 +1,6 @@
 package egovframework.let.attendance.service;
 
+import java.util.Date;
 import java.util.List;
 
 import egovframework.let.attendance.dto.request.NewLeaveDto;
@@ -55,4 +56,30 @@ public interface LeaveService {
 	 * @param approverUsername 승인자 사용자 이름
 	 */
 	void reject(String id, String approverUsername);
+
+	/**
+	 * 월별 휴가 일수 자동 부여
+	 * 
+	 * @param targetDate 대상 날짜
+	 */
+	void grantMonthlyAccrualIfEligible(Date targetDate);
+
+	/**
+	 * 지난달 월별 휴가 일수 부여가 완료되었는지 확인하고, 완료되지 않았다면 부여 작업을 수행
+	 */
+	void ensureLastMonthMonthlyAccrualClosed();
+
+	/**
+	 * 입사 기념일 기준 연차 휴가 일수 부여
+	 * 
+	 * @param today 오늘 날짜
+	 */
+	void grantAnnualByAnniversary(Date today);
+
+	/**
+	 * 달력 연도 기준 연차 휴가 일수 부여
+	 * 
+	 * @param year 대상 연도
+	 */
+	void grantAnnualByCalendarYear(int year);
 }

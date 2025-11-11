@@ -14,8 +14,7 @@
 		<result property="checkOut" column="a_check_out" />
 		<result property="status" column="a_status" />
 		<result property="overtimeMinutes" column="a_overtime_minutes" />
-		<association property="employee"
-			javaType="egovframework.let.attendance.entity.Employee">
+		<association property="employee" javaType="egovframework.let.attendance.entity.Employee">
 			<id property="id" column="e_id" />
 			<result property="name" column="e_name" />
 			<result property="email" column="e_email" />
@@ -27,23 +26,17 @@
 		<result property="department" column="department" />
 		<result property="headcount" column="headcount" />
 		<result property="workDays" column="work_days" />
-		<result property="totalMinutes" column="total_minutes"
-			javaType="int" />
-		<result property="totalOvertime" column="total_overtime"
-			javaType="int" />
-		<result property="nightOvertime" column="night_overtime"
-			javaType="int" />
-		<result property="weekendOvertime" column="weekend_overtime"
-			javaType="int" />
+		<result property="totalMinutes" column="total_minutes" javaType="int" />
+		<result property="totalOvertime" column="total_overtime" javaType="int" />
+		<result property="nightOvertime" column="night_overtime" javaType="int" />
+		<result property="weekendOvertime" column="weekend_overtime" javaType="int" />
 		<result property="lateCount" column="late_cnt" />
 		<result property="earlyLeaveCount" column="early_leave_cnt" />
 		<result property="absentCount" column="absent_days" />
 		<result property="leaveDays" column="total_leave_days" />
 		<result property="sickLeaveDays" column="sick_leave_days" />
-		<result property="avgMinutes" column="avg_minutes"
-			javaType="int" />
-		<result property="avgOvertimePerCapita"
-			column="avg_overtime_pc" javaType="int" />
+		<result property="avgMinutes" column="avg_minutes" javaType="int" />
+		<result property="avgOvertimePerCapita" column="avg_overtime_pc" javaType="int" />
 	</resultMap>
 
 	<!-- 관리자용 출퇴근기록 조회 -->
