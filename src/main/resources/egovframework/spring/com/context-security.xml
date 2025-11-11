@@ -7,6 +7,7 @@
         http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
 		http://maven.egovframe.go.kr/schema/egov-security http://maven.egovframe.go.kr/schema/egov-security/egov-security-4.1.0.xsd">
 
+	<security:http pattern="/common/**" security="none" />
 	<security:http pattern="/css/**" security="none" />
 	<security:http pattern="/html/**" security="none" />
 	<security:http pattern="/images/**" security="none" />
@@ -29,32 +30,34 @@
 
 	<security:http use-expressions="true">
 		<security:csrf disabled="true" />
-		<security:intercept-url pattern="/login.do" access="permitAll" />
-		<security:intercept-url pattern="/signup.do" access="permitAll" />
-		<!-- <security:intercept-url pattern="/**" access="isAuthenticated()" /> -->
+		<security:intercept-url pattern="/login.do"  access="permitAll"/>
+		<security:intercept-url pattern="/employee/join.do" access="permitAll"/>
+		<!-- <security:intercept-url pattern="/auth/session/**" access="permitAll"/> -->
+		<security:intercept-url pattern="/**" access="isAuthenticated()"/>
 		<security:form-login login-page="/login.do"
-							 login-processing-url="/login.do" 
-							 default-target-url="/"
-							 authentication-failure-url="/login.do?error=1"
+							 login-processing-url="/loginProcess.do" 
+							 default-target-url="/main.do"
+							 authentication-success-handler-ref="customLoginSuccessHandler"
+							 authentication-failure-url="/login.do?error=true"
 							 username-parameter="username" 
 							 password-parameter="password" />
 		<security:logout logout-url="/logout.do"
-						 logout-success-url="/login.do?logout=1"
+						 logout-success-url="/login.do?logout=true"
 						 invalidate-session="true" />
 		<security:session-management invalid-session-url="/login.do?expired=1">
 			<security:concurrency-control max-sessions="1" error-if-maximum-exceeded="false" />
 		</security:session-management>
 	</security:http>
-
-	<!-- BCrypt -->
-	<bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
+	
+	<bean id="unauthorizedEntryPoint" class="org.springframework.security.web.authentication.HttpStatusEntryPoint">
+    	<constructor-arg value="UNAUTHORIZED"/>
+	</bean>
 
 	<!-- URL에 세미콜론(semicolon)허용 여부(기본값/false) -->
-	<bean id="egovStrictHttpFirewall"
-		class="org.springframework.security.web.firewall.StrictHttpFirewall">
+	<bean id="egovStrictHttpFirewall" class="org.springframework.security.web.firewall.StrictHttpFirewall">
 		<property name="allowSemicolon" value="true" />
 	</bean>
-	<security:http-firewall
-		ref="egovStrictHttpFirewall" />
+	<security:http-firewall ref="egovStrictHttpFirewall" />
 
+	<bean id="customLoginSuccessHandler" class="egovframework.let.attendance.handler.CustomLoginSuccessHandler"/>
 </beans>

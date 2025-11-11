@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="egovframework.let.attendance.repository.mybatis.LeaveRequestDAO">
+
+    <!-- 기간 겹침 건수 조회 -->
+	<select id="countOverlap" resultType="long">
+		SELECT COUNT(1)
+		FROM LEAVE_REQUEST l
+		WHERE l.emp_id = #{empId}
+		AND l.status &lt;&gt; 'REJECTED'
+		AND l.start_date &lt;= #{end}
+		AND l.end_date &gt;= #{start}
+	</select>
+
+</mapper>

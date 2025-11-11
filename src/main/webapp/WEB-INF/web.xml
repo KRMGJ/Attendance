@@ -63,9 +63,16 @@
 	<listener>
 		<listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
 	</listener>
-
-
 	<!-- security end -->
+	
+	<filter>
+    	<filter-name>noCacheFilter</filter-name>
+    	<filter-class>egovframework.let.attendance.common.NoCacheFilter</filter-class>
+	</filter>
+	<filter-mapping>
+    	<filter-name>noCacheFilter</filter-name>
+    	<url-pattern>/*</url-pattern>
+	</filter-mapping>
 
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
@@ -91,7 +98,7 @@
 	</servlet-mapping>
 
 	<welcome-file-list>
-		<welcome-file>index.jsp</welcome-file>
+		<welcome-file>WEB-INF/jsp/main/dashboard.jsp</welcome-file>
 	</welcome-file-list>
 	<login-config>
 		<auth-method>BASIC</auth-method>
@@ -106,11 +113,15 @@
 		<location>/common/error.jsp</location>
 	</error-page>
 	<error-page>
+		<error-code>403</error-code>
+		<location>/errors/403.html</location>
+	</error-page>
+	<error-page>
 		<error-code>404</error-code>
-		<location>/common/error.jsp</location>
+		<location>/errors/404.html</location>
 	</error-page>
 	<error-page>
 		<error-code>500</error-code>
-		<location>/common/error.jsp</location>
+		<location>/errors/500.html</location>
 	</error-page>
 </web-app>

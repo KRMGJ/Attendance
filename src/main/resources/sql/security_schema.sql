@@ -21,7 +21,7 @@ CREATE TABLE USERS (
   USERNAME   VARCHAR2(100)   NOT NULL,  -- 로그인 ID. 애플리케이션 전역 고유
   PASSWORD   VARCHAR2(200)   NOT NULL,  -- BCrypt 등 해시 저장
   ENABLED    NUMBER(1)       DEFAULT 1 NOT NULL,  -- 1=활성, 0=비활성
-  EMAIL      VARCHAR2(200),               -- 선택. 필요 시 UNIQUE 인덱스 부여
+  EMAIL      VARCHAR2(200)   NOT NULL,             -- 이메일
   CREATED_AT DATE            DEFAULT SYSDATE NOT NULL,
   CONSTRAINT PK_USERS PRIMARY KEY (USERNAME)
 );
@@ -30,11 +30,10 @@ COMMENT ON TABLE USERS IS '인증 전용 사용자 테이블(업무용 EMPLOYEE�
 COMMENT ON COLUMN USERS.USERNAME   IS '로그인 ID(고유)';
 COMMENT ON COLUMN USERS.PASSWORD   IS '비밀번호 해시(예: BCrypt)';
 COMMENT ON COLUMN USERS.ENABLED    IS '계정 활성화 플래그(1/0)';
-COMMENT ON COLUMN USERS.EMAIL      IS '이메일(선택)';
+COMMENT ON COLUMN USERS.EMAIL      IS '이메일';
 COMMENT ON COLUMN USERS.CREATED_AT IS '생성일';
 
--- (선택) 이메일 유니크 인덱스
--- CREATE UNIQUE INDEX UX_USERS_EMAIL ON USERS(EMAIL);
+CREATE UNIQUE INDEX UX_USERS_EMAIL ON USERS(EMAIL);
 
 --------------------------------------------------------------------------------
 -- 2) AUTHORITIES: 사용자 ↔ 권한 매핑

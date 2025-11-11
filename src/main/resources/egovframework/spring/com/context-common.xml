@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
     <!-- component-scan 설정-->
 	<context:component-scan base-package="egovframework">
@@ -11,8 +13,12 @@
 		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
 	</context:component-scan>
 	
+	<mvc:annotation-driven />
+	    <bean id="mappingJackson2HttpMessageConverter"
+          class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"/>
+	
 	<import resource="classpath:/egovframework/spring/com/context-jpa.xml"/>
-	<!-- <import resource="classpath:/egovframework/spring/com/context-session-init.xml"/> -->
+	<import resource="classpath:/egovframework/spring/com/context-scheduler.xml"/>
 
     <!-- 메시지소스빈 설정 -->
     <bean id="egovMessageSource" class="egovframework.com.cmm.EgovMessageSource">
@@ -90,5 +96,10 @@
     <!-- choose one from above and alias it to the name Spring expects -->
     <alias name="local.MultiCommonsMultipartResolver" alias="filterMultipartResolver" />
     <!-- <alias name="spring.RegularCommonsMultipartResolver" alias="multipartResolver" /> -->
+    
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/jsp/" />
+        <property name="suffix" value=".jsp" />
+    </bean>
         
 </beans>

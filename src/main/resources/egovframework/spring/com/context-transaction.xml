@@ -7,21 +7,34 @@
 	    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 
     <!-- transaction 설정 -->
-    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" primary="true">
+<!--     <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
       <property name="dataSource" ref="dataSource"/>
-    </bean>
+    </bean> -->
+    
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="transactionFactory">
+			<bean class="org.mybatis.spring.transaction.SpringManagedTransactionFactory"/>
+		</property>
+	</bean>
 
-    <tx:advice id="txAdvice" transaction-manager="txManager">
+    <tx:advice id="txAdvice" transaction-manager="jpaTxManager">
         <tx:attributes>
             <tx:method name="*" rollback-for="Exception"/>
         </tx:attributes>
     </tx:advice>
 
-	<tx:annotation-driven transaction-manager="txManager"/>
+	<tx:annotation-driven transaction-manager="jpaTxManager"/>
 
     <aop:config>
         <aop:pointcut id="requiredTx" expression="execution(* egovframework.let..impl.*Impl.*(..)) or execution(* egovframework.com..*Impl.*(..))"/>
         <aop:advisor advice-ref="txAdvice" pointcut-ref="requiredTx" />
+    </aop:config>
+    
+      <aop:config>
+        <aop:pointcut id="leaveSchedulerOps"
+            expression="execution(* egovframework.let.attendance.common.LeaveGrantJob.*(..))"/>
+        <aop:advisor pointcut-ref="leaveSchedulerOps" advice-ref="txAdvice"/>
     </aop:config>
 
 </beans>

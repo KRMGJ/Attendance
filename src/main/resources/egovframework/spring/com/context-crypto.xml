@@ -9,6 +9,10 @@
 		<property name="hashedPassword" value="gdyYs/IZqY86VcWhT8emCYfqY1ahw2vtLG+/FzNqtrQ=" />
 	</bean>
 	
+    <bean id="passwordEncoder" class="egovframework.let.attendance.security.EgovPasswordEncoderAdapter">
+		<constructor-arg ref="egovPasswordEncoder"/>
+    </bean>
+	
 	<bean id="egovARIACryptoService" class="org.egovframe.rte.fdl.cryptography.impl.EgovARIACryptoServiceImpl">
 		<property name="passwordEncoder" ref="egovPasswordEncoder" />
 		<property name="blockSize" value="1024" />

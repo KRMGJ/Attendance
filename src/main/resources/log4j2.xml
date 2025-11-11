@@ -40,6 +40,9 @@
         <Logger name="org.springframework.security" level="INFO" additivity="false">
             <AppenderRef ref="console" />
         </Logger>
+        <!-- <Logger name="org.springframework.security.web" level="TRACE" additivity="false">
+            <AppenderRef ref="console" />
+        </Logger> -->
 
         <Logger name="org.apache.catalina" level="WARN" additivity="false">
             <AppenderRef ref="console" />
