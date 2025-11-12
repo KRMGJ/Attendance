@@ -3,6 +3,8 @@ package egovframework.let.attendance.web;
 import java.security.Principal;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,7 +15,10 @@ import egovframework.let.attendance.entity.Employee;
 import egovframework.let.attendance.repository.EmployeeRepository;
 import egovframework.let.attendance.service.AttendanceService;
 import egovframework.let.attendance.service.LeaveService;
+import lombok.extern.slf4j.Slf4j;
 
+@PreAuthorize("hasRole('ROLE_USER')")
+@Slf4j
 @Controller
 public class RootController {
 
@@ -30,7 +35,7 @@ public class RootController {
 	 * 메인 대시보드
 	 */
 	@RequestMapping(value = "/main.do", method = RequestMethod.GET)
-	public String home(Model model, Principal principal) {
+	public String home(Model model, Principal principal, Authentication a) {
 		if (principal == null) {
 			return "redirect:/login.do";
 		}
@@ -42,6 +47,7 @@ public class RootController {
 		model.addAttribute("today", attendanceService.getToday(emp.getId()));
 		model.addAttribute("recentAttendance", attendanceService.getRecent(emp.getId()));
 		model.addAttribute("leave", leaveService.getRemaining(emp.getId()));
+		log.info(a.getAuthorities().toString());
 		return "main/dashboard";
 	}
 

@@ -43,7 +43,7 @@
 	const result = "${result}";
 	if (result === "success") {
 	    alert("직원 등록이 완료되었습니다.");
-	    window.location.href = "<c:url value='/employee/list.do'/>";
+	    window.location.href = "<c:url value='/admin/employee/list.do'/>";
 	} else if (result === "fail") {
 	    alert("직원 등록에 실패했습니다. 다시 시도해주세요.");
 	}

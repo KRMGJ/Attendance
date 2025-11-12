@@ -3,6 +3,7 @@ package egovframework.let.attendance.web;
 import java.security.Principal;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -26,6 +27,7 @@ public class EmployeeController {
 	/**
 	 * 사원 등록 폼
 	 */
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@RequestMapping(value = "/join.do", method = RequestMethod.GET)
 	public String joinForm(Model model) {
 		model.addAttribute("registEmployeeDto", new RegistEmployeeDto());
@@ -35,6 +37,7 @@ public class EmployeeController {
 	/**
 	 * 사원 등록 처리
 	 */
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@RequestMapping(value = "/join.do", method = RequestMethod.POST)
 	public String join(@ModelAttribute("registEmployeeDto") RegistEmployeeDto dto, RedirectAttributes attributes)
 			throws Exception {
@@ -50,6 +53,7 @@ public class EmployeeController {
 	/**
 	 * 사원 상세 조회
 	 */
+	@PreAuthorize("hasRole('ROLE_HR') or #username == authentication.name")
 	@RequestMapping(value = "/detail.do", method = RequestMethod.GET)
 	public String employeeDetail(@RequestParam String id, Model model) {
 		EmployeeViewDto employee = employeeService.getEmployeeDetail(id);
@@ -60,16 +64,18 @@ public class EmployeeController {
 	/**
 	 * 사원 정보 수정 폼
 	 */
+	@PreAuthorize("hasRole('ROLE_HR') or #username == authentication.name")
 	@RequestMapping(value = "/edit.do", method = RequestMethod.GET)
 	public String editForm(@RequestParam("id") String id, Model model) {
 		EmployeeViewDto v = employeeService.loadView(id);
 		model.addAttribute("employee", v);
-		return "employee/edit"; // 질문에 준 JSP
+		return "employee/edit";
 	}
 
 	/**
 	 * 사원 정보 수정 처리
 	 */
+	@PreAuthorize("hasRole('ROLE_HR') or #username == authentication.name")
 	@RequestMapping(value = "/edit.do", method = RequestMethod.POST)
 	public String editSubmit(EditEmployeeDto dto, Model model, Principal principal) {
 		employeeService.edit(dto, principal.getName());

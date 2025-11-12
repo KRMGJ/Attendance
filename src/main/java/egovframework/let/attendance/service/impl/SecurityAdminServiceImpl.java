@@ -102,11 +102,17 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 		securityAdminDAO.deleteRoleHierarchy(parent, child);
 	}
 
+	/**
+	 * ROLE_HIERARCHY 트리 구조 조회
+	 */
 	@Override
 	public List<Map<String, Object>> listRoleHierarchyTree() {
 		return securityAdminDAO.selectRoleHierarchyTree();
 	}
 
+	/**
+	 * ROLE_HIERARCHY closure 목록 조회
+	 */
 	@Override
 	public List<Map<String, Object>> listRoleClosure() {
 		return securityAdminDAO.selectRoleClosure();

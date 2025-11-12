@@ -51,7 +51,7 @@ public class AdminController {
 	public void initBinder(WebDataBinder binder) {
 		SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
 		fmt.setLenient(false);
-		binder.registerCustomEditor(Date.class, new CustomDateEditor(fmt, true)); // allowEmpty=true
+		binder.registerCustomEditor(Date.class, new CustomDateEditor(fmt, true));
 	}
 
 	/**
@@ -131,6 +131,13 @@ public class AdminController {
 		return "report/monthly";
 	}
 
+	/**
+	 * 월의 첫날 구하기
+	 * 
+	 * @param ym "yyyy-MM" 형식의 문자열
+	 * @return 월의 첫날 Date 객체
+	 * @throws ParseException
+	 */
 	private Date firstDayOfMonth(String ym) throws ParseException {
 		Calendar cal = Calendar.getInstance();
 		cal.set(Calendar.MILLISECOND, 0);
@@ -145,6 +152,12 @@ public class AdminController {
 		return f.parse(ym + "-01");
 	}
 
+	/**
+	 * 월의 마지막 순간 구하기
+	 * 
+	 * @param start 월의 첫날 Date 객체
+	 * @return 월의 마지막 순간 Date 객체
+	 */
 	private Date lastMomentOfMonth(Date start) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(start);
@@ -153,10 +166,22 @@ public class AdminController {
 		return cal.getTime();
 	}
 
+	/**
+	 * "yyyy-MM" 형식의 문자열 구하기
+	 * 
+	 * @param start 월의 첫날 Date 객체
+	 * @return "yyyy-MM" 형식의 문자열
+	 */
 	private String ymValue(Date start) {
 		return new SimpleDateFormat("yyyy-MM").format(start);
 	}
 
+	/**
+	 * 날짜의 23:59:59.999 구하기
+	 * 
+	 * @param d 날짜
+	 * @return 날짜의 23:59:59.999
+	 */
 	private Date endOfDay(Date d) {
 		Calendar c = Calendar.getInstance();
 		c.setTime(d);
@@ -167,6 +192,13 @@ public class AdminController {
 		return c.getTime();
 	}
 
+	/**
+	 * PaginationInfo 생성
+	 * 
+	 * @param page  현재 페이지 번호
+	 * @param size  페이지당 레코드 수
+	 * @param total 전체 레코드 수
+	 */
 	private PaginationInfo buildPi(int page, int size, int total) {
 		PaginationInfo pi = new PaginationInfo();
 		pi.setCurrentPageNo(page);
