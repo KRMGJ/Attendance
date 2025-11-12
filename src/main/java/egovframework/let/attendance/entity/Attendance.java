@@ -30,9 +30,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "attendance", indexes = {
-		@Index(name = "ix_attendance_emp_workdate", columnList = "emp_id, work_date") }, uniqueConstraints = {
-				@UniqueConstraint(name = "uk_attendance_emp_workdate", columnNames = { "emp_id", "work_date" }) })
+@Table(name = "attendance", uniqueConstraints = {
+		@UniqueConstraint(name = "uk_attendance_emp_workdate", columnNames = { "emp_id", "work_date" }) }, indexes = {
+				@Index(name = "ix_attendance_workdate", columnList = "work_date") })
 @org.hibernate.annotations.Table(appliesTo = "attendance", comment = "근태 기록 테이블")
 public class Attendance {
 

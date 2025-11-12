@@ -28,10 +28,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "leave_request", indexes = {
-		@Index(name = "ix_leave_request_emp_status", columnList = "emp_id, status") }, uniqueConstraints = {
-				@UniqueConstraint(name = "uk_leave_request_emp_start_end", columnNames = { "emp_id", "start_date",
-						"end_date" }) })
+@Table(name = "leave_request", uniqueConstraints = {
+		@UniqueConstraint(name = "uk_leave_request_emp_start_end", columnNames = { "emp_id", "start_date",
+				"end_date" }) }, indexes = {
+						@Index(name = "ix_lrq_status_created", columnList = "status, created_at") })
 @org.hibernate.annotations.Table(appliesTo = "leave_request", comment = "휴가 신청 테이블")
 @Builder
 public class LeaveRequest {

@@ -163,8 +163,6 @@ COMMENT ON COLUMN ROLE_MASTER.AUTHORITY IS '권한';
 --------------------------------------------------------------------------------
 -- 초기 샘플 데이터
 --------------------------------------------------------------------------------
-INSERT INTO USERS (USERNAME, PASSWORD, ENABLED, EMAIL) VALUES ('admin', '{bcrypt}해시값', 1, 'admin@example.com');
-INSERT INTO AUTHORITIES (USERNAME, AUTHORITY) VALUES ('admin', 'ROLE_ADMIN');
 INSERT INTO ROLE_URL (AUTHORITY, ROLE_PATTERN, ROLE_SORT) VALUES ('ROLE_ADMIN', '/admin/**', 10);
 INSERT INTO ROLE_URL (AUTHORITY, ROLE_PATTERN, ROLE_SORT) VALUES ('ROLE_USER',  '/mypage/**', 20);
 INSERT INTO ROLE_HIERARCHY (PARENT_ROLE, CHILD_ROLE) VALUES ('ROLE_ADMIN', 'ROLE_USER');

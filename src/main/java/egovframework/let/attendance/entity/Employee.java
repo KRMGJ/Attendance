@@ -32,8 +32,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "employee", indexes = { @Index(name = "ix_employee_email", columnList = "email") }, uniqueConstraints = {
-		@UniqueConstraint(name = "uk_employee_email", columnNames = { "email" }) })
+@Table(name = "employee", uniqueConstraints = {
+		@UniqueConstraint(name = "uk_employee_email", columnNames = { "email" }) }, indexes = {
+				@Index(name = "ix_employee_hiredate", columnList = "hire_date") })
 @org.hibernate.annotations.Table(appliesTo = "employee", comment = "직원 정보 테이블")
 public class Employee {
 
