@@ -7,4 +7,6 @@ import egovframework.let.attendance.entity.LeaveRequest;
 
 public interface LeaveRequestRepositoryCustom {
 	Page<LeaveRequest> searchMine(String empId, Pageable pageable);
+
+	Page<LeaveRequest> searchPending(Pageable pageable);
 }

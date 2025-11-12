@@ -1,5 +1,7 @@
 package egovframework.let.attendance.repository.impl;
 
+import static egovframework.let.attendance.common.Enums.PENDING;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -28,6 +30,16 @@ public class LeaveRequestRepositoryImpl implements LeaveRequestRepositoryCustom 
 		List<LeaveRequest> content = total == 0 ? Collections.emptyList()
 				: leaveRequestDAO.selectMinePage(empId, offset, limit);
 
+		return new PageImpl<>(content, pageable, total);
+	}
+
+	@Override
+	public Page<LeaveRequest> searchPending(Pageable pageable) {
+		int offset = (int) pageable.getOffset();
+		int limit = pageable.getPageSize();
+		long total = leaveRequestDAO.countByStatus(PENDING);
+		List<LeaveRequest> content = total == 0 ? Collections.emptyList()
+				: leaveRequestDAO.selectByStatusPage(PENDING, offset, limit);
 		return new PageImpl<>(content, pageable, total);
 	}
 

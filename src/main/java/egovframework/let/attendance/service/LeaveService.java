@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import egovframework.let.attendance.dto.request.NewLeaveDto;
 import egovframework.let.attendance.dto.response.LeaveRequestListDto;
 import egovframework.let.attendance.entity.LeaveBalance;
+import egovframework.let.attendance.entity.LeaveRequest;
 
 public interface LeaveService {
 	/**
@@ -41,6 +42,15 @@ public interface LeaveService {
 	 * @param empId 직원 ID
 	 */
 	void cancel(String id, String empId) throws Exception;
+
+	/**
+	 * 승인 대기 중인 휴가 신청 조회
+	 * 
+	 * @param page 페이지 번호
+	 * @param size 페이지 크기
+	 * @return 승인 대기 중인 휴가 신청 리스트
+	 */
+	Page<LeaveRequest> pending(int page, int size) throws Exception;
 
 	/**
 	 * 휴가 신청 승인

@@ -26,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -145,6 +146,20 @@ public class LeaveServiceImpl implements LeaveService {
 
 		} catch (Exception e) {
 			log.error("Error fetching leave requests for userEmail {}: {}", userEmail, e);
+			throw e;
+		}
+	}
+
+	/**
+	 * 승인 대기 중인 휴가 신청 조회
+	 */
+	@Override
+	public Page<LeaveRequest> pending(int page, int size) throws Exception {
+		try {
+			Pageable pageable = PageRequest.of(Math.max(page - 1, 0), size, Sort.by(Direction.ASC, "createdAt"));
+			return leaveRequestRepository.searchPending(pageable);
+		} catch (Exception e) {
+			log.error("Error fetching pending leave requests: {}", e);
 			throw e;
 		}
 	}
@@ -381,5 +396,4 @@ public class LeaveServiceImpl implements LeaveService {
 		LocalDate e = end.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 		return (int) (ChronoUnit.DAYS.between(s, e) + 1);
 	}
-
 }

@@ -16,7 +16,8 @@
 
 	<select id="countMine" resultType="long">
 		SELECT COUNT(*)
-		FROM leave_request
+		FROM
+		leave_request
 		WHERE emp_id = #{empId}
 	</select>
 
@@ -24,9 +25,28 @@
 		SELECT * FROM (
 		SELECT t.*, ROWNUM rn FROM (
 		SELECT lr.*
-		FROM leave_request lr
+		FROM
+		leave_request lr
 		WHERE lr.emp_id = #{empId}
 		ORDER BY lr.id DESC
+		) t
+		WHERE
+		ROWNUM &lt;= #{offset} + #{limit}
+		)
+		WHERE rn &gt; #{offset}
+	</select>
+
+	<select id="countByStatus" resultType="long">
+		SELECT COUNT(*) FROM leave_request WHERE status = #{status}
+	</select>
+
+	<select id="selectByStatusPage" resultType="egovframework.let.attendance.entity.LeaveRequest">
+		SELECT * FROM (
+		SELECT t.*, ROWNUM rn FROM (
+		SELECT lr.*
+		FROM leave_request lr
+		WHERE lr.status = #{status}
+		ORDER BY lr.created_at ASC
 		) t
 		WHERE ROWNUM &lt;= #{offset} + #{limit}
 		)

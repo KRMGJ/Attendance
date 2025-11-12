@@ -1,6 +1,5 @@
 package egovframework.let.attendance.web;
 
-import static egovframework.let.attendance.common.Enums.PENDING;
 import static egovframework.let.attendance.common.Utils.buildPi;
 
 import java.security.Principal;
@@ -12,7 +11,6 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -29,7 +27,6 @@ import egovframework.let.attendance.dto.response.AttendanceListDto;
 import egovframework.let.attendance.dto.response.EmployeeViewDto;
 import egovframework.let.attendance.dto.response.MonthlyDeptReportDto;
 import egovframework.let.attendance.entity.LeaveRequest;
-import egovframework.let.attendance.repository.LeaveRequestRepository;
 import egovframework.let.attendance.service.AttendanceService;
 import egovframework.let.attendance.service.EmployeeService;
 import egovframework.let.attendance.service.LeaveService;
@@ -46,9 +43,6 @@ public class AdminController {
 
 	@Resource(name = "leaveService")
 	private LeaveService leaveService;
-
-	@Autowired
-	private LeaveRequestRepository leaveRequestRepository;
 
 	@InitBinder
 	public void initBinder(WebDataBinder binder) {
@@ -111,9 +105,13 @@ public class AdminController {
 	 * 휴가 신청 승인 대기 목록 조회
 	 */
 	@RequestMapping(value = "/leave/pending.do", method = RequestMethod.GET)
-	public String pending(Model model) {
-		List<LeaveRequest> pending = leaveRequestRepository.findByStatusOrderByCreatedAtAsc(PENDING);
-		model.addAttribute("pending", pending);
+	public String pending(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "20") int size,
+			Model model) throws Exception {
+
+		Page<LeaveRequest> pr = leaveService.pending(page, size);
+		model.addAttribute("pending", pr.getContent());
+		model.addAttribute("paginationInfo", buildPi(page, size, (int) pr.getTotalElements()));
+		model.addAttribute("size", size);
 		return "leave/admin_approve";
 	}
 

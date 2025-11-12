@@ -55,4 +55,30 @@ public class LeaveRequestDAO extends EgovAbstractMapper {
 		return selectList("leaveRequestDAO.selectMinePage", p);
 	}
 
+	/**
+	 * 특정 상태의 휴가 신청 건수 조회
+	 * 
+	 * @param string 상태 문자열
+	 * @return 휴가 신청 건수
+	 */
+	public long countByStatus(String string) {
+		return selectOne("leaveRequestDAO.countByStatus", string);
+	}
+
+	/**
+	 * 특정 상태의 휴가 신청 내역 페이지 조회
+	 * 
+	 * @param string 상태 문자열
+	 * @param offset 시작 오프셋
+	 * @param limit  조회 건수
+	 * @return 휴가 신청 내역 리스트
+	 */
+	public List<LeaveRequest> selectByStatusPage(String string, int offset, int limit) {
+		Map<String, Object> p = new HashMap<>();
+		p.put("status", string);
+		p.put("offset", offset);
+		p.put("limit", limit);
+		return selectList("leaveRequestDAO.selectByStatusPage", p);
+	}
+
 }
