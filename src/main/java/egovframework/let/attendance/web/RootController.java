@@ -35,7 +35,7 @@ public class RootController {
 	 * 메인 대시보드
 	 */
 	@RequestMapping(value = "/main.do", method = RequestMethod.GET)
-	public String home(Model model, Principal principal, Authentication a) {
+	public String home(Model model, Principal principal, Authentication a) throws Exception {
 		if (principal == null) {
 			return "redirect:/login.do";
 		}

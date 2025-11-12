@@ -73,7 +73,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 	 * 출근 처리
 	 */
 	@Override
-	public String checkIn(String username) {
+	public String checkIn(String username) throws Exception {
 		try {
 			Employee emp = loadEmployeeByUsername(username);
 
@@ -104,7 +104,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 	 * 퇴근 처리
 	 */
 	@Override
-	public String checkOut(String username) {
+	public String checkOut(String username) throws Exception {
 		try {
 			Employee emp = loadEmployeeByUsername(username);
 
@@ -150,7 +150,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public AttendanceViewDto getToday(String empId) {
+	public AttendanceViewDto getToday(String empId) throws Exception {
 		Date today = getTodayDate();
 		AttendanceViewDto attendance = null;
 		try {
@@ -173,7 +173,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public List<AttendanceViewDto> getRecent(String empId) {
+	public List<AttendanceViewDto> getRecent(String empId) throws Exception {
 		List<AttendanceViewDto> recent = null;
 		try {
 			List<Attendance> att = attendanceRepository.findTop7ByEmpIdOrderByWorkDateDesc(empId);
@@ -194,7 +194,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public List<AttendanceListDto> getMyAttendance(String userEmail, Date from, Date to) {
+	public List<AttendanceListDto> getMyAttendance(String userEmail, Date from, Date to) throws Exception {
 		List<AttendanceListDto> attendanceList = null;
 		try {
 			Employee emp = loadEmployeeByUsername(userEmail);
@@ -226,7 +226,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public Page<AttendanceListDto> list(AdminAttendanceSearch cond) {
+	public Page<AttendanceListDto> list(AdminAttendanceSearch cond) throws Exception {
 		Page<AttendanceListDto> dtos = null;
 		try {
 			Pageable pageable = PageRequest.of(cond.getPage(), cond.getSize());
@@ -246,7 +246,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 	 * 부서별 월간 보고서 조회
 	 */
 	@Override
-	public List<MonthlyDeptReportDto> getMonthlyDeptReport(Date start, Date end) {
+	public List<MonthlyDeptReportDto> getMonthlyDeptReport(Date start, Date end) throws Exception {
 		return attendanceDAO.selectMonthlyDeptReport(start, end);
 	}
 }

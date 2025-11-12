@@ -55,7 +55,7 @@ public class EmployeeController {
 	 */
 	@PreAuthorize("hasRole('ROLE_HR') or #username == authentication.name")
 	@RequestMapping(value = "/detail.do", method = RequestMethod.GET)
-	public String employeeDetail(@RequestParam String id, Model model) {
+	public String employeeDetail(@RequestParam String id, Model model) throws Exception {
 		EmployeeViewDto employee = employeeService.getEmployeeDetail(id);
 		model.addAttribute("employee", employee);
 		return "employee/detail";
@@ -66,7 +66,7 @@ public class EmployeeController {
 	 */
 	@PreAuthorize("hasRole('ROLE_HR') or #username == authentication.name")
 	@RequestMapping(value = "/edit.do", method = RequestMethod.GET)
-	public String editForm(@RequestParam("id") String id, Model model) {
+	public String editForm(@RequestParam("id") String id, Model model) throws Exception {
 		EmployeeViewDto v = employeeService.loadView(id);
 		model.addAttribute("employee", v);
 		return "employee/edit";
@@ -77,7 +77,7 @@ public class EmployeeController {
 	 */
 	@PreAuthorize("hasRole('ROLE_HR') or #username == authentication.name")
 	@RequestMapping(value = "/edit.do", method = RequestMethod.POST)
-	public String editSubmit(EditEmployeeDto dto, Model model, Principal principal) {
+	public String editSubmit(EditEmployeeDto dto, Model model, Principal principal) throws Exception {
 		employeeService.edit(dto, principal.getName());
 		return "redirect:/employee/detail.do?id=" + dto.getId();
 	}

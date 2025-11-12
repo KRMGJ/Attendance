@@ -20,7 +20,7 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	 * 사용자 목록 조회
 	 */
 	@Override
-	public List<Map<String, Object>> findUsers(String q) {
+	public List<Map<String, Object>> findUsers(String q) throws Exception {
 		return securityAdminDAO.selectUsers(q);
 	}
 
@@ -28,7 +28,7 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	 * 모든 ROLE_* 목록 조회
 	 */
 	@Override
-	public List<String> listAllRoles() {
+	public List<String> listAllRoles() throws Exception {
 		return securityAdminDAO.selectAllRoles();
 	}
 
@@ -36,7 +36,7 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	 * 특정 사용자의 ROLE_* 목록 조회
 	 */
 	@Override
-	public List<String> findUserRoles(String u) {
+	public List<String> findUserRoles(String u) throws Exception {
 		return securityAdminDAO.selectUserRoles(u);
 	}
 
@@ -45,7 +45,7 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	 */
 	@Override
 	@Transactional
-	public void assignRoles(String username, List<String> roles) {
+	public void assignRoles(String username, List<String> roles) throws Exception {
 		securityAdminDAO.deleteAllUserRoles(username);
 		if (roles != null && !roles.isEmpty()) {
 			for (String r : roles) {
@@ -58,7 +58,7 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	 * ROLE_URL 목록 조회
 	 */
 	@Override
-	public List<Map<String, Object>> listRoleUrls() {
+	public List<Map<String, Object>> listRoleUrls() throws Exception {
 		return securityAdminDAO.selectRoleUrls();
 	}
 
@@ -66,7 +66,7 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	 * ROLE_URL 추가
 	 */
 	@Override
-	public void addRoleUrl(String a, String p, int s) {
+	public void addRoleUrl(String a, String p, int s) throws Exception {
 		securityAdminDAO.insertRoleUrl(a, p, s);
 	}
 
@@ -74,7 +74,7 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	 * ROLE_URL 삭제
 	 */
 	@Override
-	public void deleteRoleUrl(String a, String p) {
+	public void deleteRoleUrl(String a, String p) throws Exception {
 		securityAdminDAO.deleteRoleUrl(a, p);
 	}
 
@@ -82,7 +82,7 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	 * ROLE_HIERARCHY 목록 조회
 	 */
 	@Override
-	public List<Map<String, Object>> listRoleHierarchy() {
+	public List<Map<String, Object>> listRoleHierarchy() throws Exception {
 		return securityAdminDAO.selectRoleHierarchy();
 	}
 
@@ -90,7 +90,7 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	 * ROLE_HIERARCHY 추가
 	 */
 	@Override
-	public void addHierarchy(String parent, String child) {
+	public void addHierarchy(String parent, String child) throws Exception {
 		securityAdminDAO.insertRoleHierarchy(parent, child);
 	}
 
@@ -98,7 +98,7 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	 * ROLE_HIERARCHY 삭제
 	 */
 	@Override
-	public void deleteHierarchy(String parent, String child) {
+	public void deleteHierarchy(String parent, String child) throws Exception {
 		securityAdminDAO.deleteRoleHierarchy(parent, child);
 	}
 
@@ -106,7 +106,7 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	 * ROLE_HIERARCHY 트리 구조 조회
 	 */
 	@Override
-	public List<Map<String, Object>> listRoleHierarchyTree() {
+	public List<Map<String, Object>> listRoleHierarchyTree() throws Exception {
 		return securityAdminDAO.selectRoleHierarchyTree();
 	}
 
@@ -114,7 +114,7 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	 * ROLE_HIERARCHY closure 목록 조회
 	 */
 	@Override
-	public List<Map<String, Object>> listRoleClosure() {
+	public List<Map<String, Object>> listRoleClosure() throws Exception {
 		return securityAdminDAO.selectRoleClosure();
 	}
 }

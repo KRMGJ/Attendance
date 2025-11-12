@@ -44,7 +44,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	 * 직원 등록
 	 */
 	@Override
-	public void register(RegistEmployeeDto dto) {
+	public void register(RegistEmployeeDto dto) throws Exception {
 		try {
 			String encodedPassword = passwordEncoder.encode(dto.getPassword());
 			String type = null;
@@ -76,7 +76,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public List<Employee> getAllEmployees() {
+	public List<Employee> getAllEmployees() throws Exception {
 		List<Employee> employees = null;
 		try {
 			employees = employeeRepository.findAllByOrderByHireDateDesc();
@@ -91,7 +91,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public EmployeeViewDto getEmployeeDetail(String id) {
+	public EmployeeViewDto getEmployeeDetail(String id) throws Exception {
 		EmployeeViewDto employee = null;
 		try {
 			Employee emp = employeeRepository.findById(id)
@@ -110,7 +110,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	 * 직원 뷰 로드
 	 */
 	@Override
-	public EmployeeViewDto loadView(String id) {
+	public EmployeeViewDto loadView(String id) throws Exception {
 		return employeeDAO.selectViewById(id);
 	}
 
@@ -118,7 +118,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	 * 직원 정보 수정
 	 */
 	@Override
-	public void edit(EditEmployeeDto dto, String actorUsername) {
+	public void edit(EditEmployeeDto dto, String actorUsername) throws Exception {
 		if (employeeDAO.canEdit(dto.getId(), actorUsername) == 0) {
 			throw new SecurityException("수정 권한 없음");
 		}

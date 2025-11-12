@@ -31,7 +31,7 @@ public class LeaveController {
 	/** 휴가 신청 처리 */
 	@RequestMapping(value = "/new.do", method = RequestMethod.POST)
 	public String submitLeaveRequest(Principal principal, @ModelAttribute NewLeaveDto dto,
-			RedirectAttributes attributes) {
+			RedirectAttributes attributes) throws Exception {
 		String result = leaveService.request(principal.getName(), dto);
 		attributes.addFlashAttribute("message", result);
 		return "redirect:/leave/new.do";
@@ -39,7 +39,7 @@ public class LeaveController {
 
 	/** 나의 휴가 신청 내역 조회 */
 	@RequestMapping(value = "/requests.do", method = RequestMethod.GET)
-	public String list(Principal principal, Model model) {
+	public String list(Principal principal, Model model) throws Exception {
 		List<LeaveRequestListDto> rows = leaveService.myRequests(principal.getName());
 		model.addAttribute("requests", rows);
 		return "leave/request_list";

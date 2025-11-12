@@ -62,7 +62,7 @@ public class LeaveServiceImpl implements LeaveService {
 	 * @param start 시작일
 	 * @param end   종료일
 	 */
-	private int calcDays(Date start, Date end) {
+	private int calcDays(Date start, Date end) throws Exception {
 		LocalDate s = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 		LocalDate e = end.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 		return (int) (ChronoUnit.DAYS.between(s, e) + 1);
@@ -73,7 +73,7 @@ public class LeaveServiceImpl implements LeaveService {
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public LeaveBalance getRemaining(String empId) {
+	public LeaveBalance getRemaining(String empId) throws Exception {
 		int currentYear = Year.now().getValue();
 		Optional<LeaveBalance> leaveBalance = null;
 		try {
@@ -90,7 +90,7 @@ public class LeaveServiceImpl implements LeaveService {
 	 */
 	@Override
 	@Transactional
-	public String request(String userEmail, NewLeaveDto dto) {
+	public String request(String userEmail, NewLeaveDto dto) throws Exception {
 		try {
 			Employee emp = employeeRepository.findByEmail(userEmail)
 					.orElseThrow(() -> new IllegalStateException("직원 정보 없음"));
@@ -134,7 +134,7 @@ public class LeaveServiceImpl implements LeaveService {
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public List<LeaveRequestListDto> myRequests(String userEmail) {
+	public List<LeaveRequestListDto> myRequests(String userEmail) throws Exception {
 		List<LeaveRequestListDto> requests = null;
 		try {
 			Employee emp = employeeRepository.findByEmail(userEmail)
@@ -166,7 +166,7 @@ public class LeaveServiceImpl implements LeaveService {
 	 * 휴가 신청 승인
 	 */
 	@Override
-	public void approve(String id, String approverUsername) {
+	public void approve(String id, String approverUsername) throws Exception {
 		LeaveRequest lr = leaveRequestRepository.findById(id)
 				.orElseThrow(() -> new IllegalArgumentException("신청이 존재하지 않습니다."));
 		if (!PENDING.equals(lr.getStatus())) {
@@ -194,7 +194,7 @@ public class LeaveServiceImpl implements LeaveService {
 	 * 휴가 신청 거절
 	 */
 	@Override
-	public void reject(String id, String approverUsername) {
+	public void reject(String id, String approverUsername) throws Exception {
 		LeaveRequest lr = leaveRequestRepository.findById(id)
 				.orElseThrow(() -> new IllegalArgumentException("신청이 존재하지 않습니다."));
 		if (!PENDING.equals(lr.getStatus())) {
@@ -210,7 +210,7 @@ public class LeaveServiceImpl implements LeaveService {
 	 * 휴가 신청 취소
 	 */
 	@Override
-	public void cancel(String id, String empId) {
+	public void cancel(String id, String empId) throws Exception {
 		LeaveRequest lr = leaveRequestRepository.findByIdAndEmpId(id, empId)
 				.orElseThrow(() -> new IllegalArgumentException("해당 신청이 존재하지 않습니다."));
 		if (!PENDING.equals(lr.getStatus())) {
@@ -226,7 +226,7 @@ public class LeaveServiceImpl implements LeaveService {
 	 * 전월 개근자에게 월 1일 연차 부여
 	 */
 	@Override
-	public void grantMonthlyAccrualIfEligible(Date targetDate) {
+	public void grantMonthlyAccrualIfEligible(Date targetDate) throws Exception {
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"));
 		cal.setTime(targetDate);
 		// 전월로 이동
@@ -254,7 +254,7 @@ public class LeaveServiceImpl implements LeaveService {
 	 * 전월 월차 부여 중복 처리 방지
 	 */
 	@Override
-	public void ensureLastMonthMonthlyAccrualClosed() {
+	public void ensureLastMonthMonthlyAccrualClosed() throws Exception {
 		leaveBalanceDAO.fixMonthlyAccrualDuplicate(new Date());
 	}
 
@@ -262,7 +262,7 @@ public class LeaveServiceImpl implements LeaveService {
 	 * 입사기준 연차 부여
 	 */
 	@Override
-	public void grantAnnualByAnniversary(Date today) {
+	public void grantAnnualByAnniversary(Date today) throws Exception {
 		List<Map<String, Object>> targets = leaveBalanceDAO.selectEmployeesWithAnniversaryToday(today);
 		for (Map<String, Object> row : targets) {
 			String empId = (String) row.get("empId");
@@ -293,7 +293,7 @@ public class LeaveServiceImpl implements LeaveService {
 	 * 달력기준 연차 부여
 	 */
 	@Override
-	public void grantAnnualByCalendarYear(int year) {
+	public void grantAnnualByCalendarYear(int year) throws Exception {
 		List<Map<String, Object>> emps = leaveBalanceDAO.selectActiveEmployeesOnYear(year);
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"));
 		cal.set(Calendar.YEAR, year);

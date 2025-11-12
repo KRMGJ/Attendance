@@ -22,7 +22,7 @@ public class SecurityAdminController {
 	 * 사용자 목록 페이지
 	 */
 	@RequestMapping(value = "/users.do", method = RequestMethod.GET)
-	public String users(@RequestParam(value = "q", required = false) String q, Model model) {
+	public String users(@RequestParam(value = "q", required = false) String q, Model model) throws Exception {
 		model.addAttribute("users", securityAdminService.findUsers(q));
 		model.addAttribute("allRoles", securityAdminService.listAllRoles());
 		return "security/users";
@@ -33,7 +33,7 @@ public class SecurityAdminController {
 	 */
 	@RequestMapping(value = "/users/assign.do", method = RequestMethod.POST)
 	public String assign(@RequestParam String username,
-			@RequestParam(required = false, name = "roles") List<String> roles) {
+			@RequestParam(required = false, name = "roles") List<String> roles) throws Exception {
 		securityAdminService.assignRoles(username, roles);
 		return "redirect:/admin/security/users.do?username=" + username;
 	}
@@ -42,7 +42,7 @@ public class SecurityAdminController {
 	 * ROLE_URL 관리 페이지
 	 */
 	@RequestMapping(value = "/role-url.do", method = RequestMethod.GET)
-	public String roleUrl(Model model) {
+	public String roleUrl(Model model) throws Exception {
 		model.addAttribute("rows", securityAdminService.listRoleUrls());
 		model.addAttribute("allRoles", securityAdminService.listAllRoles());
 		return "security/role_url";
@@ -53,7 +53,7 @@ public class SecurityAdminController {
 	 */
 	@RequestMapping(value = "/role-url/add.do", method = RequestMethod.POST)
 	public String addRoleUrl(@RequestParam String authority, @RequestParam String pattern,
-			@RequestParam(defaultValue = "0") int sort) {
+			@RequestParam(defaultValue = "0") int sort) throws Exception {
 		securityAdminService.addRoleUrl(authority, pattern, sort);
 		return "redirect:/admin/security/role-url.do";
 	}
@@ -62,7 +62,7 @@ public class SecurityAdminController {
 	 * ROLE_URL 삭제 처리
 	 */
 	@RequestMapping(value = "/role-url/delete.do", method = RequestMethod.POST)
-	public String delRoleUrl(@RequestParam String authority, @RequestParam String pattern) {
+	public String delRoleUrl(@RequestParam String authority, @RequestParam String pattern) throws Exception {
 		securityAdminService.deleteRoleUrl(authority, pattern);
 		return "redirect:/admin/security/role-url.do";
 	}
@@ -71,7 +71,7 @@ public class SecurityAdminController {
 	 * ROLE_HIERARCHY 관리 페이지
 	 */
 	@RequestMapping(value = "/role-hierarchy.do", method = RequestMethod.GET)
-	public String roleHierarchy(Model model) {
+	public String roleHierarchy(Model model) throws Exception {
 		model.addAttribute("tree", securityAdminService.listRoleHierarchyTree());
 		model.addAttribute("closure", securityAdminService.listRoleClosure());
 		model.addAttribute("edges", securityAdminService.listRoleHierarchy());
@@ -83,7 +83,7 @@ public class SecurityAdminController {
 	 * ROLE_HIERARCHY 추가 처리
 	 */
 	@RequestMapping(value = "/role-hierarchy/add.do", method = RequestMethod.POST)
-	public String addHierarchy(@RequestParam String parentRole, @RequestParam String childRole) {
+	public String addHierarchy(@RequestParam String parentRole, @RequestParam String childRole) throws Exception {
 		securityAdminService.addHierarchy(parentRole, childRole);
 		return "redirect:/admin/security/role-hierarchy.do";
 	}
@@ -92,7 +92,7 @@ public class SecurityAdminController {
 	 * ROLE_HIERARCHY 삭제 처리
 	 */
 	@RequestMapping(value = "/role-hierarchy/delete.do", method = RequestMethod.POST)
-	public String delHierarchy(@RequestParam String parentRole, @RequestParam String childRole) {
+	public String delHierarchy(@RequestParam String parentRole, @RequestParam String childRole) throws Exception {
 		securityAdminService.deleteHierarchy(parentRole, childRole);
 		return "redirect:/admin/security/role-hierarchy.do";
 	}

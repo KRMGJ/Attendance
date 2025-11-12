@@ -62,7 +62,7 @@ public class AdminController {
 			@RequestParam(value = "from", required = false) Date from,
 			@RequestParam(value = "to", required = false) Date to,
 			@RequestParam(value = "page", defaultValue = "1") int page,
-			@RequestParam(value = "size", defaultValue = "20") int size, Model model) {
+			@RequestParam(value = "size", defaultValue = "20") int size, Model model) throws Exception {
 
 		Date toEnd = to != null ? endOfDay(to) : null;
 
@@ -84,7 +84,7 @@ public class AdminController {
 	 * 사원 목록 조회
 	 */
 	@RequestMapping(value = "/employee/list.do", method = RequestMethod.GET)
-	public String employeeList(Model model) {
+	public String employeeList(Model model) throws Exception {
 		List<Employee> list = employeeService.getAllEmployees();
 		model.addAttribute("employees", list);
 		return "employee/list";
@@ -104,7 +104,7 @@ public class AdminController {
 	 * 휴가 신청 승인
 	 */
 	@RequestMapping(value = "/leave/approve.do", method = RequestMethod.POST)
-	public String approve(@RequestParam String id, Principal principal) {
+	public String approve(@RequestParam String id, Principal principal) throws Exception {
 		leaveService.approve(id, principal.getName());
 		return "redirect:/admin/leave/pending.do?ok=approved";
 	}
@@ -113,7 +113,7 @@ public class AdminController {
 	 * 휴가 신청 거절
 	 */
 	@RequestMapping(value = "/leave/reject.do", method = RequestMethod.POST)
-	public String reject(@RequestParam String id, Principal principal) {
+	public String reject(@RequestParam String id, Principal principal) throws Exception {
 		leaveService.reject(id, principal.getName());
 		return "redirect:/admin/leave/pending.do?ok=rejected";
 	}

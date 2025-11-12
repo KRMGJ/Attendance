@@ -39,7 +39,8 @@ public class AttendanceController {
 	 * 퇴근 처리
 	 */
 	@RequestMapping(value = "/checkout.do", method = RequestMethod.POST)
-	public String checkOut(HttpServletRequest request, Principal principal, RedirectAttributes attributes) {
+	public String checkOut(HttpServletRequest request, Principal principal, RedirectAttributes attributes)
+			throws Exception {
 		String result = attendanceService.checkOut(principal.getName());
 		attributes.addFlashAttribute("attendanceResult", result);
 		return "redirect:/main.do";
@@ -50,7 +51,7 @@ public class AttendanceController {
 	 */
 	@RequestMapping(value = "/my.do", method = RequestMethod.GET)
 	public String myAttendance(Principal principal, @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date from,
-			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date to, Model model) {
+			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date to, Model model) throws Exception {
 
 		String email = principal.getName();
 

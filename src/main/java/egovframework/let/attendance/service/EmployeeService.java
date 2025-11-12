@@ -13,14 +13,14 @@ public interface EmployeeService {
 	 * 
 	 * @param dto 직원 등록 정보
 	 */
-	void register(RegistEmployeeDto dto);
+	void register(RegistEmployeeDto dto) throws Exception;
 
 	/**
 	 * 전체 직원 조회
 	 * 
 	 * @return 직원 리스트
 	 */
-	List<Employee> getAllEmployees();
+	List<Employee> getAllEmployees() throws Exception;
 
 	/**
 	 * 직원 상세 조회
@@ -28,7 +28,7 @@ public interface EmployeeService {
 	 * @param id 직원 ID
 	 * @return 직원 상세 정보
 	 */
-	EmployeeViewDto getEmployeeDetail(String id);
+	EmployeeViewDto getEmployeeDetail(String id) throws Exception;
 
 	/**
 	 * 직원 뷰 로드
@@ -36,7 +36,7 @@ public interface EmployeeService {
 	 * @param id 직원 ID
 	 * @return 직원 뷰 DTO
 	 */
-	EmployeeViewDto loadView(String id);
+	EmployeeViewDto loadView(String id) throws Exception;
 
 	/**
 	 * 직원 정보 수정
@@ -44,5 +44,5 @@ public interface EmployeeService {
 	 * @param cmd           수정할 직원 정보 DTO
 	 * @param actorUsername 수정하는 사용자의 사용자 이름
 	 */
-	void edit(EditEmployeeDto cmd, String actorUsername);
+	void edit(EditEmployeeDto cmd, String actorUsername) throws Exception;
 }
