@@ -79,7 +79,8 @@ public class LeaveServiceImpl implements LeaveService {
 		try {
 			leaveBalance = leaveBalanceRepository.findByEmpIdAndYear(empId, currentYear);
 		} catch (Exception e) {
-			log.error("Error fetching leave balance for empId {}: {}", empId, e.getMessage());
+			log.error("Error fetching leave balance for empId {}: {}", empId, e);
+			throw e;
 		}
 		return leaveBalance
 				.orElseGet(() -> LeaveBalance.builder().empId(empId).year(currentYear).total(0).used(0).build());
@@ -157,7 +158,8 @@ public class LeaveServiceImpl implements LeaveService {
 			}).collect(Collectors.toList());
 
 		} catch (Exception e) {
-			log.error("Error fetching leave requests for userEmail {}: {}", userEmail, e.getMessage());
+			log.error("Error fetching leave requests for userEmail {}: {}", userEmail, e);
+			throw e;
 		}
 		return requests;
 	}
@@ -167,27 +169,32 @@ public class LeaveServiceImpl implements LeaveService {
 	 */
 	@Override
 	public void approve(String id, String approverUsername) throws Exception {
-		LeaveRequest lr = leaveRequestRepository.findById(id)
-				.orElseThrow(() -> new IllegalArgumentException("신청이 존재하지 않습니다."));
-		if (!PENDING.equals(lr.getStatus())) {
-			throw new IllegalStateException("승인할 수 없는 상태입니다.");
-		}
-
-		if (lr.getType() == ANNUAL) {
-			int year = lr.getStartDate().toInstant().atZone(ZoneId.systemDefault()).getYear();
-			LeaveBalance bal = leaveBalanceRepository.findByEmpIdAndYear(lr.getEmpId(), year)
-					.orElseThrow(() -> new IllegalStateException("휴가 잔액 정보 없음"));
-			if (bal.getRemaining() < lr.getDays()) {
-				throw new IllegalStateException("연차 잔액 부족");
+		try {
+			LeaveRequest lr = leaveRequestRepository.findById(id)
+					.orElseThrow(() -> new IllegalArgumentException("신청이 존재하지 않습니다."));
+			if (!PENDING.equals(lr.getStatus())) {
+				throw new IllegalStateException("승인할 수 없는 상태입니다.");
 			}
-			bal.setUsed(bal.getUsed() + lr.getDays());
-			leaveBalanceRepository.save(bal);
-		}
 
-		lr.setStatus(APPROVED);
-		lr.setApprover(approverUsername);
-		lr.setApprovedAt(new Date());
-		leaveRequestRepository.save(lr);
+			if (lr.getType() == ANNUAL) {
+				int year = lr.getStartDate().toInstant().atZone(ZoneId.systemDefault()).getYear();
+				LeaveBalance bal = leaveBalanceRepository.findByEmpIdAndYear(lr.getEmpId(), year)
+						.orElseThrow(() -> new IllegalStateException("휴가 잔액 정보 없음"));
+				if (bal.getRemaining() < lr.getDays()) {
+					throw new IllegalStateException("연차 잔액 부족");
+				}
+				bal.setUsed(bal.getUsed() + lr.getDays());
+				leaveBalanceRepository.save(bal);
+			}
+
+			lr.setStatus(APPROVED);
+			lr.setApprover(approverUsername);
+			lr.setApprovedAt(new Date());
+			leaveRequestRepository.save(lr);
+		} catch (Exception e) {
+			log.error("Error approving leave request ID {}: {}", id, e);
+			throw e;
+		}
 	}
 
 	/**
@@ -195,15 +202,20 @@ public class LeaveServiceImpl implements LeaveService {
 	 */
 	@Override
 	public void reject(String id, String approverUsername) throws Exception {
-		LeaveRequest lr = leaveRequestRepository.findById(id)
-				.orElseThrow(() -> new IllegalArgumentException("신청이 존재하지 않습니다."));
-		if (!PENDING.equals(lr.getStatus())) {
-			throw new IllegalStateException("반려할 수 없는 상태입니다.");
+		try {
+			LeaveRequest lr = leaveRequestRepository.findById(id)
+					.orElseThrow(() -> new IllegalArgumentException("신청이 존재하지 않습니다."));
+			if (!PENDING.equals(lr.getStatus())) {
+				throw new IllegalStateException("반려할 수 없는 상태입니다.");
+			}
+			lr.setStatus(REJECTED);
+			lr.setApprover(approverUsername);
+			lr.setApprovedAt(new Date());
+			leaveRequestRepository.save(lr);
+		} catch (Exception e) {
+			log.error("Error rejecting leave request ID {}: {}", id, e);
+			throw e;
 		}
-		lr.setStatus(REJECTED);
-		lr.setApprover(approverUsername);
-		lr.setApprovedAt(new Date());
-		leaveRequestRepository.save(lr);
 	}
 
 	/**
@@ -211,15 +223,20 @@ public class LeaveServiceImpl implements LeaveService {
 	 */
 	@Override
 	public void cancel(String id, String empId) throws Exception {
-		LeaveRequest lr = leaveRequestRepository.findByIdAndEmpId(id, empId)
-				.orElseThrow(() -> new IllegalArgumentException("해당 신청이 존재하지 않습니다."));
-		if (!PENDING.equals(lr.getStatus())) {
-			throw new IllegalStateException("취소할 수 없는 상태입니다.");
+		try {
+			LeaveRequest lr = leaveRequestRepository.findByIdAndEmpId(id, empId)
+					.orElseThrow(() -> new IllegalArgumentException("해당 신청이 존재하지 않습니다."));
+			if (!PENDING.equals(lr.getStatus())) {
+				throw new IllegalStateException("취소할 수 없는 상태입니다.");
+			}
+			lr.setStatus(CANCELED);
+			lr.setApprover(null);
+			lr.setApprovedAt(null);
+			leaveRequestRepository.save(lr);
+		} catch (Exception e) {
+			log.error("Error canceling leave request ID {} for empId {}: {}", id, empId, e);
+			throw e;
 		}
-		lr.setStatus(CANCELED);
-		lr.setApprover(null);
-		lr.setApprovedAt(null);
-		leaveRequestRepository.save(lr);
 	}
 
 	/**
@@ -233,20 +250,24 @@ public class LeaveServiceImpl implements LeaveService {
 		cal.add(Calendar.MONTH, -1);
 		int y = cal.get(Calendar.YEAR);
 		int m = cal.get(Calendar.MONTH) + 1;
+		try {
+			// 1년 미만 + 전월 개근자
+			List<String> empIds = leaveBalanceDAO.selectFirstYearFullAttendanceEmployees(y, m);
+			for (String empId : empIds) {
+				Integer year = y;
+				String upsertId = UUID.randomUUID().toString();
+				leaveBalanceDAO.upsertLeaveBalance(upsertId, empId, year);
 
-		// 1년 미만 + 전월 개근자
-		List<String> empIds = leaveBalanceDAO.selectFirstYearFullAttendanceEmployees(y, m);
-		for (String empId : empIds) {
-			Integer year = y;
-			String upsertId = UUID.randomUUID().toString();
-			leaveBalanceDAO.upsertLeaveBalance(upsertId, empId, year);
-
-			int monthlyGranted = leaveBalanceDAO.countMonthlyGranted(empId, year);
-			if (monthlyGranted < 11) {
-				leaveBalanceDAO.addQuota(empId, year, 1);
-				String logId = UUID.randomUUID().toString();
-				leaveBalanceDAO.insertGrantLog(logId, empId, year, "MONTHLY_1D", 1, new Date());
+				int monthlyGranted = leaveBalanceDAO.countMonthlyGranted(empId, year);
+				if (monthlyGranted < 11) {
+					leaveBalanceDAO.addQuota(empId, year, 1);
+					String logId = UUID.randomUUID().toString();
+					leaveBalanceDAO.insertGrantLog(logId, empId, year, "MONTHLY_1D", 1, new Date());
+				}
 			}
+		} catch (Exception e) {
+			log.error("Error granting monthly accrual for targetDate {}: {}", targetDate, e);
+			throw e;
 		}
 	}
 
@@ -255,7 +276,12 @@ public class LeaveServiceImpl implements LeaveService {
 	 */
 	@Override
 	public void ensureLastMonthMonthlyAccrualClosed() throws Exception {
-		leaveBalanceDAO.fixMonthlyAccrualDuplicate(new Date());
+		try {
+			leaveBalanceDAO.fixMonthlyAccrualDuplicate(new Date());
+		} catch (Exception e) {
+			log.error("Error ensuring last month monthly accrual closed: {}", e);
+			throw e;
+		}
 	}
 
 	/**
@@ -263,29 +289,34 @@ public class LeaveServiceImpl implements LeaveService {
 	 */
 	@Override
 	public void grantAnnualByAnniversary(Date today) throws Exception {
-		List<Map<String, Object>> targets = leaveBalanceDAO.selectEmployeesWithAnniversaryToday(today);
-		for (Map<String, Object> row : targets) {
-			String empId = (String) row.get("empId");
-			Date hireDate = (Date) row.get("hireDate");
-			int years = diffYears(hireDate, today);
-			if (years < 1) {
-				continue;
+		try {
+			List<Map<String, Object>> targets = leaveBalanceDAO.selectEmployeesWithAnniversaryToday(today);
+			for (Map<String, Object> row : targets) {
+				String empId = (String) row.get("empId");
+				Date hireDate = (Date) row.get("hireDate");
+				int years = diffYears(hireDate, today);
+				if (years < 1) {
+					continue;
+				}
+
+				int base = 15;
+				int extra = Math.max(0, (years - 1) / 2);
+				int grant = Math.min(25, base + extra);
+
+				Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"));
+				cal.setTime(today);
+				int year = cal.get(Calendar.YEAR);
+
+				String upsertId = UUID.randomUUID().toString();
+				leaveBalanceDAO.upsertLeaveBalance(upsertId, empId, year);
+				leaveBalanceDAO.setAnnualQuota(empId, year, grant);
+
+				String logId = UUID.randomUUID().toString();
+				leaveBalanceDAO.insertGrantLog(logId, empId, year, "ANNUAL_RESET", grant, today);
 			}
-
-			int base = 15;
-			int extra = Math.max(0, (years - 1) / 2);
-			int grant = Math.min(25, base + extra);
-
-			Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"));
-			cal.setTime(today);
-			int year = cal.get(Calendar.YEAR);
-
-			String upsertId = UUID.randomUUID().toString();
-			leaveBalanceDAO.upsertLeaveBalance(upsertId, empId, year);
-			leaveBalanceDAO.setAnnualQuota(empId, year, grant);
-
-			String logId = UUID.randomUUID().toString();
-			leaveBalanceDAO.insertGrantLog(logId, empId, year, "ANNUAL_RESET", grant, today);
+		} catch (Exception e) {
+			log.error("Error granting annual leave by anniversary for date {}: {}", today, e);
+			throw e;
 		}
 	}
 
@@ -294,31 +325,36 @@ public class LeaveServiceImpl implements LeaveService {
 	 */
 	@Override
 	public void grantAnnualByCalendarYear(int year) throws Exception {
-		List<Map<String, Object>> emps = leaveBalanceDAO.selectActiveEmployeesOnYear(year);
-		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"));
-		cal.set(Calendar.YEAR, year);
-		cal.set(Calendar.MONTH, Calendar.JANUARY);
-		cal.set(Calendar.DAY_OF_MONTH, 1);
-		Date ref = cal.getTime();
+		try {
+			List<Map<String, Object>> emps = leaveBalanceDAO.selectActiveEmployeesOnYear(year);
+			Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"));
+			cal.set(Calendar.YEAR, year);
+			cal.set(Calendar.MONTH, Calendar.JANUARY);
+			cal.set(Calendar.DAY_OF_MONTH, 1);
+			Date ref = cal.getTime();
 
-		for (Map<String, Object> row : emps) {
-			String empId = (String) row.get("empId");
-			Date hireDate = (Date) row.get("hireDate");
-			int years = diffYears(hireDate, ref);
-			if (years < 1) {
-				continue;
+			for (Map<String, Object> row : emps) {
+				String empId = (String) row.get("empId");
+				Date hireDate = (Date) row.get("hireDate");
+				int years = diffYears(hireDate, ref);
+				if (years < 1) {
+					continue;
+				}
+
+				int base = 15;
+				int extra = Math.max(0, (years - 1) / 2);
+				int grant = Math.min(25, base + extra);
+
+				String upsertId = UUID.randomUUID().toString();
+				leaveBalanceDAO.upsertLeaveBalance(upsertId, empId, year);
+				leaveBalanceDAO.setAnnualQuota(empId, year, grant);
+
+				String logId = UUID.randomUUID().toString();
+				leaveBalanceDAO.insertGrantLog(logId, empId, year, "ANNUAL_RESET", grant, ref);
 			}
-
-			int base = 15;
-			int extra = Math.max(0, (years - 1) / 2);
-			int grant = Math.min(25, base + extra);
-
-			String upsertId = UUID.randomUUID().toString();
-			leaveBalanceDAO.upsertLeaveBalance(upsertId, empId, year);
-			leaveBalanceDAO.setAnnualQuota(empId, year, grant);
-
-			String logId = UUID.randomUUID().toString();
-			leaveBalanceDAO.insertGrantLog(logId, empId, year, "ANNUAL_RESET", grant, ref);
+		} catch (Exception e) {
+			log.error("Error granting annual leave by calendar year {}: {}", year, e);
+			throw e;
 		}
 	}
 

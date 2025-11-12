@@ -164,6 +164,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 					.build();
 		} catch (Exception e) {
 			log.error("Error fetching today's attendance for empId {}: {}", empId, e.getMessage());
+			throw e;
 		}
 		return attendance;
 	}
@@ -185,6 +186,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 					.collect(Collectors.toList());
 		} catch (Exception e) {
 			log.error("Error fetching recent attendance for empId {}: {}", empId, e.getMessage());
+			throw e;
 		}
 		return recent;
 	}
@@ -217,6 +219,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 			}
 		} catch (Exception e) {
 			log.error("Error fetching attendance records for user {}: {}", userEmail, e.getMessage());
+			throw e;
 		}
 		return attendanceList;
 	}
@@ -238,6 +241,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 					.employee(attendance.getEmployee()).build());
 		} catch (Exception e) {
 			log.error("Error fetching attendance list for admin", e);
+			throw e;
 		}
 		return dtos;
 	}
@@ -247,6 +251,14 @@ public class AttendanceServiceImpl implements AttendanceService {
 	 */
 	@Override
 	public List<MonthlyDeptReportDto> getMonthlyDeptReport(Date start, Date end) throws Exception {
-		return attendanceDAO.selectMonthlyDeptReport(start, end);
+		try {
+			if (start == null || end == null) {
+				throw new IllegalArgumentException("시작 날짜와 종료 날짜는 필수입니다.");
+			}
+			return attendanceDAO.selectMonthlyDeptReport(start, end);
+		} catch (Exception e) {
+			log.error("Error validating dates for monthly department report: {}", e.getMessage());
+			throw e;
+		}
 	}
 }

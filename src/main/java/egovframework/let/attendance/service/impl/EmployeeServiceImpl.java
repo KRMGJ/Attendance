@@ -67,7 +67,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 			jdbcTemplate.update("INSERT INTO AUTHORITIES (USERNAME, AUTHORITY) VALUES (?, ?)", dto.getEmail(),
 					"ROLE_USER");
 		} catch (Exception e) {
-			log.error("Error registering employee: {}", e.getMessage());
+			log.error("Error registering employee: {}", e);
+			throw e;
 		}
 	}
 
@@ -81,7 +82,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 		try {
 			employees = employeeRepository.findAllByOrderByHireDateDesc();
 		} catch (Exception e) {
-			log.error("Error retrieving all employees: {}", e.getMessage());
+			log.error("Error retrieving all employees: {}", e);
+			throw e;
 		}
 		return employees;
 	}
@@ -101,7 +103,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 					.hireDate(formatDateOnly(emp.getHireDate())).resignDate(formatDateOnly(emp.getResignDate()))
 					.updatedAt(formatDateOnly(emp.getUpdatedAt())).build();
 		} catch (Exception e) {
-			log.error("Error retrieving employee detail for ID {}: {}", id, e.getMessage());
+			log.error("Error retrieving employee detail for ID {}: {}", id, e);
+			throw e;
 		}
 		return employee;
 	}
@@ -111,7 +114,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 	 */
 	@Override
 	public EmployeeViewDto loadView(String id) throws Exception {
-		return employeeDAO.selectViewById(id);
+		try {
+			employeeRepository.findById(id).orElseThrow(() -> new IllegalStateException("직원 정보를 찾을 수 없음: " + id));
+			return employeeDAO.selectViewById(id);
+		} catch (Exception e) {
+			log.error("Error loading employee view for ID {}: {}", id, e);
+			throw e;
+		}
 	}
 
 	/**
@@ -119,37 +128,41 @@ public class EmployeeServiceImpl implements EmployeeService {
 	 */
 	@Override
 	public void edit(EditEmployeeDto dto, String actorUsername) throws Exception {
-		if (employeeDAO.canEdit(dto.getId(), actorUsername) == 0) {
-			throw new SecurityException("수정 권한 없음");
-		}
-
-		// 이메일 중복 방지
-		if (employeeDAO.existsByEmailExcludingId(dto.getEmail(), dto.getId()) > 0) {
-			throw new IllegalArgumentException("이메일이 중복됩니다.");
-		}
-
-		String type = null;
-		if (dto.getEmploymentType().equals("FULL_TIME")) {
-			type = FULL_TIME;
-		} else if (dto.getEmploymentType().equals("PART_TIME")) {
-			type = PART_TIME;
-		} else if (dto.getEmploymentType().equals("INTERN")) {
-			type = INTERN;
-		} else {
-			throw new IllegalArgumentException("Invalid employment type: " + dto.getEmploymentType());
-		}
-		dto.setUpdatedAt(new Date());
-		dto.setEmploymentType(type);
-		employeeDAO.updateProfile(dto);
-
-		// 비밀번호 변경은 입력이 있을 때만
-		if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
-			if (!dto.getPassword().equals(dto.getPasswordConfirm())) {
-				throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+		try {
+			if (employeeDAO.canEdit(dto.getId(), actorUsername) == 0) {
+				throw new SecurityException("수정 권한 없음");
 			}
-			String encoded = passwordEncoder.encode(dto.getPassword());
-			employeeDAO.updatePassword(dto.getId(), encoded, dto.getUpdatedAt());
-		}
 
+			// 이메일 중복 방지
+			if (employeeDAO.existsByEmailExcludingId(dto.getEmail(), dto.getId()) > 0) {
+				throw new IllegalArgumentException("이메일이 중복됩니다.");
+			}
+
+			String type = null;
+			if (dto.getEmploymentType().equals("FULL_TIME")) {
+				type = FULL_TIME;
+			} else if (dto.getEmploymentType().equals("PART_TIME")) {
+				type = PART_TIME;
+			} else if (dto.getEmploymentType().equals("INTERN")) {
+				type = INTERN;
+			} else {
+				throw new IllegalArgumentException("Invalid employment type: " + dto.getEmploymentType());
+			}
+			dto.setUpdatedAt(new Date());
+			dto.setEmploymentType(type);
+			employeeDAO.updateProfile(dto);
+
+			// 비밀번호 변경은 입력이 있을 때만
+			if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
+				if (!dto.getPassword().equals(dto.getPasswordConfirm())) {
+					throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+				}
+				String encoded = passwordEncoder.encode(dto.getPassword());
+				employeeDAO.updatePassword(dto.getId(), encoded, dto.getUpdatedAt());
+			}
+		} catch (Exception e) {
+			log.error("Error editing employee ID {}: {}", dto.getId(), e);
+			throw e;
+		}
 	}
 }

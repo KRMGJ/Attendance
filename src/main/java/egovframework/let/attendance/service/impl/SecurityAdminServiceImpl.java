@@ -9,7 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import egovframework.let.attendance.repository.mybatis.SecurityAdminDAO;
 import egovframework.let.attendance.service.SecurityAdminService;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class SecurityAdminServiceImpl implements SecurityAdminService {
 
@@ -21,7 +23,15 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	 */
 	@Override
 	public List<Map<String, Object>> findUsers(String q) throws Exception {
-		return securityAdminDAO.selectUsers(q);
+		try {
+			if (q != null) {
+				q = q.trim();
+			}
+			return securityAdminDAO.selectUsers(q);
+		} catch (Exception e) {
+			log.error("Error in findUsers with query '{}': {}", q, e);
+			throw e;
+		}
 	}
 
 	/**
@@ -29,7 +39,12 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	 */
 	@Override
 	public List<String> listAllRoles() throws Exception {
-		return securityAdminDAO.selectAllRoles();
+		try {
+			return securityAdminDAO.selectAllRoles();
+		} catch (Exception e) {
+			log.error("Error in listAllRoles: {}", e);
+			throw e;
+		}
 	}
 
 	/**
@@ -37,7 +52,12 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	 */
 	@Override
 	public List<String> findUserRoles(String u) throws Exception {
-		return securityAdminDAO.selectUserRoles(u);
+		try {
+			return securityAdminDAO.selectUserRoles(u);
+		} catch (Exception e) {
+			log.error("Error in findUserRoles for user '{}': {}", u, e);
+			throw e;
+		}
 	}
 
 	/**
@@ -46,11 +66,16 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	@Override
 	@Transactional
 	public void assignRoles(String username, List<String> roles) throws Exception {
-		securityAdminDAO.deleteAllUserRoles(username);
-		if (roles != null && !roles.isEmpty()) {
-			for (String r : roles) {
-				securityAdminDAO.insertUserRole(username, r);
+		try {
+			securityAdminDAO.deleteAllUserRoles(username);
+			if (roles != null && !roles.isEmpty()) {
+				for (String r : roles) {
+					securityAdminDAO.insertUserRole(username, r);
+				}
 			}
+		} catch (Exception e) {
+			log.error("Error in assignRoles for user '{}': {}", username, e);
+			throw e;
 		}
 	}
 
@@ -59,7 +84,12 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	 */
 	@Override
 	public List<Map<String, Object>> listRoleUrls() throws Exception {
-		return securityAdminDAO.selectRoleUrls();
+		try {
+			return securityAdminDAO.selectRoleUrls();
+		} catch (Exception e) {
+			log.error("Error in listRoleUrls: {}", e);
+			throw e;
+		}
 	}
 
 	/**
@@ -67,7 +97,12 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	 */
 	@Override
 	public void addRoleUrl(String a, String p, int s) throws Exception {
-		securityAdminDAO.insertRoleUrl(a, p, s);
+		try {
+			securityAdminDAO.insertRoleUrl(a, p, s);
+		} catch (Exception e) {
+			log.error("Error in addRoleUrl with authority '{}', pattern '{}', sort '{}': {}", a, p, s, e);
+			throw e;
+		}
 	}
 
 	/**
@@ -75,7 +110,12 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	 */
 	@Override
 	public void deleteRoleUrl(String a, String p) throws Exception {
-		securityAdminDAO.deleteRoleUrl(a, p);
+		try {
+			securityAdminDAO.deleteRoleUrl(a, p);
+		} catch (Exception e) {
+			log.error("Error in deleteRoleUrl with authority '{}', pattern '{}': {}", a, p, e);
+			throw e;
+		}
 	}
 
 	/**
@@ -83,7 +123,12 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	 */
 	@Override
 	public List<Map<String, Object>> listRoleHierarchy() throws Exception {
-		return securityAdminDAO.selectRoleHierarchy();
+		try {
+			return securityAdminDAO.selectRoleHierarchy();
+		} catch (Exception e) {
+			log.error("Error in listRoleHierarchy: {}", e);
+			throw e;
+		}
 	}
 
 	/**
@@ -91,7 +136,12 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	 */
 	@Override
 	public void addHierarchy(String parent, String child) throws Exception {
-		securityAdminDAO.insertRoleHierarchy(parent, child);
+		try {
+			securityAdminDAO.insertRoleHierarchy(parent, child);
+		} catch (Exception e) {
+			log.error("Error in addHierarchy with parent '{}', child '{}': {}", parent, child, e);
+			throw e;
+		}
 	}
 
 	/**
@@ -99,7 +149,12 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	 */
 	@Override
 	public void deleteHierarchy(String parent, String child) throws Exception {
-		securityAdminDAO.deleteRoleHierarchy(parent, child);
+		try {
+			securityAdminDAO.deleteRoleHierarchy(parent, child);
+		} catch (Exception e) {
+			log.error("Error in deleteHierarchy with parent '{}', child '{}': {}", parent, child, e);
+			throw e;
+		}
 	}
 
 	/**
@@ -107,7 +162,12 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	 */
 	@Override
 	public List<Map<String, Object>> listRoleHierarchyTree() throws Exception {
-		return securityAdminDAO.selectRoleHierarchyTree();
+		try {
+			return securityAdminDAO.selectRoleHierarchyTree();
+		} catch (Exception e) {
+			log.error("Error in listRoleHierarchyTree: {}", e);
+			throw e;
+		}
 	}
 
 	/**
@@ -115,6 +175,11 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	 */
 	@Override
 	public List<Map<String, Object>> listRoleClosure() throws Exception {
-		return securityAdminDAO.selectRoleClosure();
+		try {
+			return securityAdminDAO.selectRoleClosure();
+		} catch (Exception e) {
+			log.error("Error in listRoleClosure: {}", e);
+			throw e;
+		}
 	}
 }
