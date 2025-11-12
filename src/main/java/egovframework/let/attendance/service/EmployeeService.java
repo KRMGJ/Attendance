@@ -1,11 +1,11 @@
 package egovframework.let.attendance.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
 
+import egovframework.let.attendance.dto.request.AdminEmployeeSearch;
 import egovframework.let.attendance.dto.request.EditEmployeeDto;
 import egovframework.let.attendance.dto.request.RegistEmployeeDto;
 import egovframework.let.attendance.dto.response.EmployeeViewDto;
-import egovframework.let.attendance.entity.Employee;
 
 public interface EmployeeService {
 	/**
@@ -15,12 +15,7 @@ public interface EmployeeService {
 	 */
 	void register(RegistEmployeeDto dto) throws Exception;
 
-	/**
-	 * 전체 직원 조회
-	 * 
-	 * @return 직원 리스트
-	 */
-	List<Employee> getAllEmployees() throws Exception;
+	Page<EmployeeViewDto> list(AdminEmployeeSearch cond) throws Exception;
 
 	/**
 	 * 직원 상세 조회

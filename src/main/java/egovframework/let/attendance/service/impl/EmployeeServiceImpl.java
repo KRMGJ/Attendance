@@ -6,15 +6,18 @@ import static egovframework.let.attendance.common.Enums.PART_TIME;
 import static egovframework.let.attendance.common.Utils.formatDateOnly;
 
 import java.util.Date;
-import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import egovframework.let.attendance.dto.request.AdminEmployeeSearch;
 import egovframework.let.attendance.dto.request.EditEmployeeDto;
 import egovframework.let.attendance.dto.request.RegistEmployeeDto;
 import egovframework.let.attendance.dto.response.EmployeeViewDto;
@@ -78,15 +81,19 @@ public class EmployeeServiceImpl implements EmployeeService {
 	 * 전체 직원 조회
 	 */
 	@Override
-	public List<Employee> getAllEmployees() throws Exception {
-		List<Employee> employees = null;
+	public Page<EmployeeViewDto> list(AdminEmployeeSearch cond) throws Exception {
 		try {
-			employees = employeeRepository.findAllByOrderByHireDateDesc();
+			Pageable pageable = PageRequest.of(cond.getPage(), cond.getSize());
+			Page<Employee> result = employeeRepository.searchForAdmin(cond, pageable);
+
+			return result.map(emp -> EmployeeViewDto.builder().id(emp.getId()).name(emp.getName()).email(emp.getEmail())
+					.department(emp.getDepartment()).position(emp.getPosition()).status(emp.getStatus())
+					.hireDate(formatDateOnly(emp.getHireDate())).resignDate(formatDateOnly(emp.getResignDate()))
+					.build());
 		} catch (Exception e) {
-			log.error("Error retrieving all employees: {}", e);
+			log.error("Error fetching employee list for admin", e);
 			throw e;
 		}
-		return employees;
 	}
 
 	/**

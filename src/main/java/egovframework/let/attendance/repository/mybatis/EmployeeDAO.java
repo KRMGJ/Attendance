@@ -2,6 +2,7 @@ package egovframework.let.attendance.repository.mybatis;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.egovframe.rte.psl.dataaccess.EgovAbstractMapper;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import egovframework.let.attendance.dto.request.EditEmployeeDto;
 import egovframework.let.attendance.dto.response.EmployeeViewDto;
+import egovframework.let.attendance.entity.Employee;
 
 @Repository("employeeDAO")
 public class EmployeeDAO extends EgovAbstractMapper {
@@ -75,4 +77,39 @@ public class EmployeeDAO extends EgovAbstractMapper {
 		update("employeeDAO.updatePassword", params);
 	}
 
+	/**
+	 * 직원 목록 카운트
+	 * 
+	 * @param kw     검색 키워드
+	 * @param dept   부서
+	 * @param status 고용 상태
+	 * @return 직원 수
+	 */
+	public long countList(String kw, String dept, String status) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("kw", kw);
+		params.put("dept", dept);
+		params.put("status", status);
+		return selectOne("employeeDAO.countList", params);
+	}
+
+	/**
+	 * 직원 목록 페이징 조회
+	 * 
+	 * @param kw     검색 키워드
+	 * @param dept   부서
+	 * @param status 고용 상태
+	 * @param offset 오프셋
+	 * @param limit  페이지 크기
+	 * @return 직원 목록
+	 */
+	public List<Employee> selectListPage(String kw, String dept, String status, int offset, int limit) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("kw", kw);
+		params.put("dept", dept);
+		params.put("status", status);
+		params.put("offset", offset);
+		params.put("limit", limit);
+		return selectList("employeeDAO.selectListPage", params);
+	}
 }

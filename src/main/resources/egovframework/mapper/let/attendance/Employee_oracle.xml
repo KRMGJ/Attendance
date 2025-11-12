@@ -7,6 +7,7 @@
 		<result property="name" column="NAME" />
 		<result property="email" column="EMAIL" />
 		<result property="position" column="POSITION" />
+		<result property="department" column="DEPARTMENT" />
 		<result property="employmentType" column="EMPLOYMENT_TYPE" />
 		<result property="status" column="STATUS" />
 		<result property="hireDate" column="HIRE_DATE" jdbcType="TIMESTAMP" />
@@ -15,7 +16,8 @@
 	</resultMap>
 
 	<select id="selectViewById" parameterType="string" resultMap="EmployeeViewMap">
-		SELECT ID, NAME, EMAIL, POSITION, EMPLOYMENT_TYPE, STATUS, HIRE_DATE, RESIGN_DATE,
+		SELECT ID, NAME, EMAIL, POSITION, DEPARTMENT, EMPLOYMENT_TYPE, STATUS,
+		HIRE_DATE, RESIGN_DATE,
 		UPDATED_AT
 		FROM EMPLOYEE
 		WHERE ID = #{id}
@@ -30,14 +32,16 @@
 	<select id="canEdit" resultType="int">
 		SELECT CASE
 		WHEN EXISTS (
-		SELECT 1 FROM AUTHORITIES WHERE USERNAME = #{actorUsername} AND AUTHORITY IN
+		SELECT 1
+		FROM AUTHORITIES WHERE USERNAME = #{actorUsername} AND AUTHORITY IN
 		('ROLE_ADMIN','ADMIN')
 		) THEN 1
 		WHEN EXISTS (
 		SELECT 1
 		FROM EMPLOYEE E
 		JOIN USERS U ON U.USERNAME = E.EMAIL
-		WHERE E.ID = #{id} AND U.USERNAME = #{actorUsername}
+		WHERE E.ID = #{id} AND U.USERNAME
+		= #{actorUsername}
 		) THEN 1
 		ELSE 0
 		END AS OK
@@ -50,7 +54,8 @@
 		EMAIL = #{email},
 		POSITION = #{position},
 		EMPLOYMENT_TYPE = #{employmentType},
-		UPDATED_AT = #{updatedAt, jdbcType=TIMESTAMP}
+		UPDATED_AT
+		= #{updatedAt, jdbcType=TIMESTAMP}
 		WHERE ID = #{id}
 	</update>
 
@@ -59,8 +64,50 @@
 			Security JDBC를 쓰는 경우 USERS 테이블을 갱신 -->
 		UPDATE EMPLOYEE
 		SET PASSWORD = #{password},
-		UPDATED_AT = #{updatedAt, jdbcType=TIMESTAMP}
-		WHERE ID = #{id} 
+		UPDATED_AT = #{updatedAt,
+		jdbcType=TIMESTAMP}
+		WHERE ID = #{id}
 	</update>
+
+	<select id="countList" resultType="long">
+		SELECT COUNT(*)
+		FROM employee e
+		<where>
+			<if test="kw != null">
+				(LOWER(e.name) LIKE #{kw} OR LOWER(e.email) LIKE #{kw})
+			</if>
+			<if test="dept != null">
+				AND e.department = #{dept}
+			</if>
+			<if test="status != null">
+				AND e.status = #{status}
+			</if>
+		</where>
+	</select>
+
+	<select id="selectListPage" resultType="egovframework.let.attendance.entity.Employee">
+		SELECT * FROM (
+		SELECT t.*, ROWNUM rn FROM (
+		SELECT e.id, e.name, e.email, e.department, e.employment_type, e.position, e.status,
+		e.hire_date, e.resign_date, e.updated_at
+		FROM employee e
+		<where>
+			<if test="kw != null">
+				(LOWER(e.name) LIKE #{kw} OR LOWER(e.email) LIKE #{kw})
+			</if>
+			<if test="dept != null">
+				AND e.department = #{dept}
+			</if>
+			<if test="status != null">
+				AND e.status = #{status}
+			</if>
+		</where>
+		ORDER BY e.updated_at DESC
+		) t
+		WHERE ROWNUM &lt;= #{offset} + #{limit}
+		)
+		WHERE rn &gt; #{offset}
+	</select>
+
 
 </mapper>

@@ -24,9 +24,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import egovframework.let.attendance.dto.request.AdminAttendanceSearch;
+import egovframework.let.attendance.dto.request.AdminEmployeeSearch;
 import egovframework.let.attendance.dto.response.AttendanceListDto;
+import egovframework.let.attendance.dto.response.EmployeeViewDto;
 import egovframework.let.attendance.dto.response.MonthlyDeptReportDto;
-import egovframework.let.attendance.entity.Employee;
 import egovframework.let.attendance.entity.LeaveRequest;
 import egovframework.let.attendance.repository.LeaveRequestRepository;
 import egovframework.let.attendance.service.AttendanceService;
@@ -86,9 +87,23 @@ public class AdminController {
 	 * 사원 목록 조회
 	 */
 	@RequestMapping(value = "/employee/list.do", method = RequestMethod.GET)
-	public String employeeList(Model model) throws Exception {
-		List<Employee> list = employeeService.getAllEmployees();
-		model.addAttribute("employees", list);
+	public String list(@RequestParam(value = "q", required = false) String q,
+			@RequestParam(value = "dept", required = false) String dept,
+			@RequestParam(value = "status", required = false) String status,
+			@RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(value = "size", defaultValue = "20") int size, Model model) throws Exception {
+
+		AdminEmployeeSearch cond = AdminEmployeeSearch.builder().q(q).dept(dept).status(status)
+				.page(Math.max(page - 1, 0)).size(size).build();
+
+		Page<EmployeeViewDto> list = employeeService.list(cond);
+
+		model.addAttribute("list", list.getContent());
+		model.addAttribute("paginationInfo", buildPi(page, size, (int) list.getTotalElements()));
+		model.addAttribute("paramQ", q);
+		model.addAttribute("paramDept", dept);
+		model.addAttribute("paramStatus", status);
+		model.addAttribute("size", size);
 		return "employee/list";
 	}
 
