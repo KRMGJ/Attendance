@@ -51,26 +51,6 @@ public class AttendanceServiceImpl implements AttendanceService {
 	private EmployeeRepository employeeRepository;
 
 	/**
-	 * username으로 직원 정보 로드
-	 * 
-	 * @param username 사용자 이름(이메일)
-	 * @return 직원 정보
-	 */
-	private Employee loadEmployeeByUsername(String username) {
-		// username을 이메일로 사용 중이라는 전제
-		return employeeRepository.findByEmail(username)
-				.orElseThrow(() -> new IllegalArgumentException("직원 정보를 찾을 수 없음: " + username));
-	}
-
-	/**
-	 * 오늘 날짜의 00:00:00 시각을 Date 객체로 반환
-	 */
-	private Date getTodayDate() {
-		LocalDateTime todayMidnight = LocalDateTime.now(ZONE).withHour(0).withMinute(0).withSecond(0).withNano(0);
-		return Date.from(todayMidnight.atZone(ZONE).toInstant());
-	}
-
-	/**
 	 * 출근 처리
 	 */
 	@Override
@@ -267,4 +247,27 @@ public class AttendanceServiceImpl implements AttendanceService {
 			throw e;
 		}
 	}
+
+	/**
+	 * username으로 직원 정보 로드
+	 * 
+	 * @param username 사용자 이름(이메일)
+	 * @return 직원 정보
+	 */
+	private Employee loadEmployeeByUsername(String username) {
+		// username을 이메일로 사용 중이라는 전제
+		return employeeRepository.findByEmail(username)
+				.orElseThrow(() -> new IllegalArgumentException("직원 정보를 찾을 수 없음: " + username));
+	}
+
+	/**
+	 * 오늘 날짜의 00:00:00 시각을 Date 객체로 반환
+	 * 
+	 * @return 오늘 날짜의 Date 객체
+	 */
+	private Date getTodayDate() {
+		LocalDateTime todayMidnight = LocalDateTime.now(ZONE).withHour(0).withMinute(0).withSecond(0).withNano(0);
+		return Date.from(todayMidnight.atZone(ZONE).toInstant());
+	}
+
 }
