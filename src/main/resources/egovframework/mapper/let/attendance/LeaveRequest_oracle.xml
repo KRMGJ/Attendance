@@ -2,14 +2,35 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="leaveRequestDAO">
 
-    <!-- 기간 겹침 건수 조회 -->
+	<!-- 기간 겹침 건수 조회 -->
 	<select id="countOverlap" resultType="long">
 		SELECT COUNT(1)
-		FROM LEAVE_REQUEST l
+		FROM
+		LEAVE_REQUEST l
 		WHERE l.emp_id = #{empId}
-		AND l.status &lt;&gt; 'REJECTED'
+		AND l.status &lt;&gt;
+		'REJECTED'
 		AND l.start_date &lt;= #{end}
 		AND l.end_date &gt;= #{start}
+	</select>
+
+	<select id="countMine" resultType="long">
+		SELECT COUNT(*)
+		FROM leave_request
+		WHERE emp_id = #{empId}
+	</select>
+
+	<select id="selectMinePage" resultType="egovframework.let.attendance.entity.LeaveRequest">
+		SELECT * FROM (
+		SELECT t.*, ROWNUM rn FROM (
+		SELECT lr.*
+		FROM leave_request lr
+		WHERE lr.emp_id = #{empId}
+		ORDER BY lr.id DESC
+		) t
+		WHERE ROWNUM &lt;= #{offset} + #{limit}
+		)
+		WHERE rn &gt; #{offset}
 	</select>
 
 </mapper>

@@ -1,7 +1,8 @@
 package egovframework.let.attendance.service;
 
 import java.util.Date;
-import java.util.List;
+
+import org.springframework.data.domain.Page;
 
 import egovframework.let.attendance.dto.request.NewLeaveDto;
 import egovframework.let.attendance.dto.response.LeaveRequestListDto;
@@ -31,7 +32,7 @@ public interface LeaveService {
 	 * @param userEmail 사용자 이메일
 	 * @return 휴가 신청 내역 리스트
 	 */
-	List<LeaveRequestListDto> myRequests(String userEmail) throws Exception;
+	Page<LeaveRequestListDto> myRequests(String userEmail, int page, int size) throws Exception;
 
 	/**
 	 * 휴가 신청 취소

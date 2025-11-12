@@ -4,23 +4,19 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
 
 import egovframework.let.attendance.dto.request.AdminAttendanceSearch;
 import egovframework.let.attendance.entity.Attendance;
 import egovframework.let.attendance.repository.AttendanceRepositoryCustom;
 import egovframework.let.attendance.repository.mybatis.AttendanceDAO;
 
+@Repository
 public class AttendanceRepositoryImpl implements AttendanceRepositoryCustom {
-
-	@PersistenceContext
-	private EntityManager entityManager;
 
 	@Autowired
 	private AttendanceDAO attendanceDAO;

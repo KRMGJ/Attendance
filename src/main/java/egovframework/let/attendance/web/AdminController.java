@@ -1,6 +1,7 @@
 package egovframework.let.attendance.web;
 
 import static egovframework.let.attendance.common.Enums.PENDING;
+import static egovframework.let.attendance.common.Utils.buildPi;
 
 import java.security.Principal;
 import java.text.ParseException;
@@ -11,7 +12,6 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.egovframe.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.data.domain.Page;
@@ -208,21 +208,4 @@ public class AdminController {
 		c.set(Calendar.MILLISECOND, 999);
 		return c.getTime();
 	}
-
-	/**
-	 * PaginationInfo 생성
-	 * 
-	 * @param page  현재 페이지 번호
-	 * @param size  페이지당 레코드 수
-	 * @param total 전체 레코드 수
-	 */
-	private PaginationInfo buildPi(int page, int size, int total) {
-		PaginationInfo pi = new PaginationInfo();
-		pi.setCurrentPageNo(page);
-		pi.setRecordCountPerPage(size);
-		pi.setPageSize(10);
-		pi.setTotalRecordCount(total);
-		return pi;
-	}
-
 }

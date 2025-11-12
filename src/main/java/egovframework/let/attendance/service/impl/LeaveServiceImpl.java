@@ -19,10 +19,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -126,33 +129,24 @@ public class LeaveServiceImpl implements LeaveService {
 	 * 나의 휴가 신청 내역 조회
 	 */
 	@Override
-	public List<LeaveRequestListDto> myRequests(String userEmail) throws Exception {
-		List<LeaveRequestListDto> requests = null;
+	public Page<LeaveRequestListDto> myRequests(String userEmail, int page, int size) throws Exception {
 		try {
 			Employee emp = employeeRepository.findByEmail(userEmail)
 					.orElseThrow(() -> new IllegalStateException("직원 정보 없음"));
 
-			List<LeaveRequest> leaveRequests = leaveRequestRepository.findByEmpIdOrderByIdDesc(emp.getId());
+			Pageable pageable = PageRequest.of(Math.max(page - 1, 0), size, Sort.by(Sort.Direction.DESC, "id"));
+			Page<LeaveRequest> result = leaveRequestRepository.searchMine(emp.getId(), pageable);
 
-			requests = leaveRequests.stream().map(lr -> {
-				LeaveRequestListDto dto = new LeaveRequestListDto();
-				dto.setType(lr.getType());
-				dto.setStartDate(formatDateOnly(lr.getStartDate()));
-				dto.setEndDate(formatDateOnly(lr.getEndDate()));
-				dto.setDays(lr.getDays());
-				dto.setReason(lr.getReason());
-				dto.setStatus(lr.getStatus());
-				dto.setCreatedAt(lr.getCreatedAt());
-				dto.setApprover(lr.getApprover());
-				dto.setApprovedAt(lr.getApprovedAt() != null ? formatDateOnly(lr.getApprovedAt()) : null);
-				return dto;
-			}).collect(Collectors.toList());
+			return result.map(lr -> LeaveRequestListDto.builder().type(lr.getType())
+					.startDate(formatDateOnly(lr.getStartDate())).endDate(formatDateOnly(lr.getEndDate()))
+					.days(lr.getDays()).reason(lr.getReason()).status(lr.getStatus()).createdAt(lr.getCreatedAt())
+					.approver(lr.getApprover())
+					.approvedAt(lr.getApprovedAt() != null ? formatDateOnly(lr.getApprovedAt()) : null).build());
 
 		} catch (Exception e) {
 			log.error("Error fetching leave requests for userEmail {}: {}", userEmail, e);
 			throw e;
 		}
-		return requests;
 	}
 
 	/**
