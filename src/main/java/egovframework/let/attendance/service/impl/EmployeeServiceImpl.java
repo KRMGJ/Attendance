@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class EmployeeServiceImpl implements EmployeeService {
 
 	@Autowired
@@ -44,6 +44,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	 * 직원 등록
 	 */
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public void register(RegistEmployeeDto dto) throws Exception {
 		try {
 			String encodedPassword = passwordEncoder.encode(dto.getPassword());
@@ -76,7 +77,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 	 * 전체 직원 조회
 	 */
 	@Override
-	@Transactional(readOnly = true)
 	public List<Employee> getAllEmployees() throws Exception {
 		List<Employee> employees = null;
 		try {
@@ -92,7 +92,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 	 * 직원 상세 조회
 	 */
 	@Override
-	@Transactional(readOnly = true)
 	public EmployeeViewDto getEmployeeDetail(String id) throws Exception {
 		EmployeeViewDto employee = null;
 		try {
@@ -127,6 +126,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	 * 직원 정보 수정
 	 */
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public void edit(EditEmployeeDto dto, String actorUsername) throws Exception {
 		try {
 			if (employeeDAO.canEdit(dto.getId(), actorUsername) == 0) {

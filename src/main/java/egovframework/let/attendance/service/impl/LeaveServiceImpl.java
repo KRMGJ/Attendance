@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import egovframework.let.attendance.dto.request.NewLeaveDto;
 import egovframework.let.attendance.dto.response.LeaveRequestListDto;
@@ -40,6 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 public class LeaveServiceImpl implements LeaveService {
 	@Autowired
 	private LeaveRequestDAO leaveRequestDAO;
@@ -57,22 +59,9 @@ public class LeaveServiceImpl implements LeaveService {
 	private LeaveRequestRepository leaveRequestRepository;
 
 	/**
-	 * 시작일과 종료일 사이의 일수 계산 (양 끝일 포함)
-	 * 
-	 * @param start 시작일
-	 * @param end   종료일
-	 */
-	private int calcDays(Date start, Date end) throws Exception {
-		LocalDate s = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-		LocalDate e = end.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-		return (int) (ChronoUnit.DAYS.between(s, e) + 1);
-	}
-
-	/**
 	 * 남은 휴가 일수 조회
 	 */
 	@Override
-	@Transactional(readOnly = true)
 	public LeaveBalance getRemaining(String empId) throws Exception {
 		int currentYear = Year.now().getValue();
 		Optional<LeaveBalance> leaveBalance = null;
@@ -90,7 +79,7 @@ public class LeaveServiceImpl implements LeaveService {
 	 * 휴가 신청
 	 */
 	@Override
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public String request(String userEmail, NewLeaveDto dto) throws Exception {
 		try {
 			Employee emp = employeeRepository.findByEmail(userEmail)
@@ -125,6 +114,7 @@ public class LeaveServiceImpl implements LeaveService {
 			leaveRequestRepository.save(req);
 			return "휴가 신청이 완료되었습니다.";
 		} catch (Exception e) {
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			log.error("Error processing leave request for userEmail {}: {}", userEmail, e.getMessage());
 			return "휴가 신청 중 오류가 발생했습니다.";
 		}
@@ -134,7 +124,6 @@ public class LeaveServiceImpl implements LeaveService {
 	 * 나의 휴가 신청 내역 조회
 	 */
 	@Override
-	@Transactional(readOnly = true)
 	public List<LeaveRequestListDto> myRequests(String userEmail) throws Exception {
 		List<LeaveRequestListDto> requests = null;
 		try {
@@ -168,6 +157,7 @@ public class LeaveServiceImpl implements LeaveService {
 	 * 휴가 신청 승인
 	 */
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public void approve(String id, String approverUsername) throws Exception {
 		try {
 			LeaveRequest lr = leaveRequestRepository.findById(id)
@@ -201,6 +191,7 @@ public class LeaveServiceImpl implements LeaveService {
 	 * 휴가 신청 거절
 	 */
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public void reject(String id, String approverUsername) throws Exception {
 		try {
 			LeaveRequest lr = leaveRequestRepository.findById(id)
@@ -222,6 +213,7 @@ public class LeaveServiceImpl implements LeaveService {
 	 * 휴가 신청 취소
 	 */
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public void cancel(String id, String empId) throws Exception {
 		try {
 			LeaveRequest lr = leaveRequestRepository.findByIdAndEmpId(id, empId)
@@ -243,6 +235,7 @@ public class LeaveServiceImpl implements LeaveService {
 	 * 전월 개근자에게 월 1일 연차 부여
 	 */
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public void grantMonthlyAccrualIfEligible(Date targetDate) throws Exception {
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"));
 		cal.setTime(targetDate);
@@ -275,6 +268,7 @@ public class LeaveServiceImpl implements LeaveService {
 	 * 전월 월차 부여 중복 처리 방지
 	 */
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public void ensureLastMonthMonthlyAccrualClosed() throws Exception {
 		try {
 			leaveBalanceDAO.fixMonthlyAccrualDuplicate(new Date());
@@ -288,6 +282,7 @@ public class LeaveServiceImpl implements LeaveService {
 	 * 입사기준 연차 부여
 	 */
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public void grantAnnualByAnniversary(Date today) throws Exception {
 		try {
 			List<Map<String, Object>> targets = leaveBalanceDAO.selectEmployeesWithAnniversaryToday(today);
@@ -324,6 +319,7 @@ public class LeaveServiceImpl implements LeaveService {
 	 * 달력기준 연차 부여
 	 */
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public void grantAnnualByCalendarYear(int year) throws Exception {
 		try {
 			List<Map<String, Object>> emps = leaveBalanceDAO.selectActiveEmployeesOnYear(year);
@@ -376,6 +372,18 @@ public class LeaveServiceImpl implements LeaveService {
 			diff--;
 		}
 		return diff;
+	}
+
+	/**
+	 * 시작일과 종료일 사이의 일수 계산 (양 끝일 포함)
+	 * 
+	 * @param start 시작일
+	 * @param end   종료일
+	 */
+	private int calcDays(Date start, Date end) {
+		LocalDate s = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		LocalDate e = end.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		return (int) (ChronoUnit.DAYS.between(s, e) + 1);
 	}
 
 }

@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 public class SecurityAdminServiceImpl implements SecurityAdminService {
 
 	@Autowired
@@ -64,7 +65,7 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	 * 특정 사용자에게 ROLE_* 할당
 	 */
 	@Override
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public void assignRoles(String username, List<String> roles) throws Exception {
 		try {
 			securityAdminDAO.deleteAllUserRoles(username);
@@ -96,6 +97,7 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	 * ROLE_URL 추가
 	 */
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public void addRoleUrl(String a, String p, int s) throws Exception {
 		try {
 			securityAdminDAO.insertRoleUrl(a, p, s);
@@ -109,6 +111,7 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	 * ROLE_URL 삭제
 	 */
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public void deleteRoleUrl(String a, String p) throws Exception {
 		try {
 			securityAdminDAO.deleteRoleUrl(a, p);
@@ -135,6 +138,7 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	 * ROLE_HIERARCHY 추가
 	 */
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public void addHierarchy(String parent, String child) throws Exception {
 		try {
 			securityAdminDAO.insertRoleHierarchy(parent, child);
@@ -148,6 +152,7 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	 * ROLE_HIERARCHY 삭제
 	 */
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public void deleteHierarchy(String parent, String child) throws Exception {
 		try {
 			securityAdminDAO.deleteRoleHierarchy(parent, child);

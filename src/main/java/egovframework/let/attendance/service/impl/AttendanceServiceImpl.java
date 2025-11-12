@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import egovframework.let.attendance.dto.request.AdminAttendanceSearch;
 import egovframework.let.attendance.dto.response.AttendanceListDto;
@@ -73,6 +74,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 	 * 출근 처리
 	 */
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public String checkIn(String username) throws Exception {
 		try {
 			Employee emp = loadEmployeeByUsername(username);
@@ -93,17 +95,19 @@ public class AttendanceServiceImpl implements AttendanceService {
 			a.setOvertimeMinutes(0);
 
 			attendanceRepository.save(a);
+			return "checkin_success";
 		} catch (Exception e) {
 			log.error("Error during check-in for user {}: {}", username, e.getMessage());
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			return "checkin_fail";
 		}
-		return "checkin_success";
 	}
 
 	/**
 	 * 퇴근 처리
 	 */
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public String checkOut(String username) throws Exception {
 		try {
 			Employee emp = loadEmployeeByUsername(username);
@@ -138,11 +142,12 @@ public class AttendanceServiceImpl implements AttendanceService {
 				}
 			}
 			attendanceRepository.save(a);
+			return "checkout_success";
 		} catch (Exception e) {
 			log.error("Error during check-out for user {}: {}", username, e.getMessage());
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			return "checkout_fail";
 		}
-		return "checkout_success";
 	}
 
 	/**
@@ -250,6 +255,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 	 * 부서별 월간 보고서 조회
 	 */
 	@Override
+	@Transactional(readOnly = true)
 	public List<MonthlyDeptReportDto> getMonthlyDeptReport(Date start, Date end) throws Exception {
 		try {
 			if (start == null || end == null) {
