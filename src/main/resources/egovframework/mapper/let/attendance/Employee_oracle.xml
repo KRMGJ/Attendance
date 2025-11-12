@@ -88,7 +88,7 @@
 	<select id="selectListPage" resultType="egovframework.let.attendance.entity.Employee">
 		SELECT * FROM (
 		SELECT t.*, ROWNUM rn FROM (
-		SELECT e.id, e.name, e.email, e.department, e.employment_type, e.position, e.status,
+		SELECT e.id, e.name, e.email, e.position, e.department, e.employment_type,  e.status,
 		e.hire_date, e.resign_date, e.updated_at
 		FROM employee e
 		<where>

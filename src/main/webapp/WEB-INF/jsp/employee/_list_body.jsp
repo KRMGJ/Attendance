@@ -55,10 +55,10 @@
 							<tr class="border-t">
 								<td class="px-4 py-2"><c:out value="${e.name}" /></td>
 								<td class="px-4 py-2"><c:out value="${e.email}" /></td>
-								<td class="px-4 py-2"><c:out value="${e.department}" /></td>
+								<td class="px-4 py-2"><c:out value="${empty e.department ? '-' : e.department}" /></td>
 								<td class="px-4 py-2"><c:out value="${e.position}" /></td>
 								<td class="px-4 py-2"><c:out value="${e.status}" /></td>
-								<td class="px-4 py-2"><c:out value="${e.employmentType}" /></td>
+								<td class="px-4 py-2"><c:out value="${empty e.employmentType ? '-' : e.employmentType}" /></td>
 								<td class="px-4 py-2 text-right"><a class="underline"
 									href="<c:url value='/employee/detail.do?id=${e.id}'/>">보기</a></td>
 							</tr>

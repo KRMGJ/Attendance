@@ -87,9 +87,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 			Page<Employee> result = employeeRepository.searchForAdmin(cond, pageable);
 
 			return result.map(emp -> EmployeeViewDto.builder().id(emp.getId()).name(emp.getName()).email(emp.getEmail())
-					.department(emp.getDepartment()).position(emp.getPosition()).status(emp.getStatus())
-					.hireDate(formatDateOnly(emp.getHireDate())).resignDate(formatDateOnly(emp.getResignDate()))
-					.build());
+					.employmentType(emp.getEmploymentType()).department(emp.getDepartment()).position(emp.getPosition())
+					.status(emp.getStatus()).hireDate(formatDateOnly(emp.getHireDate()))
+					.resignDate(formatDateOnly(emp.getResignDate())).build());
 		} catch (Exception e) {
 			log.error("Error fetching employee list for admin", e);
 			throw e;
