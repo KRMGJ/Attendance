@@ -36,7 +36,7 @@
 	</bean>
     
 	<bean class="org.springframework.session.jdbc.config.annotation.web.http.JdbcHttpSessionConfiguration">
-    	<property name="maxInactiveIntervalInSeconds" value="1800"/> <!-- 30분 -->
+    	<property name="maxInactiveIntervalInSeconds" value="3600"/> <!-- 1 hour -->
   	</bean>
   	
 	<bean id="cookieSerializer" class="org.springframework.session.web.http.DefaultCookieSerializer">

@@ -28,8 +28,8 @@ public class SessionController {
 	@ResponseBody
 	public ResponseEntity<String> extend(HttpSession session) {
 		SessionLimit limit = sessionLimitRepository.findBySessionId(session.getId()).orElseGet(
-				() -> SessionLimit.create(session.getId(), String.valueOf(session.getAttribute("username")), 30));
-		limit.extend(30);
+				() -> SessionLimit.create(session.getId(), String.valueOf(session.getAttribute("username")), 60));
+		limit.extend(60);
 		sessionLimitRepository.save(limit);
 
 		long expiresAt = limit.getExpiresAt().getTime();
