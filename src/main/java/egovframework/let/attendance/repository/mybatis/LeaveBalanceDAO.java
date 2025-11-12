@@ -8,7 +8,7 @@ import java.util.Map;
 import org.egovframe.rte.psl.dataaccess.EgovAbstractMapper;
 import org.springframework.stereotype.Repository;
 
-@Repository
+@Repository("leaveBalanceDAO")
 public class LeaveBalanceDAO extends EgovAbstractMapper {
 
 	/**
@@ -22,9 +22,7 @@ public class LeaveBalanceDAO extends EgovAbstractMapper {
 		Map<String, Object> params = new HashMap<>();
 		params.put("year", year);
 		params.put("month", month);
-		return selectList(
-				"egovframework.let.attendance.repository.mybatis.LeaveBalanceDAO.selectFirstYearFullAttendanceEmployees",
-				params);
+		return selectList("leaveBalanceDAO.selectFirstYearFullAttendanceEmployees", params);
 	}
 
 	/**
@@ -38,7 +36,7 @@ public class LeaveBalanceDAO extends EgovAbstractMapper {
 		Map<String, Object> params = new HashMap<>();
 		params.put("empId", empId);
 		params.put("year", year);
-		return selectOne("egovframework.let.attendance.repository.mybatis.LeaveBalanceDAO.countMonthlyGranted", params);
+		return selectOne("leaveBalanceDAO.countMonthlyGranted", params);
 	}
 
 	/**
@@ -54,7 +52,7 @@ public class LeaveBalanceDAO extends EgovAbstractMapper {
 		params.put("empId", empId);
 		params.put("year", year);
 		params.put("days", days);
-		return update("egovframework.let.attendance.repository.mybatis.LeaveBalanceDAO.addQuota", params);
+		return update("leaveBalanceDAO.addQuota", params);
 	}
 
 	/**
@@ -76,7 +74,7 @@ public class LeaveBalanceDAO extends EgovAbstractMapper {
 		params.put("reason", reason);
 		params.put("days", days);
 		params.put("grantedAt", grantedAt);
-		return insert("egovframework.let.attendance.repository.mybatis.LeaveBalanceDAO.insertGrantLog", params);
+		return insert("leaveBalanceDAO.insertGrantLog", params);
 	}
 
 	/**
@@ -92,7 +90,7 @@ public class LeaveBalanceDAO extends EgovAbstractMapper {
 		params.put("empId", empId);
 		params.put("year", year);
 		params.put("grant", grant);
-		return update("egovframework.let.attendance.repository.mybatis.LeaveBalanceDAO.setAnnualQuota", params);
+		return update("leaveBalanceDAO.setAnnualQuota", params);
 	}
 
 	/**
@@ -108,7 +106,7 @@ public class LeaveBalanceDAO extends EgovAbstractMapper {
 		params.put("id", id);
 		params.put("empId", empId);
 		params.put("year", year);
-		return insert("egovframework.let.attendance.repository.mybatis.LeaveBalanceDAO.upsertLeavePolicy", params);
+		return insert("leaveBalanceDAO.upsertLeavePolicy", params);
 	}
 
 	/**
@@ -118,9 +116,7 @@ public class LeaveBalanceDAO extends EgovAbstractMapper {
 	 * @return 직원 목록
 	 */
 	public List<Map<String, Object>> selectEmployeesWithAnniversaryToday(Date today) {
-		return selectList(
-				"egovframework.let.attendance.repository.mybatis.LeaveBalanceDAO.selectEmployeesWithAnniversaryToday",
-				today);
+		return selectList("leaveBalanceDAO.selectEmployeesWithAnniversaryToday", today);
 	}
 
 	/**
@@ -130,8 +126,7 @@ public class LeaveBalanceDAO extends EgovAbstractMapper {
 	 * @return 직원 목록
 	 */
 	public List<Map<String, Object>> selectActiveEmployeesOnYear(int year) {
-		return selectList("egovframework.let.attendance.repository.mybatis.LeaveBalanceDAO.selectActiveEmployeesOnYear",
-				year);
+		return selectList("leaveBalanceDAO.selectActiveEmployeesOnYear", year);
 	}
 
 	/**
@@ -141,8 +136,7 @@ public class LeaveBalanceDAO extends EgovAbstractMapper {
 	 * @return 정리된 건수
 	 */
 	public int fixMonthlyAccrualDuplicate(Date now) {
-		return update("egovframework.let.attendance.repository.mybatis.LeaveBalanceDAO.fixMonthlyAccrualDuplicate",
-				now);
+		return update("leaveBalanceDAO.fixMonthlyAccrualDuplicate", now);
 	}
 
 }

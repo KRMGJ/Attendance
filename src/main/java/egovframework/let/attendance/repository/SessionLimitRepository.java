@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import egovframework.let.attendance.entity.SessionLimit;
 
-@Repository
+@Repository("sessionLimitRepository")
 public interface SessionLimitRepository extends JpaRepository<SessionLimit, String> {
 	Optional<SessionLimit> findBySessionId(String sessionId);
 }

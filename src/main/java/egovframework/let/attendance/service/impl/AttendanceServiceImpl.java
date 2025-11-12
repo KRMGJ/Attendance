@@ -14,7 +14,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,19 +36,19 @@ import egovframework.let.attendance.service.AttendanceService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Service
+@Service("attendanceService")
 public class AttendanceServiceImpl implements AttendanceService {
 	private static final ZoneId ZONE = ZoneId.of("Asia/Seoul");
 	private static final LocalTime WORK_START = LocalTime.of(9, 0);
 	private static final LocalTime WORK_END = LocalTime.of(18, 0);
 
-	@Autowired
+	@Resource(name = "attendanceDAO")
 	private AttendanceDAO attendanceDAO;
 
-	@Autowired
+	@Resource(name = "attendanceRepository")
 	private AttendanceRepository attendanceRepository;
 
-	@Autowired
+	@Resource(name = "employeeRepository")
 	private EmployeeRepository employeeRepository;
 
 	/**

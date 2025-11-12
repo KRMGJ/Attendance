@@ -21,7 +21,8 @@ import java.util.TimeZone;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -40,22 +41,23 @@ import egovframework.let.attendance.service.LeaveService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Service
+@Service("leaveService")
 @Transactional(readOnly = true)
 public class LeaveServiceImpl implements LeaveService {
-	@Autowired
+
+	@Resource(name = "leaveRequestDAO")
 	private LeaveRequestDAO leaveRequestDAO;
 
-	@Autowired
+	@Resource(name = "leaveBalanceDAO")
 	private LeaveBalanceDAO leaveBalanceDAO;
 
-	@Autowired
+	@Resource(name = "employeeRepository")
 	private EmployeeRepository employeeRepository;
 
-	@Autowired
+	@Resource(name = "leaveBalanceRepository")
 	private LeaveBalanceRepository leaveBalanceRepository;
 
-	@Autowired
+	@Resource(name = "leaveRequestRepository")
 	private LeaveRequestRepository leaveRequestRepository;
 
 	/**

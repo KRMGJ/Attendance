@@ -8,7 +8,8 @@ import static egovframework.let.attendance.common.Utils.formatDateOnly;
 import java.util.Date;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,20 +25,20 @@ import egovframework.let.attendance.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Service
+@Service("employeeService")
 @Transactional(readOnly = true)
 public class EmployeeServiceImpl implements EmployeeService {
 
-	@Autowired
+	@Resource(name = "employeeRepository")
 	private EmployeeRepository employeeRepository;
 
-	@Autowired
+	@Resource(name = "employeeDAO")
 	private EmployeeDAO employeeDAO;
 
-	@Autowired
+	@Resource(name = "passwordEncoder")
 	private PasswordEncoder passwordEncoder;
 
-	@Autowired
+	@Resource(name = "jdbcTemplate")
 	private JdbcTemplate jdbcTemplate;
 
 	/**

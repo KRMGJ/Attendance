@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import egovframework.let.attendance.entity.LeaveRequest;
 
-@Repository
+@Repository("leaveRequestRepository")
 public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, String>, LeaveRequestRepositoryCustom {
 	List<LeaveRequest> findByEmpIdOrderByIdDesc(String empId);
 

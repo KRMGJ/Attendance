@@ -2,7 +2,8 @@ package egovframework.let.attendance.web;
 
 import java.security.Principal;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,7 +22,7 @@ import egovframework.let.attendance.service.EmployeeService;
 @RequestMapping("/employee")
 public class EmployeeController {
 
-	@Autowired
+	@Resource(name = "employeeService")
 	private EmployeeService employeeService;
 
 	/**

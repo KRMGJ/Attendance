@@ -9,6 +9,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.egovframe.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -35,13 +37,13 @@ import egovframework.let.attendance.service.LeaveService;
 @RequestMapping("/admin")
 public class AdminController {
 
-	@Autowired
+	@Resource(name = "attendanceService")
 	private AttendanceService attendanceService;
 
-	@Autowired
+	@Resource(name = "employeeService")
 	private EmployeeService employeeService;
 
-	@Autowired
+	@Resource(name = "leaveService")
 	private LeaveService leaveService;
 
 	@Autowired

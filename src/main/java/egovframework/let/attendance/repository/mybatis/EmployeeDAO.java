@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import egovframework.let.attendance.dto.request.EditEmployeeDto;
 import egovframework.let.attendance.dto.response.EmployeeViewDto;
 
-@Repository
+@Repository("employeeDAO")
 public class EmployeeDAO extends EgovAbstractMapper {
 
 	/**
@@ -20,7 +20,7 @@ public class EmployeeDAO extends EgovAbstractMapper {
 	 * @return 직원 상세 정보
 	 */
 	public EmployeeViewDto selectViewById(String id) {
-		return selectOne("egovframework.let.attendance.repository.mybatis.EmployeeDAO.selectViewById", id);
+		return selectOne("employeeDAO.selectViewById", id);
 	}
 
 	/**
@@ -29,7 +29,7 @@ public class EmployeeDAO extends EgovAbstractMapper {
 	 * @param dto 수정할 직원 정보 DTO
 	 */
 	public void updateProfile(EditEmployeeDto dto) {
-		update("egovframework.let.attendance.repository.mybatis.EmployeeDAO.updateProfile", dto);
+		update("employeeDAO.updateProfile", dto);
 	}
 
 	/**
@@ -43,8 +43,7 @@ public class EmployeeDAO extends EgovAbstractMapper {
 		Map<String, Object> params = new HashMap<>();
 		params.put("email", email);
 		params.put("id", id);
-		return selectOne("egovframework.let.attendance.repository.mybatis.EmployeeDAO.existsByEmailExcludingId",
-				params);
+		return selectOne("employeeDAO.existsByEmailExcludingId", params);
 	}
 
 	/**
@@ -58,7 +57,7 @@ public class EmployeeDAO extends EgovAbstractMapper {
 		Map<String, Object> params = new HashMap<>();
 		params.put("id", id);
 		params.put("actorUsername", actorUsername);
-		return selectOne("egovframework.let.attendance.repository.mybatis.EmployeeDAO.canEdit", params);
+		return selectOne("employeeDAO.canEdit", params);
 	}
 
 	/**
@@ -73,7 +72,7 @@ public class EmployeeDAO extends EgovAbstractMapper {
 		params.put("id", id);
 		params.put("encoded", encoded);
 		params.put("updatedAt", updatedAt);
-		update("egovframework.let.attendance.repository.mybatis.EmployeeDAO.updatePassword", params);
+		update("employeeDAO.updatePassword", params);
 	}
 
 }

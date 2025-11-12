@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper
-	namespace="egovframework.let.attendance.repository.mybatis.SecurityAdminDAO">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="securityAdminDAO">
 
 	<select id="selectUsers" parameterType="string" resultType="map">
 		SELECT USERNAME, EMAIL, ENABLED, CREATED_AT FROM USERS
@@ -18,8 +16,7 @@
 		ROLE_MASTER ORDER BY AUTHORITY
 	</select>
 
-	<select id="selectUserRoles" parameterType="string"
-		resultType="string">
+	<select id="selectUserRoles" parameterType="string" resultType="string">
 		SELECT AUTHORITY FROM AUTHORITIES WHERE USERNAME =
 		#{username}
 	</select>

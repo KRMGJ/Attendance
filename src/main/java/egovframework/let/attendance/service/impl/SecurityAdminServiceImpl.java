@@ -3,7 +3,8 @@ package egovframework.let.attendance.service.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,11 +13,11 @@ import egovframework.let.attendance.service.SecurityAdminService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Service
+@Service("securityAdminService")
 @Transactional(readOnly = true)
 public class SecurityAdminServiceImpl implements SecurityAdminService {
 
-	@Autowired
+	@Resource(name = "securityAdminDAO")
 	private SecurityAdminDAO securityAdminDAO;
 
 	/**

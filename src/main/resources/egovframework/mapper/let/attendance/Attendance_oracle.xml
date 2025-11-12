@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper
-	namespace="egovframework.let.attendance.repository.mybatis.AttendanceDAO">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="attendanceDAO">
 
 	<!-- Attendance + Employee 연계 매핑 -->
-	<resultMap id="AttendanceWithEmpMap"
-		type="egovframework.let.attendance.entity.Attendance">
+	<resultMap id="AttendanceWithEmpMap" type="egovframework.let.attendance.entity.Attendance">
 		<id property="id" column="a_id" />
 		<result property="empId" column="a_emp_id" />
 		<result property="workDate" column="a_work_date" />
@@ -21,8 +18,7 @@
 		</association>
 	</resultMap>
 
-	<resultMap id="MonthlyDeptReportMap"
-		type="egovframework.let.attendance.dto.response.MonthlyDeptReportDto">
+	<resultMap id="MonthlyDeptReportMap" type="egovframework.let.attendance.dto.response.MonthlyDeptReportDto">
 		<result property="department" column="department" />
 		<result property="headcount" column="headcount" />
 		<result property="workDays" column="work_days" />

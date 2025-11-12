@@ -7,7 +7,7 @@ import java.util.Map;
 import org.egovframe.rte.psl.dataaccess.EgovAbstractMapper;
 import org.springframework.stereotype.Repository;
 
-@Repository
+@Repository("securityAdminDAO")
 public class SecurityAdminDAO extends EgovAbstractMapper {
 
 	/**
@@ -17,7 +17,7 @@ public class SecurityAdminDAO extends EgovAbstractMapper {
 	 * @return 사용자 목록
 	 */
 	public List<Map<String, Object>> selectUsers(String q) {
-		return selectList("egovframework.let.attendance.repository.mybatis.SecurityAdminDAO.selectUsers", q);
+		return selectList("securityAdminDAO.selectUsers", q);
 	}
 
 	/**
@@ -26,7 +26,7 @@ public class SecurityAdminDAO extends EgovAbstractMapper {
 	 * @return ROLE_* 목록
 	 */
 	public List<String> selectAllRoles() {
-		return selectList("egovframework.let.attendance.repository.mybatis.SecurityAdminDAO.selectAllRoles");
+		return selectList("securityAdminDAO.selectAllRoles");
 	}
 
 	/**
@@ -36,11 +36,16 @@ public class SecurityAdminDAO extends EgovAbstractMapper {
 	 * @return ROLE_* 목록
 	 */
 	public List<String> selectUserRoles(String username) {
-		return selectList("egovframework.let.attendance.repository.mybatis.SecurityAdminDAO.selectUserRoles", username);
+		return selectList("securityAdminDAO.selectUserRoles", username);
 	}
 
+	/**
+	 * 특정 사용자의 모든 ROLE_* 삭제
+	 * 
+	 * @param username 사용자 아이디
+	 */
 	public int deleteAllUserRoles(String username) {
-		return delete("egovframework.let.attendance.repository.mybatis.SecurityAdminDAO.deleteAllUserRoles", username);
+		return delete("securityAdminDAO.deleteAllUserRoles", username);
 	}
 
 	/**
@@ -53,7 +58,7 @@ public class SecurityAdminDAO extends EgovAbstractMapper {
 		Map<String, String> param = new HashMap<>();
 		param.put("username", username);
 		param.put("authority", authority);
-		return insert("egovframework.let.attendance.repository.mybatis.SecurityAdminDAO.insertUserRole", param);
+		return insert("securityAdminDAO.insertUserRole", param);
 	}
 
 	/**
@@ -62,7 +67,7 @@ public class SecurityAdminDAO extends EgovAbstractMapper {
 	 * @return ROLE_URL 목록
 	 */
 	public List<Map<String, Object>> selectRoleUrls() {
-		return selectList("egovframework.let.attendance.repository.mybatis.SecurityAdminDAO.selectRoleUrls");
+		return selectList("securityAdminDAO.selectRoleUrls");
 	}
 
 	/**
@@ -77,7 +82,7 @@ public class SecurityAdminDAO extends EgovAbstractMapper {
 		param.put("authority", authority);
 		param.put("pattern", pattern);
 		param.put("sort", sort);
-		return insert("egovframework.let.attendance.repository.mybatis.SecurityAdminDAO.insertRoleUrl", param);
+		return insert("securityAdminDAO.insertRoleUrl", param);
 	}
 
 	/**
@@ -90,7 +95,7 @@ public class SecurityAdminDAO extends EgovAbstractMapper {
 		Map<String, String> param = new HashMap<>();
 		param.put("authority", authority);
 		param.put("pattern", pattern);
-		return delete("egovframework.let.attendance.repository.mybatis.SecurityAdminDAO.deleteRoleUrl", param);
+		return delete("securityAdminDAO.deleteRoleUrl", param);
 	}
 
 	/**
@@ -99,7 +104,7 @@ public class SecurityAdminDAO extends EgovAbstractMapper {
 	 * @return ROLE 계층구조 목록
 	 */
 	public List<Map<String, Object>> selectRoleHierarchy() {
-		return selectList("egovframework.let.attendance.repository.mybatis.SecurityAdminDAO.selectRoleHierarchy");
+		return selectList("securityAdminDAO.selectRoleHierarchy");
 	}
 
 	/**
@@ -112,7 +117,7 @@ public class SecurityAdminDAO extends EgovAbstractMapper {
 		Map<String, String> param = new HashMap<>();
 		param.put("parent", parent);
 		param.put("child", child);
-		return insert("egovframework.let.attendance.repository.mybatis.SecurityAdminDAO.insertRoleHierarchy", param);
+		return insert("securityAdminDAO.insertRoleHierarchy", param);
 	}
 
 	/**
@@ -125,7 +130,7 @@ public class SecurityAdminDAO extends EgovAbstractMapper {
 		Map<String, String> param = new HashMap<>();
 		param.put("parent", parent);
 		param.put("child", child);
-		return delete("egovframework.let.attendance.repository.mybatis.SecurityAdminDAO.deleteRoleHierarchy", param);
+		return delete("securityAdminDAO.deleteRoleHierarchy", param);
 	}
 
 	/**
@@ -134,7 +139,7 @@ public class SecurityAdminDAO extends EgovAbstractMapper {
 	 * @return ROLE_HIERARCHY 트리 구조
 	 */
 	public List<Map<String, Object>> selectRoleHierarchyTree() {
-		return selectList("egovframework.let.attendance.repository.mybatis.SecurityAdminDAO.selectRoleHierarchyTree");
+		return selectList("securityAdminDAO.selectRoleHierarchyTree");
 	}
 
 	/**
@@ -143,6 +148,6 @@ public class SecurityAdminDAO extends EgovAbstractMapper {
 	 * @return ROLE_HIERARCHY closure 목록
 	 */
 	public List<Map<String, Object>> selectRoleClosure() {
-		return selectList("egovframework.let.attendance.repository.mybatis.SecurityAdminDAO.selectRoleClosure");
+		return selectList("securityAdminDAO.selectRoleClosure");
 	}
 }

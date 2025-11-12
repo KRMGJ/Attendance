@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import egovframework.let.attendance.entity.Employee;
 
-@Repository
+@Repository("employeeRepository")
 public interface EmployeeRepository extends JpaRepository<Employee, String> {
 	Optional<Employee> findByEmail(String email);
 

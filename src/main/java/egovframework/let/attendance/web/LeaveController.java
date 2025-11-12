@@ -3,7 +3,8 @@ package egovframework.let.attendance.web;
 import java.security.Principal;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -19,7 +20,7 @@ import egovframework.let.attendance.service.LeaveService;
 @RequestMapping("/leave")
 public class LeaveController {
 
-	@Autowired
+	@Resource(name = "leaveService")
 	private LeaveService leaveService;
 
 	/** 휴가 신청 폼 조회 */

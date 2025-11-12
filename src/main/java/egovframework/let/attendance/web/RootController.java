@@ -2,6 +2,8 @@ package egovframework.let.attendance.web;
 
 import java.security.Principal;
 
+import javax.annotation.Resource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -25,10 +27,10 @@ public class RootController {
 	@Autowired
 	private EmployeeRepository employeeRepository;
 
-	@Autowired
+	@Resource(name = "attendanceService")
 	private AttendanceService attendanceService;
 
-	@Autowired
+	@Resource(name = "leaveService")
 	private LeaveService leaveService;
 
 	/**

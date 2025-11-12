@@ -4,9 +4,9 @@ import java.security.Principal;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,7 +21,7 @@ import egovframework.let.attendance.service.AttendanceService;
 @RequestMapping("/attendance")
 public class AttendanceController {
 
-	@Autowired
+	@Resource(name = "attendanceService")
 	private AttendanceService attendanceService;
 
 	/**

@@ -7,7 +7,7 @@ import java.util.Map;
 import org.egovframe.rte.psl.dataaccess.EgovAbstractMapper;
 import org.springframework.stereotype.Repository;
 
-@Repository
+@Repository("leaveRequestDAO")
 public class LeaveRequestDAO extends EgovAbstractMapper {
 
 	/**
@@ -23,7 +23,7 @@ public class LeaveRequestDAO extends EgovAbstractMapper {
 		p.put("empId", empId);
 		p.put("start", start);
 		p.put("end", end);
-		return selectOne("egovframework.let.attendance.repository.mybatis.LeaveRequestDAO.countOverlap", p);
+		return selectOne("leaveRequestDAO.countOverlap", p);
 	}
 
 }

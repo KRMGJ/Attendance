@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import egovframework.let.attendance.dto.response.MonthlyDeptReportDto;
 import egovframework.let.attendance.entity.Attendance;
 
-@Repository
+@Repository("attendanceDAO")
 public class AttendanceDAO extends EgovAbstractMapper {
 
 	/**
@@ -31,7 +31,7 @@ public class AttendanceDAO extends EgovAbstractMapper {
 		param.put("to", to);
 		param.put("offset", offset);
 		param.put("limit", limit);
-		return selectList("egovframework.let.attendance.repository.mybatis.AttendanceDAO.selectAdminPage", param);
+		return selectList("attendanceDAO.selectAdminPage", param);
 	}
 
 	/**
@@ -47,7 +47,7 @@ public class AttendanceDAO extends EgovAbstractMapper {
 		param.put("kw", kw);
 		param.put("from", from);
 		param.put("to", to);
-		return selectOne("egovframework.let.attendance.repository.mybatis.AttendanceDAO.countAdmin", param);
+		return selectOne("attendanceDAO.countAdmin", param);
 	}
 
 	/**
@@ -63,7 +63,7 @@ public class AttendanceDAO extends EgovAbstractMapper {
 		param.put("empId", empId);
 		param.put("from", from);
 		param.put("to", to);
-		return selectList("egovframework.let.attendance.repository.mybatis.AttendanceDAO.findMyRange", param);
+		return selectList("attendanceDAO.findMyRange", param);
 	}
 
 	/**
@@ -77,7 +77,6 @@ public class AttendanceDAO extends EgovAbstractMapper {
 		Map<String, Object> param = new HashMap<>();
 		param.put("start", start);
 		param.put("end", end);
-		return selectList("egovframework.let.attendance.repository.mybatis.AttendanceDAO.selectMonthlyDeptReport",
-				param);
+		return selectList("attendanceDAO.selectMonthlyDeptReport", param);
 	}
 }
