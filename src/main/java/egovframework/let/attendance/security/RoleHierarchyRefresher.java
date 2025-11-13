@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
@@ -14,14 +16,14 @@ import egovframework.let.attendance.repository.mybatis.SecurityAdminDAO;
 @Service
 public class RoleHierarchyRefresher {
 
-	@Autowired
-	SecurityAdminDAO dao;
+	@Resource(name = "securityAdminDAO")
+	private SecurityAdminDAO securityAdminDAO;
 
 	@Autowired
 	RoleHierarchy roleHierarchy;
 
 	public void refresh() {
-		List<Map<String, Object>> edges = dao.selectRoleHierarchy();
+		List<Map<String, Object>> edges = securityAdminDAO.selectRoleHierarchy();
 
 		String text = edges.stream().map(e -> e.get("PARENT_ROLE") + " > " + e.get("CHILD_ROLE"))
 				.collect(Collectors.joining("\n"));

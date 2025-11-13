@@ -4,7 +4,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Service;
 
 import egovframework.let.attendance.service.LeaveService;
@@ -12,7 +13,7 @@ import egovframework.let.attendance.service.LeaveService;
 @Service
 public class LeaveGrantJob {
 
-	@Autowired
+	@Resource(name = "leaveService")
 	private LeaveService leaveService;
 
 	/** 입사 1년 미만 월만근 시 1일 부여 */
