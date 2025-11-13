@@ -1,13 +1,19 @@
 package egovframework.let.attendance.service.impl;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import egovframework.let.attendance.dto.request.AdminSecuritySearch;
 import egovframework.let.attendance.repository.mybatis.SecurityAdminDAO;
 import egovframework.let.attendance.service.SecurityAdminService;
 import lombok.extern.slf4j.Slf4j;
@@ -24,14 +30,23 @@ public class SecurityAdminServiceImpl implements SecurityAdminService {
 	 * 사용자 목록 조회
 	 */
 	@Override
-	public List<Map<String, Object>> findUsers(String q) throws Exception {
+	public Page<Map<String, Object>> findUsers(AdminSecuritySearch cond) throws Exception {
 		try {
-			if (q != null) {
-				q = q.trim();
-			}
-			return securityAdminDAO.selectUsers(q);
+			Pageable pageable = PageRequest.of(cond.getPage(), cond.getSize());
+			String kw = (cond.getQ() == null || cond.getQ().trim().isEmpty()) ? null
+					: "%" + cond.getQ().trim().toLowerCase() + "%";
+			String role = cond.getRole();
+
+			int offset = (int) pageable.getOffset();
+			int limit = pageable.getPageSize();
+
+			long total = securityAdminDAO.countUsers(kw, role);
+			List<Map<String, Object>> content = total == 0 ? Collections.emptyList()
+					: securityAdminDAO.selectUsersPage(kw, role, offset, limit);
+
+			return new PageImpl<>(content, pageable, total);
 		} catch (Exception e) {
-			log.error("Error in findUsers with query '{}': {}", q, e);
+			log.error("Error in findUsers: {}", e);
 			throw e;
 		}
 	}

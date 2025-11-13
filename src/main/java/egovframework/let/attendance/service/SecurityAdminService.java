@@ -3,6 +3,10 @@ package egovframework.let.attendance.service;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.domain.Page;
+
+import egovframework.let.attendance.dto.request.AdminSecuritySearch;
+
 public interface SecurityAdminService {
 	/**
 	 * 사용자 목록 조회
@@ -10,7 +14,7 @@ public interface SecurityAdminService {
 	 * @param q 검색어
 	 * @return 사용자 목록
 	 */
-	List<Map<String, Object>> findUsers(String q) throws Exception;
+	Page<Map<String, Object>> findUsers(AdminSecuritySearch cond) throws Exception;
 
 	/**
 	 * 모든 ROLE_* 목록 조회

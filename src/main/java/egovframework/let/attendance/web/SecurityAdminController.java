@@ -1,15 +1,20 @@
 package egovframework.let.attendance.web;
 
+import static egovframework.let.attendance.common.Utils.buildPi;
+
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import egovframework.let.attendance.dto.request.AdminSecuritySearch;
 import egovframework.let.attendance.service.SecurityAdminService;
 
 @Controller
@@ -23,9 +28,22 @@ public class SecurityAdminController {
 	 * 사용자 목록 페이지
 	 */
 	@RequestMapping(value = "/users.do", method = RequestMethod.GET)
-	public String users(@RequestParam(value = "q", required = false) String q, Model model) throws Exception {
-		model.addAttribute("users", securityAdminService.findUsers(q));
+	public String users(@RequestParam(value = "q", required = false) String q,
+			@RequestParam(value = "role", required = false) String role,
+			@RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(value = "size", defaultValue = "20") int size, Model model) throws Exception {
+
+		AdminSecuritySearch cond = AdminSecuritySearch.builder().q(q).role(role).page(Math.max(page - 1, 0)).size(size)
+				.build();
+
+		Page<Map<String, Object>> list = securityAdminService.findUsers(cond);
+
+		model.addAttribute("users", list.getContent());
 		model.addAttribute("allRoles", securityAdminService.listAllRoles());
+		model.addAttribute("paginationInfo", buildPi(page, size, (int) list.getTotalElements()));
+		model.addAttribute("paramQ", q);
+		model.addAttribute("paramRole", role);
+		model.addAttribute("size", size);
 		return "security/users";
 	}
 

@@ -11,16 +11,6 @@ import org.springframework.stereotype.Repository;
 public class SecurityAdminDAO extends EgovAbstractMapper {
 
 	/**
-	 * 사용자 목록 조회
-	 * 
-	 * @param q 검색어
-	 * @return 사용자 목록
-	 */
-	public List<Map<String, Object>> selectUsers(String q) {
-		return selectList("securityAdminDAO.selectUsers", q);
-	}
-
-	/**
 	 * 모든 ROLE_* 목록 조회
 	 * 
 	 * @return ROLE_* 목록
@@ -149,5 +139,37 @@ public class SecurityAdminDAO extends EgovAbstractMapper {
 	 */
 	public List<Map<String, Object>> selectRoleClosure() {
 		return selectList("securityAdminDAO.selectRoleClosure");
+	}
+
+	/**
+	 * 사용자 수 조회
+	 * 
+	 * @param kw   검색어
+	 * @param role ROLE_*
+	 * @return 사용자 수
+	 */
+	public long countUsers(String kw, String role) {
+		Map<String, Object> param = new HashMap<>();
+		param.put("kw", kw);
+		param.put("role", role);
+		return selectOne("securityAdminDAO.countUsers", param);
+	}
+
+	/**
+	 * 사용자 목록 페이지 조회
+	 * 
+	 * @param kw     검색어
+	 * @param role   ROLE_*
+	 * @param offset 시작 위치
+	 * @param limit  페이지 크기
+	 * @return 사용자 목록
+	 */
+	public List<Map<String, Object>> selectUsersPage(String kw, String role, int offset, int limit) {
+		Map<String, Object> param = new HashMap<>();
+		param.put("kw", kw);
+		param.put("role", role);
+		param.put("offset", offset);
+		param.put("limit", limit);
+		return selectList("securityAdminDAO.selectUsersPage", param);
 	}
 }
