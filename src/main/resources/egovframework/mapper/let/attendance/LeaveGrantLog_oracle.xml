@@ -7,7 +7,7 @@
 		<result property="empId" column="emp_id" />
 		<result property="year" column="year" />
 		<result property="reason" column="reason" />
-		<result property="days" column="days" />
+		<result property="changeDays" column="change_days" />
 		<result property="grantedAt" column="granted_at" jdbcType="TIMESTAMP" javaType="Date" />
 		<result property="empName" column="emp_name" />
 		<result property="empEmail" column="emp_email" />
@@ -39,10 +39,10 @@
 				AND g.granted_at &lt;= #{to}
 			</if>
 			<if test="kind != null and kind != '' and kind == 'GRANT'">
-				AND g.days > 0
+				AND g.change_days > 0
 			</if>
 			<if test="kind != null and kind != '' and kind == 'DEDUCT'">
-				AND g.days &lt; 0
+				AND g.change_days &lt; 0
 			</if>
 		</where>
 	</select>
@@ -52,13 +52,11 @@
 		g.id AS id,
 		g.emp_id AS emp_id,
 		e.name AS emp_name,
-		e.email AS
-		emp_email,
+		e.email AS emp_email,
 		e.department AS department,
 		g.year AS year,
-		g.reason AS
-		reason,
-		g.days AS days,
+		g.reason AS reason,
+		g.change_days AS change_days,
 		g.granted_at AS granted_at
 		FROM leave_grant_log g
 		JOIN
@@ -82,10 +80,10 @@
 				AND g.granted_at &lt;= #{to}
 			</if>
 			<if test="kind != null and kind != '' and kind == 'GRANT'">
-				AND g.days > 0
+				AND g.change_days > 0
 			</if>
 			<if test="kind != null and kind != '' and kind == 'DEDUCT'">
-				AND g.days &lt; 0
+				AND g.change_days &lt; 0
 			</if>
 		</where>
 		ORDER BY g.granted_at DESC

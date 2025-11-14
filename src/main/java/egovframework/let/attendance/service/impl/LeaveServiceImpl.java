@@ -39,6 +39,7 @@ import egovframework.let.attendance.dto.request.NewLeaveDto;
 import egovframework.let.attendance.dto.response.LeaveRequestListDto;
 import egovframework.let.attendance.entity.Employee;
 import egovframework.let.attendance.entity.LeaveBalance;
+import egovframework.let.attendance.entity.LeaveGrantLog;
 import egovframework.let.attendance.entity.LeaveRequest;
 import egovframework.let.attendance.repository.EmployeeRepository;
 import egovframework.let.attendance.repository.LeaveBalanceRepository;
@@ -194,6 +195,11 @@ public class LeaveServiceImpl implements LeaveService {
 				}
 				bal.setUsed(bal.getUsed() + lr.getDays());
 				leaveBalanceRepository.save(bal);
+
+				LeaveGrantLog log = LeaveGrantLog.builder().empId(lr.getEmpId()).year(year).reason("휴가 사용 확정 차감")
+						.changeDays(-lr.getDays()).grantedAt(lr.getStartDate()).build();
+
+				leaveGrantLogRepository.save(log);
 			}
 
 			lr.setStatus(APPROVED);

@@ -19,11 +19,17 @@ import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.Comment;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "leave_grant_log", uniqueConstraints = {
 		@UniqueConstraint(name = "uk_grant_emp_year_reason_dt", columnNames = { "emp_id", "year", "reason",
@@ -47,9 +53,9 @@ public class LeaveGrantLog {
 	@Comment("지급사유")
 	private String reason;
 
-	@Column(name = "days", nullable = false)
-	@Comment("지급일수")
-	private Integer days;
+	@Column(name = "change_days", nullable = false)
+	@Comment("변경일수(양수=지급, 음수=차감)")
+	private Integer changeDays;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "granted_at", nullable = false)

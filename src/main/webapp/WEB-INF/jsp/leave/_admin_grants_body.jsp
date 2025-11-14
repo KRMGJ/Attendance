@@ -74,7 +74,7 @@
 					<th class="px-4 py-2 text-left">부서</th>
 					<th class="px-4 py-2 text-left">연도</th>
 					<th class="px-4 py-2 text-left">지급 사유</th>
-					<th class="px-4 py-2 text-right">일수</th>
+					<th class="px-4 py-2 text-right">변경 일수</th>
 					<th class="px-4 py-2 text-left">지급일시</th>
 				</tr>
 			</thead>
@@ -85,10 +85,22 @@
 							<tr class="border-t">
 								<td class="px-4 py-2"><c:out value="${r.empName}" /></td>
 								<td class="px-4 py-2"><c:out value="${r.empEmail}" /></td>
-								<td class="px-4 py-2"><c:out value="${r.department}" /></td>
+								<td class="px-4 py-2"><c:out value="${empty r.department ? '-' : r.department}" /></td>
 								<td class="px-4 py-2"><c:out value="${r.year}" /></td>
 								<td class="px-4 py-2"><c:out value="${r.reason}" /></td>
-								<td class="px-4 py-2 text-right"><c:out value="${r.days}" /></td>
+								<td class="px-4 py-2 text-right">
+									<c:choose>
+										<c:when test="${r.changeDays > 0}">
+											<span class="text-green-600">+<c:out value="${r.changeDays}" /></span>
+										</c:when>
+										<c:when test="${r.changeDays < 0}">
+											<span class="text-red-600"><c:out value="${r.changeDays}" /></span>
+										</c:when>
+										<c:otherwise>
+											<span class="text-gray-700"><c:out value="${r.changeDays}" /></span>
+										</c:otherwise>
+									</c:choose>
+								</td>
 								<td class="px-4 py-2"><fmt:formatDate value="${r.grantedAt}" pattern="yyyy-MM-dd HH:mm" /></td>
 							</tr>
 						</c:forEach>
