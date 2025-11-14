@@ -28,15 +28,17 @@
 		<div class="mt-3 text-xs uppercase text-gray-500 px-3">직원</div>
 
 		<sec:authorize access="hasAnyRole('ROLE_HR','ROLE_ADMIN')">
-			<a href="<c:url value='/admin/employee/list.do'/>" class="block px-3 py-2 rounded hover:bg-gray-100
-            	<c:if test='${fn:startsWith(reqUri, ADMIN_EMP_PREFIX)}'> bg-gray-100 font-semibold</c:if>">
-				직원 목록 </a>
+		    <a href="<c:url value='/admin/employee/list.do'/>" class="block px-3 py-2 rounded hover:bg-gray-100
+				<c:if test='${fn:startsWith(reqUri, ADMIN_EMP_PREFIX)}'> bg-gray-100 font-semibold </c:if>">
+		        직원 목록
+		    </a>
 		</sec:authorize>
-
+		
 		<sec:authorize access="hasRole('ROLE_ADMIN')">
-			<a href="<c:url value='/employee/join.do'/>" class="block px-3 py-2 rounded hover:bg-gray-100
-                <c:if test='${fn:endsWith(reqUri, "/employee/join.do")}'> bg-gray-100 font-semibold</c:if>">
-				직원 등록 </a>
+		    <a href="<c:url value='/employee/join.do'/>" class="block px-3 py-2 rounded hover:bg-gray-100
+				<c:if test='${fn:endsWith(reqUri, "/employee/join.do")}'> bg-gray-100 font-semibold </c:if>">
+		        직원 등록
+		    </a>
 		</sec:authorize>
 
 		<div class="mt-3 text-xs uppercase text-gray-500 px-3">근태</div>
@@ -48,49 +50,57 @@
 		</sec:authorize>
 
 		<sec:authorize access="hasAnyRole('ROLE_HR','ROLE_ADMIN','ROLE_AUDITOR')">
-			<a href="<c:url value='/admin/attendance/list.do'/>" class="block px-3 py-2 rounded hover:bg-gray-100
-		        <c:if test='${fn:startsWith(reqUri, ADMIN_ATT_PREFIX)}'> bg-gray-100 font-semibold</c:if>">
-				근태 관리 </a>
+		    <a href="<c:url value='/admin/attendance/list.do'/>" class="block px-3 py-2 rounded hover:bg-gray-100
+				<c:if test='${fn:startsWith(reqUri, ADMIN_ATT_PREFIX)}'> bg-gray-100 font-semibold </c:if>">
+		        근태 관리
+		    </a>
 		</sec:authorize>
 
 		<div class="mt-3 text-xs uppercase text-gray-500 px-3">휴가</div>
 
 		<sec:authorize access="hasRole('ROLE_USER')">
-			<a href="<c:url value='/leave/requests.do'/>" class="block px-3 py-2 rounded hover:bg-gray-100
-	            <c:if test='${fn:startsWith(reqUri, LEAVE_PREFIX)}'> bg-gray-100 font-semibold</c:if>">
-				휴가 신청 목록 </a>
-			<a href="<c:url value='/leave/new.do'/>" class="block px-3 py-2 rounded hover:bg-gray-100
-                <c:if test='${fn:endsWith(reqUri, "/leave/new.do")}'> bg-gray-100 font-semibold</c:if>">
-				휴가 신청 </a>
+		    <a href="<c:url value='/leave/requests.do'/>" class="block px-3 py-2 rounded hover:bg-gray-100
+				<c:if test='${fn:endsWith(reqUri, "/leave/requests.do")}'> bg-gray-100 font-semibold</c:if>">
+		        휴가 신청 목록
+		    </a>
+		
+		    <a href="<c:url value='/leave/new.do'/>" class="block px-3 py-2 rounded hover:bg-gray-100
+				<c:if test='${fn:endsWith(reqUri, "/leave/new.do")}'> bg-gray-100 font-semibold</c:if>">
+		        휴가 신청
+		    </a>
 		</sec:authorize>
 
 		<sec:authorize access="hasAnyRole('ROLE_HR','ROLE_ADMIN')">
-			<a href="<c:url value='/admin/leave/pending.do'/>" class="block px-3 py-2 rounded hover:bg-gray-100
-	            <c:if test='${fn:startsWith(reqUri, ADMIN_LEAVE_PREFIX)}'> bg-gray-100 font-semibold</c:if>">
-				휴가 승인 </a>
+		    <a href="<c:url value='/admin/leave/pending.do'/>" class="block px-3 py-2 rounded hover:bg-gray-100
+				<c:if test='${fn:startsWith(reqUri, ADMIN_LEAVE_PREFIX)}'> bg-gray-100 font-semibold </c:if>">
+		        휴가 승인
+		    </a>
 		</sec:authorize>
 
-		<div class="mt-3 text-xs uppercase text-gray-500 px-3">리포트</div>
 		<sec:authorize access="hasAnyRole('ROLE_ADMIN','ROLE_AUDITOR','ROLE_HR','ROLE_MANAGER')">
-			<a href="<c:url value='/admin/report/monthly.do'/>" class="block px-3 py-2 rounded hover:bg-gray-100
-	          	<c:if test='${fn:startsWith(reqUri, ADMIN_REPORT_PREFIX)}'> bg-gray-100 font-semibold</c:if>">
-				월별 통계 </a>
+		    <a href="<c:url value='/admin/report/monthly.do'/>" class="block px-3 py-2 rounded hover:bg-gray-100 
+				<c:if test='${fn:startsWith(reqUri, ADMIN_REPORT_PREFIX)}'> bg-gray-100 font-semibold </c:if>">
+		        월별 통계
+		    </a>
 		</sec:authorize>
 
 		<sec:authorize access="hasRole('ROLE_ADMIN')">
-			<div class="mt-3 text-xs uppercase text-gray-500 px-3">보안</div>
+    		<div class="mt-3 text-xs uppercase text-gray-500 px-3">보안</div>
 
-			<a href="<c:url value='/admin/security/users.do'/>" class="block px-3 py-2 rounded hover:bg-gray-100
-	            <c:if test='${fn:startsWith(reqUri, ADMIN_SEC_PREFIX)}'> bg-gray-100 font-semibold</c:if>">
-				사용자 권한 부여 </a>
-
-			<a href="<c:url value='/admin/security/role-url.do'/>" class="block px-3 py-2 rounded hover:bg-gray-100
-                <c:if test='${fn:endsWith(reqUri, "/admin/security/role-url.do")}'> bg-gray-100 font-semibold</c:if>">
-				URL ↔ 권한 매핑 </a>
-
-			<a href="<c:url value='/admin/security/role-hierarchy.do'/>" class="block px-3 py-2 rounded hover:bg-gray-100
-                <c:if test='${fn:endsWith(reqUri, "/admin/security/role-hierarchy.do")}'> bg-gray-100 font-semibold</c:if>">
-				권한 계층 </a>
+		    <a href="<c:url value='/admin/security/users.do'/>" class="block px-3 py-2 rounded hover:bg-gray-100
+				<c:if test='${fn:endsWith(reqUri, "/admin/security/users.do")}'> bg-gray-100 font-semibold </c:if>">
+		        사용자 권한 부여
+		    </a>
+		
+		    <a href="<c:url value='/admin/security/role-url.do'/>" class="block px-3 py-2 rounded hover:bg-gray-100
+				<c:if test='${fn:endsWith(reqUri, "/admin/security/role-url.do")}'> bg-gray-100 font-semibold </c:if>">
+		        URL ↔ 권한 매핑
+		    </a>
+		
+		    <a href="<c:url value='/admin/security/role-hierarchy.do'/>" class="block px-3 py-2 rounded hover:bg-gray-100
+				<c:if test='${fn:endsWith(reqUri, "/admin/security/role-hierarchy.do")}'> bg-gray-100 font-semibold </c:if>">
+		        권한 계층
+		    </a>
 		</sec:authorize>
 
 	</nav>

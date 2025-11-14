@@ -38,7 +38,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 			session.setAttribute("empName", emp.getName());
 		}
 
-		SessionLimit limit = SessionLimit.create(session.getId(), username, 30);
+		SessionLimit limit = SessionLimit.create(session.getId(), username, 60);
 		sessionLimitRepository.save(limit);
 
 		response.sendRedirect(request.getContextPath() + "/main.do");
