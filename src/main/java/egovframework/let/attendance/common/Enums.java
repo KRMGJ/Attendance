@@ -26,4 +26,10 @@ public interface Enums {
 	public static String APPROVED = "승인 완료";
 	public static String REJECTED = "반려";
 	public static String CANCELED = "취소";
+
+	/** 연차 지급 사유 */
+	public static String ANNUAL_GRANT_CALENDAR = "캘린더 기준 연차 지급";
+	public static String ANNUAL_GRANT_ANNIVERSARY = "입사기념일 기준 연차 지급";
+	public static String MONTHLY_ACCRUAL = "월만근 연차 지급";
+
 }

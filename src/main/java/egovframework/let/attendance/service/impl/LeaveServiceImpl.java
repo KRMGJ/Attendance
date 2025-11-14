@@ -1,8 +1,11 @@
 package egovframework.let.attendance.service.impl;
 
 import static egovframework.let.attendance.common.Enums.ANNUAL;
+import static egovframework.let.attendance.common.Enums.ANNUAL_GRANT_ANNIVERSARY;
+import static egovframework.let.attendance.common.Enums.ANNUAL_GRANT_CALENDAR;
 import static egovframework.let.attendance.common.Enums.APPROVED;
 import static egovframework.let.attendance.common.Enums.CANCELED;
+import static egovframework.let.attendance.common.Enums.MONTHLY_ACCRUAL;
 import static egovframework.let.attendance.common.Enums.PENDING;
 import static egovframework.let.attendance.common.Enums.REJECTED;
 import static egovframework.let.attendance.common.Enums.SICK;
@@ -271,7 +274,7 @@ public class LeaveServiceImpl implements LeaveService {
 				if (monthlyGranted < 11) {
 					leaveBalanceDAO.addQuota(empId, year, 1);
 					String logId = UUID.randomUUID().toString();
-					leaveBalanceDAO.insertGrantLog(logId, empId, year, "MONTHLY_1D", 1, new Date());
+					leaveBalanceDAO.insertGrantLog(logId, empId, year, MONTHLY_ACCRUAL, 1, targetDate);
 				}
 			}
 		} catch (Exception e) {
@@ -323,7 +326,7 @@ public class LeaveServiceImpl implements LeaveService {
 				leaveBalanceDAO.setAnnualQuota(empId, year, grant);
 
 				String logId = UUID.randomUUID().toString();
-				leaveBalanceDAO.insertGrantLog(logId, empId, year, "ANNUAL_RESET", grant, today);
+				leaveBalanceDAO.insertGrantLog(logId, empId, year, ANNUAL_GRANT_ANNIVERSARY, grant, today);
 			}
 		} catch (Exception e) {
 			log.error("Error granting annual leave by anniversary for date {}: {}", today, e);
@@ -362,7 +365,7 @@ public class LeaveServiceImpl implements LeaveService {
 				leaveBalanceDAO.setAnnualQuota(empId, year, grant);
 
 				String logId = UUID.randomUUID().toString();
-				leaveBalanceDAO.insertGrantLog(logId, empId, year, "ANNUAL_RESET", grant, ref);
+				leaveBalanceDAO.insertGrantLog(logId, empId, year, ANNUAL_GRANT_CALENDAR, grant, ref);
 			}
 		} catch (Exception e) {
 			log.error("Error granting annual leave by calendar year {}: {}", year, e);
