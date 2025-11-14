@@ -3,8 +3,19 @@
 <div class="bg-white border rounded-xl p-6 shadow-sm">
 	<div class="flex items-center justify-between mb-4">
 		<h2 class="text-lg font-semibold">내 근태</h2>
-		<a class="px-3 py-2 rounded-md border"
-			href="<c:url value='/attendance/checkin.do'/>">출·퇴근</a>
+	</div>
+	<div class="flex items-end gap-3 mb-4">
+	    <form method="get" action="<c:url value='/attendance/my.do'/>" class="flex gap-3 items-end">
+	        <div>
+	            <label class="block text-sm mb-1">시작일</label>
+	            <input type="date" name="from" value="<fmt:formatDate value='${from}' pattern='yyyy-MM-dd'/>" class="rounded border px-3 py-2" />
+	        </div>
+	        <div>
+	            <label class="block text-sm mb-1">종료일</label>
+	            <input type="date" name="to" value="<fmt:formatDate value='${to}' pattern='yyyy-MM-dd'/>" class="rounded border px-3 py-2" />
+	        </div>
+	        <button class="rounded-md bg-gray-900 text-white px-4 py-2">조회</button>
+	    </form>
 	</div>
 	<table class="min-w-full text-sm">
 		<thead class="bg-gray-50">

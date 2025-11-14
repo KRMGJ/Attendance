@@ -106,8 +106,7 @@
 		e.id AS e_id, e.name AS e_name, e.email AS e_email
 		FROM ATTENDANCE a
 		JOIN EMPLOYEE e ON e.id = a.emp_id
-		WHERE e.emp_id =
-		#{empId}
+		WHERE a.emp_id = #{empId}
 		AND a.work_date BETWEEN #{from} AND #{to}
 		ORDER BY a.work_date
 		ASC

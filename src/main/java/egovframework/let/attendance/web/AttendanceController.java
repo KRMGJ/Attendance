@@ -1,8 +1,10 @@
 package egovframework.let.attendance.web;
 
 import java.security.Principal;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import egovframework.let.attendance.dto.response.AttendanceListDto;
@@ -50,17 +53,31 @@ public class AttendanceController {
 	 * 나의 출퇴근 기록 조회
 	 */
 	@RequestMapping(value = "/my.do", method = RequestMethod.GET)
-	public String myAttendance(Principal principal, @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date from,
-			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date to, Model model) throws Exception {
+	public String myAttendance(Principal principal,
+			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date from,
+			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date to, Model model)
+			throws Exception {
 
 		String email = principal.getName();
 
+		if (from == null || to == null) {
+			Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"));
+
+			cal.set(Calendar.DAY_OF_MONTH, 1);
+			from = cal.getTime();
+
+			cal.add(Calendar.MONTH, 1);
+			cal.set(Calendar.DAY_OF_MONTH, 1);
+			cal.add(Calendar.DATE, -1);
+			to = cal.getTime();
+		}
+
 		List<AttendanceListDto> rows = attendanceService.getMyAttendance(email, from, to);
 		model.addAttribute("myAttendance", rows);
-
 		model.addAttribute("from", from);
 		model.addAttribute("to", to);
 
 		return "attendance/my";
 	}
+
 }
