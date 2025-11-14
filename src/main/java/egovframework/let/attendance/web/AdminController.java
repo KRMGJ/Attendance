@@ -2,6 +2,8 @@ package egovframework.let.attendance.web;
 
 import static egovframework.let.attendance.common.Utils.buildPi;
 
+import java.io.PrintWriter;
+import java.net.URLEncoder;
 import java.security.Principal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -11,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.data.domain.Page;
@@ -150,6 +153,59 @@ public class AdminController {
 	}
 
 	/**
+	 * 부서별 월간 보고서 CSV 다운로드
+	 */
+	@RequestMapping(value = "/report/monthlyCsv.do", method = RequestMethod.GET)
+	public void downloadMonthlyCsv(@RequestParam String ym, HttpServletResponse response) throws Exception {
+
+		Date start = firstDayOfMonth(ym);
+		Date end = lastMomentOfMonth(start);
+
+		List<MonthlyDeptReportDto> report = attendanceService.getMonthlyDeptReport(start, end);
+
+		String filename = URLEncoder.encode("월별부서리포트_" + ym + ".csv", "UTF-8").replaceAll("\\+", "%20");
+
+		response.setContentType("text/csv; charset=UTF-8");
+		response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
+		PrintWriter writer = response.getWriter();
+		writer.write('\uFEFF');
+
+		writer.println("부서,인원,근무일수,총근무시간(분),총연장(분),야간연장(분),주말연장(분),지각,조퇴,결근,휴가,병가,1인평균근무(분),1인평균연장(분)");
+
+		for (MonthlyDeptReportDto r : report) {
+			writer.print(csv(r.getDepartment()));
+			writer.print(',');
+			writer.print(r.getHeadcount());
+			writer.print(',');
+			writer.print(r.getWorkDays());
+			writer.print(',');
+			writer.print(r.getTotalMinutes());
+			writer.print(',');
+			writer.print(r.getTotalOvertime());
+			writer.print(',');
+			writer.print(r.getNightOvertime());
+			writer.print(',');
+			writer.print(r.getWeekendOvertime());
+			writer.print(',');
+			writer.print(r.getLateCount());
+			writer.print(',');
+			writer.print(r.getEarlyLeaveCount());
+			writer.print(',');
+			writer.print(r.getAbsentCount());
+			writer.print(',');
+			writer.print(r.getLeaveDays());
+			writer.print(',');
+			writer.print(r.getSickLeaveDays());
+			writer.print(',');
+			writer.print(r.getAvgMinutes());
+			writer.print(',');
+			writer.print(r.getAvgOvertimePerCapita());
+			writer.println();
+		}
+		writer.flush();
+	}
+
+	/**
 	 * 휴가 일수 부여 내역 조회
 	 */
 	@RequestMapping(value = "/leave/grants.do", method = RequestMethod.GET)
@@ -238,5 +294,19 @@ public class AdminController {
 		c.set(Calendar.SECOND, 59);
 		c.set(Calendar.MILLISECOND, 999);
 		return c.getTime();
+	}
+
+	private String csv(String value) {
+		if (value == null) {
+			return "";
+		}
+		String v = value;
+		if (v.contains("\"")) {
+			v = v.replace("\"", "\"\"");
+		}
+		if (v.contains(",") || v.contains("\"") || v.contains("\n") || v.contains("\r")) {
+			return "\"" + v + "\"";
+		}
+		return v;
 	}
 }
