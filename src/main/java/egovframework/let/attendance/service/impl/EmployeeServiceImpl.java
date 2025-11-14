@@ -141,7 +141,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 				throw new SecurityException("수정 권한 없음");
 			}
 
-			// 이메일 중복 방지
 			if (employeeDAO.existsByEmailExcludingId(dto.getEmail(), dto.getId()) > 0) {
 				throw new IllegalArgumentException("이메일이 중복됩니다.");
 			}
@@ -159,15 +158,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 			dto.setUpdatedAt(new Date());
 			dto.setEmploymentType(type);
 			employeeDAO.updateProfile(dto);
-
-			// 비밀번호 변경은 입력이 있을 때만
-			if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
-				if (!dto.getPassword().equals(dto.getPasswordConfirm())) {
-					throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
-				}
-				String encoded = passwordEncoder.encode(dto.getPassword());
-				employeeDAO.updatePassword(dto.getId(), encoded, dto.getUpdatedAt());
-			}
 		} catch (Exception e) {
 			log.error("Error editing employee ID {}: {}", dto.getId(), e);
 			throw e;

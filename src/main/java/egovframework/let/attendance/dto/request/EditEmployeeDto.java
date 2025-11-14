@@ -12,8 +12,7 @@ public class EditEmployeeDto {
 	private String name;
 	private String email;
 	private String position;
+	private String department;
 	private String employmentType;
-	private String password;
-	private String passwordConfirm;
 	private Date updatedAt;
 }

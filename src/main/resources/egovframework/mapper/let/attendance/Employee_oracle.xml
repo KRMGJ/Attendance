@@ -53,9 +53,9 @@
 		SET NAME = #{name},
 		EMAIL = #{email},
 		POSITION = #{position},
+		DEPARTMENT = #{department},
 		EMPLOYMENT_TYPE = #{employmentType},
-		UPDATED_AT
-		= #{updatedAt, jdbcType=TIMESTAMP}
+		UPDATED_AT = #{updatedAt, jdbcType=TIMESTAMP}
 		WHERE ID = #{id}
 	</update>
 

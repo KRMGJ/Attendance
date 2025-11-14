@@ -10,26 +10,27 @@
 			<input type="hidden" name="id" value="${employee.id}" />
 
 			<div class="col-span-1">
-				<label class="block text-sm mb-1">이름</label> <input name="name"
-					value="${employee.name}" class="w-full rounded border px-3 py-2"
-					required />
+				<label class="block text-sm mb-1">이름</label> 
+				<input name="name" value="${employee.name}" class="w-full rounded border px-3 py-2" required />
 			</div>
 
 			<div class="col-span-1">
-				<label class="block text-sm mb-1">이메일</label> <input type="email"
-					name="email" value="${employee.email}"
-					class="w-full rounded border px-3 py-2" required />
+				<label class="block text-sm mb-1">이메일</label> 
+				<input type="email" name="email" value="${employee.email}" class="w-full rounded border px-3 py-2" required />
 			</div>
 
 			<div class="col-span-1">
-				<label class="block text-sm mb-1">직급</label> <input name="position"
-					value="${employee.position}"
-					class="w-full rounded border px-3 py-2" />
+				<label class="block text-sm mb-1">직급</label> 
+				<input name="position" value="${employee.position}" class="w-full rounded border px-3 py-2" />
+			</div>
+			<div class="col-span-1">
+				<label class="block text-sm mb-1">부서</label>
+				<input name="department" value="${employee.department}" class="w-full rounded border px-3 py-2" />
 			</div>
 
 			<div class="col-span-1">
-				<label class="block text-sm mb-1">고용형태</label> <select
-					name="employmentType" class="w-full rounded border px-3 py-2">
+				<label class="block text-sm mb-1">고용형태</label> 
+				<select name="employmentType" class="w-full rounded border px-3 py-2">
 					<option value="FULL_TIME"
 						<c:if test="${employee.employmentType=='FULL_TIME'}">selected</c:if>>정규직</option>
 					<option value="PART_TIME"
@@ -37,18 +38,6 @@
 					<option value="INTERN"
 						<c:if test="${employee.employmentType=='INTERN'}">selected</c:if>>인턴</option>
 				</select>
-			</div>
-
-			<!-- 선택: 비밀번호 변경. 비워두면 변경 안함 -->
-			<div class="col-span-1">
-				<label class="block text-sm mb-1">새 비밀번호(선택)</label> <input
-					type="password" name="password" placeholder="변경 시에만 입력"
-					class="w-full rounded border px-3 py-2" />
-			</div>
-			<div class="col-span-1">
-				<label class="block text-sm mb-1">새 비밀번호 확인</label> <input
-					type="password" name="passwordConfirm"
-					class="w-full rounded border px-3 py-2" />
 			</div>
 
 			<div class="col-span-2 flex justify-end gap-2 mt-2">
