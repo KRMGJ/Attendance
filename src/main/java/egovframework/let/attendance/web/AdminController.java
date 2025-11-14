@@ -8,11 +8,13 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import egovframework.let.attendance.dto.request.AdminAttendanceSearch;
 import egovframework.let.attendance.dto.request.AdminEmployeeSearch;
+import egovframework.let.attendance.dto.request.AdminGrantLogSearch;
 import egovframework.let.attendance.dto.response.AttendanceListDto;
 import egovframework.let.attendance.dto.response.EmployeeViewDto;
 import egovframework.let.attendance.dto.response.MonthlyDeptReportDto;
@@ -144,6 +147,36 @@ public class AdminController {
 		model.addAttribute("report", report);
 		model.addAttribute("ym", ymValue(start));
 		return "report/monthly";
+	}
+
+	/**
+	 * 휴가 일수 부여 내역 조회
+	 */
+	@RequestMapping(value = "/leave/grants.do", method = RequestMethod.GET)
+	public String list(@RequestParam(value = "q", required = false) String q,
+			@RequestParam(value = "from", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
+			@RequestParam(value = "to", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,
+			@RequestParam(value = "year", required = false) Integer year,
+			@RequestParam(value = "reason", required = false) String reason,
+			@RequestParam(value = "kind", required = false) String kind,
+			@RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(value = "size", defaultValue = "20") int size, Model model) throws Exception {
+
+		AdminGrantLogSearch cond = AdminGrantLogSearch.builder().q(q).year(year).reason(reason).kind(kind).from(from)
+				.to(to).page(Math.max(page - 1, 0)).size(size).build();
+
+		Page<Map<String, Object>> list = leaveService.listLeaveGrants(cond);
+		model.addAttribute("list", list.getContent());
+		model.addAttribute("paginationInfo", buildPi(page, size, (int) list.getTotalElements()));
+		model.addAttribute("paramQ", q);
+		model.addAttribute("paramFrom", from);
+		model.addAttribute("paramTo", to);
+		model.addAttribute("paramYear", year);
+		model.addAttribute("paramReason", reason);
+		model.addAttribute("paramKind", kind);
+		model.addAttribute("size", size);
+
+		return "leave/admin_grants";
 	}
 
 	/**

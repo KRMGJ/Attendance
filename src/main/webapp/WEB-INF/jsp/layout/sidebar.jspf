@@ -61,7 +61,7 @@
 		<sec:authorize access="hasRole('ROLE_USER')">
 		    <a href="<c:url value='/leave/requests.do'/>" class="block px-3 py-2 rounded hover:bg-gray-100
 				<c:if test='${fn:endsWith(reqUri, "/leave/requests.do")}'> bg-gray-100 font-semibold</c:if>">
-		        휴가 신청 목록
+		        내 휴가 신청 목록
 		    </a>
 		
 		    <a href="<c:url value='/leave/new.do'/>" class="block px-3 py-2 rounded hover:bg-gray-100
@@ -72,8 +72,12 @@
 
 		<sec:authorize access="hasAnyRole('ROLE_HR','ROLE_ADMIN')">
 		    <a href="<c:url value='/admin/leave/pending.do'/>" class="block px-3 py-2 rounded hover:bg-gray-100
-				<c:if test='${fn:startsWith(reqUri, ADMIN_LEAVE_PREFIX)}'> bg-gray-100 font-semibold </c:if>">
+				<c:if test='${fn:endsWith(reqUri, "/admin/leave/pending.do")}'> bg-gray-100 font-semibold </c:if>">
 		        휴가 승인
+		    </a>
+   		    <a href="<c:url value='/admin/leave/grants.do'/>" class="block px-3 py-2 rounded hover:bg-gray-100
+				<c:if test='${fn:endsWith(reqUri, "/admin/leave/grants.do")}'> bg-gray-100 font-semibold </c:if>">
+		        휴가 현황
 		    </a>
 		</sec:authorize>
 

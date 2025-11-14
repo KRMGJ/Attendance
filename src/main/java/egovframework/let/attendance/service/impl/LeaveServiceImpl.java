@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+import egovframework.let.attendance.dto.request.AdminGrantLogSearch;
 import egovframework.let.attendance.dto.request.NewLeaveDto;
 import egovframework.let.attendance.dto.response.LeaveRequestListDto;
 import egovframework.let.attendance.entity.Employee;
@@ -38,6 +39,7 @@ import egovframework.let.attendance.entity.LeaveBalance;
 import egovframework.let.attendance.entity.LeaveRequest;
 import egovframework.let.attendance.repository.EmployeeRepository;
 import egovframework.let.attendance.repository.LeaveBalanceRepository;
+import egovframework.let.attendance.repository.LeaveGrantLogRepository;
 import egovframework.let.attendance.repository.LeaveRequestRepository;
 import egovframework.let.attendance.repository.mybatis.LeaveBalanceDAO;
 import egovframework.let.attendance.repository.mybatis.LeaveRequestDAO;
@@ -63,6 +65,9 @@ public class LeaveServiceImpl implements LeaveService {
 
 	@Resource(name = "leaveRequestRepository")
 	private LeaveRequestRepository leaveRequestRepository;
+
+	@Resource(name = "leaveGrantLogRepository")
+	private LeaveGrantLogRepository leaveGrantLogRepository;
 
 	/**
 	 * 남은 휴가 일수 조회
@@ -361,6 +366,21 @@ public class LeaveServiceImpl implements LeaveService {
 			}
 		} catch (Exception e) {
 			log.error("Error granting annual leave by calendar year {}: {}", year, e);
+			throw e;
+		}
+	}
+
+	/**
+	 * 휴가 일수 부여 내역 조회
+	 */
+	@Override
+	public Page<Map<String, Object>> listLeaveGrants(AdminGrantLogSearch cond) throws Exception {
+		try {
+			Pageable pageable = PageRequest.of(cond.getPage(), cond.getSize());
+			Page<Map<String, Object>> result = leaveGrantLogRepository.searchForAdmin(cond, pageable);
+			return result;
+		} catch (Exception e) {
+			log.error("Error listing leave grants with conditions {}: {}", cond, e);
 			throw e;
 		}
 	}

@@ -1,9 +1,11 @@
 package egovframework.let.attendance.service;
 
 import java.util.Date;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 
+import egovframework.let.attendance.dto.request.AdminGrantLogSearch;
 import egovframework.let.attendance.dto.request.NewLeaveDto;
 import egovframework.let.attendance.dto.response.LeaveRequestListDto;
 import egovframework.let.attendance.entity.LeaveBalance;
@@ -93,4 +95,12 @@ public interface LeaveService {
 	 * @param year 대상 연도
 	 */
 	void grantAnnualByCalendarYear(int year) throws Exception;
+
+	/**
+	 * 휴가 일수 부여 내역 조회
+	 * 
+	 * @param cond 검색 조건
+	 * @return 휴가 일수 부여 내역 리스트
+	 */
+	Page<Map<String, Object>> listLeaveGrants(AdminGrantLogSearch cond) throws Exception;
 }
