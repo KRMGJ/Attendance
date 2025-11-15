@@ -5,7 +5,7 @@
 	<div class="bg-white border rounded-xl p-6 shadow-sm">
 		<h2 class="text-lg font-semibold mb-4">직원 정보 수정</h2>
 
-		<form method="post" action="<c:url value='/employee/edit.do'/>"
+		<form method="post" action="<c:url value='/admin/employee/edit.do'/>"
 			class="grid grid-cols-1 md:grid-cols-2 gap-4">
 			<input type="hidden" name="id" value="${employee.id}" />
 
