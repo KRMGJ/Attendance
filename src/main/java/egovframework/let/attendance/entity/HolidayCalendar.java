@@ -1,13 +1,11 @@
 package egovframework.let.attendance.entity;
 
 import java.util.Date;
-import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Index;
-import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -43,11 +41,4 @@ public class HolidayCalendar {
 	@Column(name = "is_working_day", nullable = false)
 	@Comment("근무일여부 (0: 휴일, 1: 근무일)")
 	private Integer isWorkingDay;
-
-	@PrePersist
-	public void prePersist() {
-		if (id == null) {
-			id = UUID.randomUUID().toString();
-		}
-	}
 }

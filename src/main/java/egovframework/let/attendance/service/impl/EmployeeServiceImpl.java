@@ -9,6 +9,7 @@ import java.util.Date;
 
 import javax.annotation.Resource;
 
+import org.egovframe.rte.fdl.idgnr.EgovIdGnrService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -44,6 +45,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Resource(name = "jdbcTemplate")
 	private JdbcTemplate jdbcTemplate;
 
+	@Resource(name = "employeeIdGnrService")
+	private EgovIdGnrService employeeIdGnrService;
+
 	/**
 	 * 직원 등록
 	 */
@@ -63,8 +67,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 				throw new IllegalArgumentException("Invalid employment type: " + dto.getEmploymentType());
 			}
 
-			Employee employee = Employee.builder().name(dto.getName()).email(dto.getEmail()).password(encodedPassword)
-					.position(dto.getPosition()).employmentType(type).build();
+			Employee employee = Employee.builder().id(employeeIdGnrService.getNextStringId()).name(dto.getName())
+					.email(dto.getEmail()).employeeNumber(dto.getEmployeeNumber()).password(encodedPassword)
+					.department(dto.getDepartment()).position(dto.getPosition()).employmentType(type)
+					.hireDate(dto.getHireDate()).phone(dto.getPhone())
+					.emergencyContactPhone(dto.getEmergencyContactPhone()).address(dto.getAddress())
+					.workStartTime(dto.getWorkStartTime()).workEndTime(dto.getWorkEndTime()).build();
 			employeeRepository.save(employee);
 
 			jdbcTemplate.update("INSERT INTO USERS (USERNAME, PASSWORD, EMAIL, ENABLED) VALUES (?, ?, ?, 1)",

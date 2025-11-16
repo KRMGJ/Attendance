@@ -1965,5 +1965,95 @@
         <property name="cipers" value="15" />
         <property name="fillChar" value="0" />
     </bean>     
-    <!-- ProcessMonLog... END-->      
+    <!-- ProcessMonLog... END-->    
+    
+    <!-- 직원 ID Generation -->
+    <bean name="employeeIdGnrService" class="org.egovframe.rte.fdl.idgnr.impl.EgovTableIdGnrServiceImpl" destroy-method="destroy">
+        <property name="dataSource" ref="egov.dataSource" />
+        <property name="strategy"   ref="employeeIdStrategy" />
+        <property name="blockSize"  value="10"/>
+        <property name="table"      value="COMTECOPSEQ"/>
+        <property name="tableName"  value="EMP_ID"/>
+    </bean>
+
+    <bean name="employeeIdStrategy" class="org.egovframe.rte.fdl.idgnr.impl.strategy.EgovIdGnrStrategyImpl">
+        <property name="prefix"   value="EMP"/>
+        <property name="cipers"   value="6"/>
+        <property name="fillChar" value="0"/>
+    </bean>
+    
+    <!-- 근태 ID Generation -->
+    <bean name="attendanceIdGnrService" class="org.egovframe.rte.fdl.idgnr.impl.EgovTableIdGnrServiceImpl" destroy-method="destroy">
+        <property name="dataSource" ref="egov.dataSource" />
+        <property name="strategy"   ref="attendanceIdStrategy" />
+        <property name="blockSize"  value="10"/>
+        <property name="table"      value="COMTECOPSEQ"/>
+        <property name="tableName"  value="ATT_ID"/>
+    </bean>
+
+    <bean name="attendanceIdStrategy" class="org.egovframe.rte.fdl.idgnr.impl.strategy.EgovIdGnrStrategyImpl">
+        <property name="prefix"   value="ATT"/>
+        <property name="cipers"   value="6"/>
+        <property name="fillChar" value="0"/>
+    </bean>
+    
+	<!-- 연차 잔여일 ID Generation -->
+    <bean name="leaveBalanceIdGnrService" class="org.egovframe.rte.fdl.idgnr.impl.EgovTableIdGnrServiceImpl" destroy-method="destroy">
+        <property name="dataSource" ref="egov.dataSource" />
+        <property name="strategy"   ref="leaveBalanceIdStrategy" />
+        <property name="blockSize"  value="10"/>
+        <property name="table"      value="COMTECOPSEQ"/>
+        <property name="tableName"  value="LEAVEBALANCE_ID"/>
+    </bean>
+
+    <bean name="leaveBalanceIdStrategy" class="org.egovframe.rte.fdl.idgnr.impl.strategy.EgovIdGnrStrategyImpl">
+        <property name="prefix"   value="LVB"/>
+        <property name="cipers"   value="6"/>
+        <property name="fillChar" value="0"/>
+    </bean>
+    
+    <!-- 휴가 신청 ID Generation -->
+    <bean name="leaveRequestIdGnrService" class="org.egovframe.rte.fdl.idgnr.impl.EgovTableIdGnrServiceImpl" destroy-method="destroy">
+        <property name="dataSource" ref="egov.dataSource" />
+        <property name="strategy"   ref="leaveRequestIdStrategy" />
+        <property name="blockSize"  value="10"/>
+        <property name="table"      value="COMTECOPSEQ"/>
+        <property name="tableName"  value="LEAVEREQ_ID"/>
+    </bean>
+
+    <bean name="leaveRequestIdStrategy" class="org.egovframe.rte.fdl.idgnr.impl.strategy.EgovIdGnrStrategyImpl">
+        <property name="prefix"   value="LRQ"/>
+        <property name="cipers"   value="6"/>
+        <property name="fillChar" value="0"/>
+    </bean>
+    
+    <!-- 연차 지급/차감 로그 ID Generation -->
+    <bean name="leaveGrantLogIdGnrService" class="org.egovframe.rte.fdl.idgnr.impl.EgovTableIdGnrServiceImpl" destroy-method="destroy">
+        <property name="dataSource" ref="egov.dataSource" />
+        <property name="strategy"   ref="leaveGrantLogIdStrategy" />
+        <property name="blockSize"  value="10"/>
+        <property name="table"      value="COMTECOPSEQ"/>
+        <property name="tableName"  value="LEAVELOG_ID"/>
+    </bean>
+
+    <bean name="leaveGrantLogIdStrategy" class="org.egovframe.rte.fdl.idgnr.impl.strategy.EgovIdGnrStrategyImpl">
+        <property name="prefix"   value="LGL"/>
+        <property name="cipers"   value="6"/>
+        <property name="fillChar" value="0"/>
+    </bean>
+    
+    <!-- 휴일 캘린더 ID Generation -->
+    <bean name="holidayCalendarIdGnrService" class="org.egovframe.rte.fdl.idgnr.impl.EgovTableIdGnrServiceImpl" destroy-method="destroy">
+        <property name="dataSource" ref="egov.dataSource" />
+        <property name="strategy"   ref="holidayCalendarIdStrategy" />
+        <property name="blockSize"  value="10"/>
+        <property name="table"      value="COMTECOPSEQ"/>
+        <property name="tableName"  value="HOLIDAY_ID"/>
+    </bean>
+
+    <bean name="holidayCalendarIdStrategy" class="org.egovframe.rte.fdl.idgnr.impl.strategy.EgovIdGnrStrategyImpl">
+        <property name="prefix"   value="HOL"/>
+        <property name="cipers"   value="6"/>
+        <property name="fillChar" value="0"/>
+    </bean>
 </beans>

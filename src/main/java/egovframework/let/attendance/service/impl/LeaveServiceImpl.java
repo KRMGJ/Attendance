@@ -21,10 +21,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
-import java.util.UUID;
 
 import javax.annotation.Resource;
 
+import org.egovframe.rte.fdl.idgnr.EgovIdGnrService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -72,6 +72,15 @@ public class LeaveServiceImpl implements LeaveService {
 
 	@Resource(name = "leaveGrantLogRepository")
 	private LeaveGrantLogRepository leaveGrantLogRepository;
+
+	@Resource(name = "leaveRequestIdGnrService")
+	private EgovIdGnrService leaveRequestIdGnrService;
+
+	@Resource(name = "leaveGrantLogIdGnrService")
+	private EgovIdGnrService leaveGrantLogIdGnrService;
+
+	@Resource(name = "leaveBalanceIdGnrService")
+	private EgovIdGnrService leaveBalanceIdGnrService;
 
 	/**
 	 * 남은 휴가 일수 조회
@@ -123,8 +132,9 @@ public class LeaveServiceImpl implements LeaveService {
 
 			String type = ANNUAL.equals(dto.getType()) ? ANNUAL : SICK;
 
-			LeaveRequest req = LeaveRequest.builder().empId(emp.getId()).type(type).startDate(start).endDate(end)
-					.days(days).reason(dto.getReason()).status(PENDING).build();
+			LeaveRequest req = LeaveRequest.builder().id(leaveRequestIdGnrService.getNextStringId()).empId(emp.getId())
+					.type(type).startDate(start).endDate(end).days(days).reason(dto.getReason()).status(PENDING)
+					.build();
 
 			leaveRequestRepository.save(req);
 			return "휴가 신청이 완료되었습니다.";
@@ -196,8 +206,9 @@ public class LeaveServiceImpl implements LeaveService {
 				bal.setUsed(bal.getUsed() + lr.getDays());
 				leaveBalanceRepository.save(bal);
 
-				LeaveGrantLog log = LeaveGrantLog.builder().empId(lr.getEmpId()).year(year).reason("휴가 사용 확정 차감")
-						.changeDays(-lr.getDays()).grantedAt(lr.getStartDate()).build();
+				LeaveGrantLog log = LeaveGrantLog.builder().id(leaveGrantLogIdGnrService.getNextStringId())
+						.empId(lr.getEmpId()).year(year).reason("휴가 사용 확정 차감").changeDays(-lr.getDays())
+						.grantedAt(lr.getStartDate()).build();
 
 				leaveGrantLogRepository.save(log);
 			}
@@ -273,13 +284,13 @@ public class LeaveServiceImpl implements LeaveService {
 			List<String> empIds = leaveBalanceDAO.selectFirstYearFullAttendanceEmployees(y, m);
 			for (String empId : empIds) {
 				Integer year = y;
-				String upsertId = UUID.randomUUID().toString();
+				String upsertId = leaveBalanceIdGnrService.getNextStringId();
 				leaveBalanceDAO.upsertLeaveBalance(upsertId, empId, year);
 
 				int monthlyGranted = leaveBalanceDAO.countMonthlyGranted(empId, year);
 				if (monthlyGranted < 11) {
 					leaveBalanceDAO.addQuota(empId, year, 1);
-					String logId = UUID.randomUUID().toString();
+					String logId = leaveGrantLogIdGnrService.getNextStringId();
 					leaveBalanceDAO.insertGrantLog(logId, empId, year, MONTHLY_ACCRUAL, 1, targetDate);
 				}
 			}
@@ -327,11 +338,11 @@ public class LeaveServiceImpl implements LeaveService {
 				cal.setTime(today);
 				int year = cal.get(Calendar.YEAR);
 
-				String upsertId = UUID.randomUUID().toString();
+				String upsertId = leaveBalanceIdGnrService.getNextStringId();
 				leaveBalanceDAO.upsertLeaveBalance(upsertId, empId, year);
 				leaveBalanceDAO.setAnnualQuota(empId, year, grant);
 
-				String logId = UUID.randomUUID().toString();
+				String logId = leaveGrantLogIdGnrService.getNextStringId();
 				leaveBalanceDAO.insertGrantLog(logId, empId, year, ANNUAL_GRANT_ANNIVERSARY, grant, today);
 			}
 		} catch (Exception e) {
@@ -366,11 +377,11 @@ public class LeaveServiceImpl implements LeaveService {
 				int extra = Math.max(0, (years - 1) / 2);
 				int grant = Math.min(25, base + extra);
 
-				String upsertId = UUID.randomUUID().toString();
+				String upsertId = leaveBalanceIdGnrService.getNextStringId();
 				leaveBalanceDAO.upsertLeaveBalance(upsertId, empId, year);
 				leaveBalanceDAO.setAnnualQuota(empId, year, grant);
 
-				String logId = UUID.randomUUID().toString();
+				String logId = leaveGrantLogIdGnrService.getNextStringId();
 				leaveBalanceDAO.insertGrantLog(logId, empId, year, ANNUAL_GRANT_CALENDAR, grant, ref);
 			}
 		} catch (Exception e) {

@@ -32,7 +32,7 @@ import lombok.Setter;
 public class SessionLimit {
 
 	@Id
-	@Column(length = 100)
+	@Column(name = "session_id", length = 100)
 	@Comment("세션ID")
 	private String sessionId;
 
@@ -45,7 +45,7 @@ public class SessionLimit {
 	private String username;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(nullable = false)
+	@Column(name = "expires_at", nullable = false)
 	@Comment("만료일시")
 	private Date expiresAt;
 

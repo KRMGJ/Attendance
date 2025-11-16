@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import org.egovframe.rte.fdl.idgnr.EgovIdGnrService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -51,6 +52,9 @@ public class AttendanceServiceImpl implements AttendanceService {
 	@Resource(name = "employeeRepository")
 	private EmployeeRepository employeeRepository;
 
+	@Resource(name = "attendanceIdGnrService")
+	private EgovIdGnrService attendanceIdGnrService;
+
 	/**
 	 * 출근 처리
 	 */
@@ -68,10 +72,14 @@ public class AttendanceServiceImpl implements AttendanceService {
 			Date now = new Date();
 			LocalTime nowTime = now.toInstant().atZone(ZONE).toLocalTime();
 
-			Attendance a = Attendance.builder().empId(emp.getId()).workDate(today).checkIn(now).build();
+			// 직원별 기준 시작시간 계산
+			LocalTime workStart = resolveWorkStart(emp);
 
-			// 지각 판정
-			String status = nowTime.isAfter(WORK_START) ? LATE : PRESENT;
+			Attendance a = Attendance.builder().id(attendanceIdGnrService.getNextStringId()).empId(emp.getId())
+					.workDate(today).checkIn(now).build();
+
+			// 지각 판정: 직원별 기준시간 사용
+			String status = nowTime.isAfter(workStart) ? LATE : PRESENT;
 			a.setStatus(status);
 			a.setOvertimeMinutes(0);
 
@@ -104,15 +112,19 @@ public class AttendanceServiceImpl implements AttendanceService {
 			Date now = new Date();
 			LocalTime nowTime = now.toInstant().atZone(ZONE).toLocalTime();
 
+			// 직원별 기준 종료시간 계산
+			LocalTime workEnd = resolveWorkEnd(emp);
+
 			a.setCheckOut(now);
 
-			// 조퇴 판정
-			if (nowTime.isBefore(WORK_END)) {
+			if (nowTime.isBefore(workEnd)) {
+				// 조퇴
 				a.setStatus(EARLY_LEAVE);
 			} else {
-				// 연장근로 계산
-				LocalDateTime endBase = LocalDateTime.ofInstant(today.toInstant(), ZONE).withHour(WORK_END.getHour())
-						.withMinute(WORK_END.getMinute());
+				// 연장근로 계산 (직원별 기준 종료시간 기준)
+				LocalDateTime endBase = LocalDateTime.ofInstant(today.toInstant(), ZONE).withHour(workEnd.getHour())
+						.withMinute(workEnd.getMinute());
+
 				LocalDateTime nowLocal = now.toInstant().atZone(ZONE).toLocalDateTime();
 				long overtime = Duration.between(endBase, nowLocal).toMinutes();
 
@@ -122,6 +134,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 					a.setStatus(PRESENT);
 				}
 			}
+
 			attendanceRepository.save(a);
 			return "checkout_success";
 		} catch (Exception e) {
@@ -269,6 +282,20 @@ public class AttendanceServiceImpl implements AttendanceService {
 	private Date getTodayDate() {
 		LocalDateTime todayMidnight = LocalDateTime.now(ZONE).withHour(0).withMinute(0).withSecond(0).withNano(0);
 		return Date.from(todayMidnight.atZone(ZONE).toInstant());
+	}
+
+	private LocalTime resolveWorkStart(Employee emp) {
+		if (emp.getWorkStartTime() != null && !emp.getWorkStartTime().isEmpty()) {
+			return LocalTime.parse(emp.getWorkStartTime()); // "HH:mm"
+		}
+		return WORK_START;
+	}
+
+	private LocalTime resolveWorkEnd(Employee emp) {
+		if (emp.getWorkEndTime() != null && !emp.getWorkEndTime().isEmpty()) {
+			return LocalTime.parse(emp.getWorkEndTime());
+		}
+		return WORK_END;
 	}
 
 }

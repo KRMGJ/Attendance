@@ -3,7 +3,7 @@
 <div class="mx-auto max-w-2xl">
 	<div class="bg-white border rounded-xl p-6 shadow-sm">
 		<h2 class="text-lg font-semibold mb-4">직원 등록</h2>
-		<form method="post" action="<c:url value='/employee/join.do'/>"
+		<form method="post" action="<c:url value='/admin/employee/join.do'/>"
 			class="grid grid-cols-1 md:grid-cols-2 gap-4">
 			<div class="col-span-1">
 				<label class="block text-sm mb-1">이름</label> <input name="name"

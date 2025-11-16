@@ -1,7 +1,6 @@
 package egovframework.let.attendance.entity;
 
 import java.util.Date;
-import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,7 +8,6 @@ import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -88,11 +86,4 @@ public class LeaveRequest {
 	@ManyToOne
 	@JoinColumn(name = "emp_id", referencedColumnName = "id", insertable = false, updatable = false)
 	private Employee employee;
-
-	@PrePersist
-	public void prePersist() {
-		if (id == null) {
-			id = UUID.randomUUID().toString();
-		}
-	}
 }

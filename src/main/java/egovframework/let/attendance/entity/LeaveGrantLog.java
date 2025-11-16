@@ -1,7 +1,6 @@
 package egovframework.let.attendance.entity;
 
 import java.util.Date;
-import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,7 +10,6 @@ import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -70,11 +68,4 @@ public class LeaveGrantLog {
 	@JoinColumns({ @JoinColumn(name = "emp_id", referencedColumnName = "emp_id", insertable = false, updatable = false),
 			@JoinColumn(name = "year", referencedColumnName = "year", insertable = false, updatable = false) })
 	private LeaveBalance leaveBalance;
-
-	@PrePersist
-	public void prePersist() {
-		if (id == null) {
-			id = UUID.randomUUID().toString();
-		}
-	}
 }

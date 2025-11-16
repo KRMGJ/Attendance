@@ -63,7 +63,7 @@ public class AdminController {
 	/**
 	 * 사원 등록 폼
 	 */
-	@RequestMapping(value = "/join.do", method = RequestMethod.GET)
+	@RequestMapping(value = "/employee/join.do", method = RequestMethod.GET)
 	public String joinForm(Model model) {
 		model.addAttribute("registEmployeeDto", new RegistEmployeeDto());
 		return "employee/join";
@@ -72,7 +72,7 @@ public class AdminController {
 	/**
 	 * 사원 등록 처리
 	 */
-	@RequestMapping(value = "/join.do", method = RequestMethod.POST)
+	@RequestMapping(value = "/employee/join.do", method = RequestMethod.POST)
 	public String join(@ModelAttribute("registEmployeeDto") RegistEmployeeDto dto, RedirectAttributes attributes)
 			throws Exception {
 		try {
