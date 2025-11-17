@@ -35,7 +35,7 @@
 				<c:when test="${not empty pending}">
 					<c:forEach var="r" items="${pending}">
 						<tr class="border-t">
-							<td class="px-4 py-2"><c:out value="${r.employee.name}" /></td>
+							<td class="px-4 py-2"><c:out value="${r.employeeName}" /></td>
 							<td class="px-4 py-2"><c:out value="${r.startDate}" /> ~ <c:out value="${r.endDate}" /></td>
 							<td class="px-4 py-2"><c:out value="${r.type}" /></td>
 							<td class="px-4 py-2"><c:out value="${r.status}" /></td>

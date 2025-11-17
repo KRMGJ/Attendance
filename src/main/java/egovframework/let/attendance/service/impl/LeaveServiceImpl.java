@@ -21,11 +21,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
 import org.egovframe.rte.fdl.idgnr.EgovIdGnrService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -36,6 +38,7 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import egovframework.let.attendance.dto.request.AdminGrantLogSearch;
 import egovframework.let.attendance.dto.request.NewLeaveDto;
+import egovframework.let.attendance.dto.response.EmployeeViewDto;
 import egovframework.let.attendance.dto.response.LeaveRequestListDto;
 import egovframework.let.attendance.entity.Employee;
 import egovframework.let.attendance.entity.LeaveBalance;
@@ -45,6 +48,7 @@ import egovframework.let.attendance.repository.EmployeeRepository;
 import egovframework.let.attendance.repository.LeaveBalanceRepository;
 import egovframework.let.attendance.repository.LeaveGrantLogRepository;
 import egovframework.let.attendance.repository.LeaveRequestRepository;
+import egovframework.let.attendance.repository.mybatis.EmployeeDAO;
 import egovframework.let.attendance.repository.mybatis.LeaveBalanceDAO;
 import egovframework.let.attendance.repository.mybatis.LeaveRequestDAO;
 import egovframework.let.attendance.service.LeaveService;
@@ -54,6 +58,9 @@ import lombok.extern.slf4j.Slf4j;
 @Service("leaveService")
 @Transactional(readOnly = true)
 public class LeaveServiceImpl implements LeaveService {
+
+	@Resource(name = "employeeDAO")
+	private EmployeeDAO employeeDAO;
 
 	@Resource(name = "leaveRequestDAO")
 	private LeaveRequestDAO leaveRequestDAO;
@@ -173,10 +180,19 @@ public class LeaveServiceImpl implements LeaveService {
 	 * 승인 대기 중인 휴가 신청 조회
 	 */
 	@Override
-	public Page<LeaveRequest> pending(int page, int size) throws Exception {
+	public Page<LeaveRequestListDto> pending(int page, int size) throws Exception {
 		try {
 			Pageable pageable = PageRequest.of(Math.max(page - 1, 0), size, Sort.by(Direction.ASC, "createdAt"));
-			return leaveRequestRepository.searchPending(pageable);
+			Page<LeaveRequest> result = leaveRequestRepository.searchPending(pageable);
+			List<LeaveRequestListDto> content = result.getContent().stream().map(lr -> {
+				EmployeeViewDto emp = employeeDAO.selectViewById(lr.getEmpId());
+				return LeaveRequestListDto.builder().id(lr.getId()).empId(lr.getEmpId())
+						.employeeName(emp != null ? emp.getName() : "알 수 없음").type(lr.getType())
+						.startDate(formatDateOnly(lr.getStartDate())).endDate(formatDateOnly(lr.getEndDate()))
+						.days(lr.getDays()).reason(lr.getReason()).status(lr.getStatus()).createdAt(lr.getCreatedAt())
+						.approvedAt(lr.getApprovedAt() != null ? formatDateOnly(lr.getApprovedAt()) : null).build();
+			}).collect(Collectors.toList());
+			return new PageImpl<>(content, pageable, result.getTotalElements());
 		} catch (Exception e) {
 			log.error("Error fetching pending leave requests: {}", e);
 			throw e;

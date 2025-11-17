@@ -9,7 +9,6 @@ import egovframework.let.attendance.dto.request.AdminGrantLogSearch;
 import egovframework.let.attendance.dto.request.NewLeaveDto;
 import egovframework.let.attendance.dto.response.LeaveRequestListDto;
 import egovframework.let.attendance.entity.LeaveBalance;
-import egovframework.let.attendance.entity.LeaveRequest;
 
 public interface LeaveService {
 	/**
@@ -52,7 +51,7 @@ public interface LeaveService {
 	 * @param size 페이지 크기
 	 * @return 승인 대기 중인 휴가 신청 리스트
 	 */
-	Page<LeaveRequest> pending(int page, int size) throws Exception;
+	Page<LeaveRequestListDto> pending(int page, int size) throws Exception;
 
 	/**
 	 * 휴가 신청 승인

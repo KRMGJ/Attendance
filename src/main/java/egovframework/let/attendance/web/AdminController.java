@@ -34,8 +34,8 @@ import egovframework.let.attendance.dto.request.AdminGrantLogSearch;
 import egovframework.let.attendance.dto.request.RegistEmployeeDto;
 import egovframework.let.attendance.dto.response.AttendanceListDto;
 import egovframework.let.attendance.dto.response.EmployeeViewDto;
+import egovframework.let.attendance.dto.response.LeaveRequestListDto;
 import egovframework.let.attendance.dto.response.MonthlyDeptReportDto;
-import egovframework.let.attendance.entity.LeaveRequest;
 import egovframework.let.attendance.service.AttendanceService;
 import egovframework.let.attendance.service.EmployeeService;
 import egovframework.let.attendance.service.LeaveService;
@@ -141,7 +141,7 @@ public class AdminController {
 	public String pending(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "20") int size,
 			Model model) throws Exception {
 
-		Page<LeaveRequest> pr = leaveService.pending(page, size);
+		Page<LeaveRequestListDto> pr = leaveService.pending(page, size);
 		model.addAttribute("pending", pr.getContent());
 		model.addAttribute("paginationInfo", buildPi(page, size, (int) pr.getTotalElements()));
 		model.addAttribute("size", size);
