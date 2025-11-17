@@ -5,8 +5,6 @@ import static egovframework.let.attendance.common.Enums.INTERN;
 import static egovframework.let.attendance.common.Enums.PART_TIME;
 import static egovframework.let.attendance.common.Utils.formatDateOnly;
 
-import java.util.Date;
-
 import javax.annotation.Resource;
 
 import org.egovframe.rte.fdl.idgnr.EgovIdGnrService;
@@ -114,7 +112,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 			Employee emp = employeeRepository.findById(id)
 					.orElseThrow(() -> new IllegalStateException("직원 정보를 찾을 수 없음: " + id));
 			employee = EmployeeViewDto.builder().id(emp.getId()).name(emp.getName()).email(emp.getEmail())
-					.position(emp.getPosition()).employmentType(emp.getEmploymentType()).status(emp.getStatus())
+					.employeeNumber(emp.getEmployeeNumber()).phone(emp.getPhone())
+					.emergencyContactPhone(emp.getEmergencyContactPhone()).address(emp.getAddress())
+					.workStartTime(emp.getWorkStartTime()).workEndTime(emp.getWorkEndTime())
+					.department(emp.getDepartment()).password(emp.getPassword()).position(emp.getPosition())
+					.employmentType(emp.getEmploymentType()).status(emp.getStatus())
 					.hireDate(formatDateOnly(emp.getHireDate())).resignDate(formatDateOnly(emp.getResignDate()))
 					.updatedAt(formatDateOnly(emp.getUpdatedAt())).build();
 		} catch (Exception e) {
@@ -130,8 +132,16 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public EmployeeViewDto loadView(String id) throws Exception {
 		try {
-			employeeRepository.findById(id).orElseThrow(() -> new IllegalStateException("직원 정보를 찾을 수 없음: " + id));
-			return employeeDAO.selectViewById(id);
+			Employee emp = employeeRepository.findById(id)
+					.orElseThrow(() -> new IllegalStateException("직원 정보를 찾을 수 없음: " + id));
+			return EmployeeViewDto.builder().id(emp.getId()).name(emp.getName()).email(emp.getEmail())
+					.employeeNumber(emp.getEmployeeNumber()).phone(emp.getPhone())
+					.emergencyContactPhone(emp.getEmergencyContactPhone()).address(emp.getAddress())
+					.workStartTime(emp.getWorkStartTime()).workEndTime(emp.getWorkEndTime())
+					.department(emp.getDepartment()).password(emp.getPassword()).position(emp.getPosition())
+					.employmentType(emp.getEmploymentType()).status(emp.getStatus())
+					.hireDate(formatDateOnly(emp.getHireDate())).resignDate(formatDateOnly(emp.getResignDate()))
+					.updatedAt(formatDateOnly(emp.getUpdatedAt())).build();
 		} catch (Exception e) {
 			log.error("Error loading employee view for ID {}: {}", id, e);
 			throw e;
@@ -145,6 +155,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Transactional(rollbackFor = Exception.class)
 	public void edit(EditEmployeeDto dto, String actorUsername) throws Exception {
 		try {
+			Employee emp = employeeRepository.findById(dto.getId())
+					.orElseThrow(() -> new IllegalArgumentException("직원 없음"));
 			if (employeeDAO.canEdit(dto.getId(), actorUsername) == 0) {
 				throw new SecurityException("수정 권한 없음");
 			}
@@ -163,9 +175,24 @@ public class EmployeeServiceImpl implements EmployeeService {
 			} else {
 				throw new IllegalArgumentException("Invalid employment type: " + dto.getEmploymentType());
 			}
-			dto.setUpdatedAt(new Date());
 			dto.setEmploymentType(type);
-			employeeDAO.updateProfile(dto);
+			emp.setName(dto.getName());
+			emp.setEmail(dto.getEmail());
+			emp.setEmployeeNumber(dto.getEmployeeNumber());
+			emp.setDepartment(dto.getDepartment());
+			emp.setPosition(dto.getPosition());
+			emp.setHireDate(dto.getHireDate());
+			emp.setPhone(dto.getPhone());
+			emp.setEmergencyContactPhone(dto.getEmergencyContactPhone());
+			emp.setAddress(dto.getAddress());
+			emp.setWorkStartTime(dto.getWorkStartTime());
+			emp.setWorkEndTime(dto.getWorkEndTime());
+
+			if (dto.getPassword() != null && !dto.getPassword().trim().isEmpty()) {
+				emp.setPassword(passwordEncoder.encode(dto.getPassword()));
+			}
+
+			employeeRepository.save(emp);
 		} catch (Exception e) {
 			log.error("Error editing employee ID {}: {}", dto.getId(), e);
 			throw e;

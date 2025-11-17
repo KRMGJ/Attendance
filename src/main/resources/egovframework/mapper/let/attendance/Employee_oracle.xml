@@ -6,19 +6,26 @@
 		<id property="id" column="ID" />
 		<result property="name" column="NAME" />
 		<result property="email" column="EMAIL" />
-		<result property="position" column="POSITION" />
+		<result property="employeeNumber" column="EMPLOYEE_NUMBER" />
+		<result property="password" column="PASSWORD" />
 		<result property="department" column="DEPARTMENT" />
+		<result property="position" column="POSITION" />
 		<result property="employmentType" column="EMPLOYMENT_TYPE" />
 		<result property="status" column="STATUS" />
 		<result property="hireDate" column="HIRE_DATE" jdbcType="TIMESTAMP" />
+		<result property="phone" column="PHONE" />
+		<result property="emergencyContactPhone" column="EMERGENCY_CONTACT_PHONE" />
+		<result property="address" column="ADDRESS" />
+		<result property="workStartTime" column="WORK_START_TIME" />
+        <result property="workEndTime" column="WORK_END_TIME" />
 		<result property="resignDate" column="RESIGN_DATE" jdbcType="TIMESTAMP" />
 		<result property="updatedAt" column="UPDATED_AT" jdbcType="TIMESTAMP" />
 	</resultMap>
 
 	<select id="selectViewById" parameterType="string" resultMap="EmployeeViewMap">
-		SELECT ID, NAME, EMAIL, POSITION, DEPARTMENT, EMPLOYMENT_TYPE, STATUS,
-		HIRE_DATE, RESIGN_DATE,
-		UPDATED_AT
+		SELECT ID, NAME, EMAIL, EMPLOYEE_NUMBER, PASSWORD, DEPARTMENT, POSITION,
+		EMPLOYMENT_TYPE, STATUS, HIRE_DATE, PHONE, EMERGENCY_CONTACT_PHONE,
+		ADDRESS, WORK_START_TIME, WORK_END_TIME, RESIGN_DATE, UPDATED_AT
 		FROM EMPLOYEE
 		WHERE ID = #{id}
 	</select>
@@ -47,17 +54,6 @@
 		END AS OK
 		FROM DUAL
 	</select>
-
-	<update id="updateProfile" parameterType="egovframework.let.attendance.dto.request.EditEmployeeDto">
-		UPDATE EMPLOYEE
-		SET NAME = #{name},
-		EMAIL = #{email},
-		POSITION = #{position},
-		DEPARTMENT = #{department},
-		EMPLOYMENT_TYPE = #{employmentType},
-		UPDATED_AT = #{updatedAt, jdbcType=TIMESTAMP}
-		WHERE ID = #{id}
-	</update>
 
 	<update id="updatePassword">
 		<!-- 직원 비밀번호 보관 위치 정책: 1) EMPLOYEE 테이블에 PASSWORD 컬럼이 있다면 거기에 저장 2) Spring 

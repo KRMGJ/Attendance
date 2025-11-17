@@ -8,7 +8,6 @@ import java.util.Map;
 import org.egovframe.rte.psl.dataaccess.EgovAbstractMapper;
 import org.springframework.stereotype.Repository;
 
-import egovframework.let.attendance.dto.request.EditEmployeeDto;
 import egovframework.let.attendance.dto.response.EmployeeViewDto;
 import egovframework.let.attendance.entity.Employee;
 
@@ -23,15 +22,6 @@ public class EmployeeDAO extends EgovAbstractMapper {
 	 */
 	public EmployeeViewDto selectViewById(String id) {
 		return selectOne("employeeDAO.selectViewById", id);
-	}
-
-	/**
-	 * 직원 프로필 정보 수정
-	 * 
-	 * @param dto 수정할 직원 정보 DTO
-	 */
-	public void updateProfile(EditEmployeeDto dto) {
-		update("employeeDAO.updateProfile", dto);
 	}
 
 	/**
