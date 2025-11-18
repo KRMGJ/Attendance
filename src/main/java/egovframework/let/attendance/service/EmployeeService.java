@@ -40,4 +40,18 @@ public interface EmployeeService {
 	 * @param actorUsername 수정하는 사용자의 사용자 이름
 	 */
 	void edit(EditEmployeeDto cmd, String actorUsername) throws Exception;
+
+	/**
+	 * 직원 퇴사 처리
+	 * 
+	 * @param id 직원 ID
+	 */
+	void resign(String id) throws Exception;
+
+	/**
+	 * 직원 복직 처리
+	 * 
+	 * @param id 직원 ID
+	 */
+	void reactivate(String id) throws Exception;
 }

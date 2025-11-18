@@ -113,10 +113,36 @@
 		<a href="<c:url value='/employee/edit.do?id=${employee.id}'/>"
 			class="px-4 py-2 rounded-md bg-gray-900 text-white">정보 수정</a>
 
-		<form method="post" action="<c:url value='/employee/delete.do'/>"
-			class="inline"
-			onsubmit="return confirm('정말 삭제하시겠습니까?');">
-			<input type="hidden" name="id" value="${employee.id}" />
+		<%-- 퇴사 처리 버튼: 재직 중일 때만 노출 --%>
+		<c:if test="${employee.status == 'ACTIVE'}">
+			<form method="post"
+				  action="<c:url value='/employee/resign.do'/>"
+				  class="inline"
+				  onsubmit="return confirm('이 직원을 퇴사 처리하시겠습니까?');">
+				<input type="hidden" name="id" value="${employee.id}" />
+				<button type="submit"
+						class="px-4 py-2 rounded-md bg-amber-600 text-white">
+					퇴사 처리
+				</button>
+			</form>
+		</c:if>
+	
+		<%-- 재직 전환 버튼: 이미 퇴사 상태일 때만 노출 (선택사항) --%>
+		<c:if test="${employee.status == 'RESIGNED'}">
+			<form method="post" action="<c:url value='/employee/reactivate.do'/>" class="inline"
+				  onsubmit="return confirm('이 직원을 재직 상태로 변경하시겠습니까?');">
+				<input type="hidden" name="id" value="${employee.id}" />
+				<button type="submit" class="px-4 py-2 rounded-md bg-emerald-600 text-white">
+					재직 전환
+				</button>
+			</form>
+		</c:if>
+	
+		<%-- (테스트/특수한 경우용) 물리 삭제가 꼭 필요하면 그대로 두고, 
+		     운영에서는 보통 안 쓰거나 관리자만 보이게 제한 --%>
+		<form method="post" action="<c:url value='/employee/delete.do'/>" class="inline"
+			  onsubmit="return confirm('정말 삭제하시겠습니까? 일반적으로는 퇴사 처리만 사용합니다.');">
+			<input type="hidden" name="id" value="${employee.id}" /> 
 			<button class="px-4 py-2 rounded-md bg-rose-600 text-white">
 				삭제
 			</button>

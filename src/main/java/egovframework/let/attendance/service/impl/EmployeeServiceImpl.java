@@ -1,9 +1,13 @@
 package egovframework.let.attendance.service.impl;
 
+import static egovframework.let.attendance.common.Enums.ACTIVE;
 import static egovframework.let.attendance.common.Enums.FULL_TIME;
 import static egovframework.let.attendance.common.Enums.INTERN;
 import static egovframework.let.attendance.common.Enums.PART_TIME;
+import static egovframework.let.attendance.common.Enums.RESIGNED;
 import static egovframework.let.attendance.common.Utils.formatDateOnly;
+
+import java.util.Date;
 
 import javax.annotation.Resource;
 
@@ -195,6 +199,42 @@ public class EmployeeServiceImpl implements EmployeeService {
 			employeeRepository.save(emp);
 		} catch (Exception e) {
 			log.error("Error editing employee ID {}: {}", dto.getId(), e);
+			throw e;
+		}
+	}
+
+	/**
+	 * 직원 퇴사 처리
+	 */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void resign(String id) throws Exception {
+		try {
+			Employee emp = employeeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("직원 없음"));
+			emp.setStatus(RESIGNED);
+			emp.setResignDate(new Date());
+			employeeRepository.save(emp);
+			jdbcTemplate.update("UPDATE USERS SET ENABLED = 0 WHERE USERNAME = ?", emp.getEmail());
+		} catch (Exception e) {
+			log.error("Error processing resignation for employee ID {}: {}", id, e);
+			throw e;
+		}
+	}
+
+	/**
+	 * 직원 복직 처리
+	 */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void reactivate(String id) throws Exception {
+		try {
+			Employee emp = employeeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("직원 없음"));
+			emp.setStatus(ACTIVE);
+			emp.setResignDate(null);
+			employeeRepository.save(emp);
+			jdbcTemplate.update("UPDATE USERS SET ENABLED = 1 WHERE USERNAME = ?", emp.getEmail());
+		} catch (Exception e) {
+			log.error("Error processing reactivation for employee ID {}: {}", id, e);
 			throw e;
 		}
 	}

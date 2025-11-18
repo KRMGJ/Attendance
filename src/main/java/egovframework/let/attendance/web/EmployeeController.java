@@ -54,4 +54,24 @@ public class EmployeeController {
 		return "redirect:/employee/detail.do?id=" + dto.getId();
 	}
 
+	/**
+	 * 사원 퇴사 처리
+	 */
+	@PreAuthorize("hasRole('ROLE_HR')")
+	@RequestMapping(value = "/resign.do", method = RequestMethod.POST)
+	public String retireEmployee(@RequestParam("id") String id) throws Exception {
+		employeeService.resign(id);
+		return "redirect:/employee/detail.do?id=" + id;
+	}
+
+	/**
+	 * 사원 복직 처리
+	 */
+	@PreAuthorize("hasRole('ROLE_HR')")
+	@RequestMapping(value = "/reactivate.do", method = RequestMethod.POST)
+	public String rejoinEmployee(@RequestParam("id") String id) throws Exception {
+		employeeService.reactivate(id);
+		return "redirect:/employee/detail.do?id=" + id;
+	}
+
 }
