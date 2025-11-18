@@ -73,7 +73,15 @@
 								<td class="px-4 py-2"><c:out value="${empty a.workDate ? '-' : a.workDate}" /></td>
 								<td class="px-4 py-2"><c:out value="${empty a.checkIn ? '-' : a.checkIn}" /></td>
 								<td class="px-4 py-2"><c:out value="${empty a.checkOut ? '-' : a.checkOut}" /></td>
-								<td class="px-4 py-2"><c:out value="${a.status}" /></td>
+								<td class="px-4 py-2">
+									<c:choose>
+										<c:when test="${a.status == 'PRESENT'}">정상 출근</c:when>
+										<c:when test="${a.status == 'LATE'}">지각</c:when>
+										<c:when test="${a.status == 'EARLY_LEAVE'}">조퇴</c:when>
+										<c:when test="${a.status == 'ABSENT'}">결근</c:when>
+										<c:otherwise>-</c:otherwise>
+									</c:choose>
+								</td>
 							</tr>
 						</c:forEach>
 					</c:when>

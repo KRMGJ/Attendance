@@ -37,8 +37,22 @@
 						<tr class="border-t">
 							<td class="px-4 py-2"><c:out value="${r.employeeName}" /></td>
 							<td class="px-4 py-2"><c:out value="${r.startDate}" /> ~ <c:out value="${r.endDate}" /></td>
-							<td class="px-4 py-2"><c:out value="${r.type}" /></td>
-							<td class="px-4 py-2"><c:out value="${r.status}" /></td>
+							<td>
+								<c:choose>
+									<c:when test="${r.type == 'ANNUAL'}">연차</c:when>
+									<c:when test="${r.type == 'SICK'}">병가</c:when>
+									<c:otherwise>-</c:otherwise>
+								</c:choose>
+							</td>							
+							<td>
+								<c:choose>
+									<c:when test="${r.status == 'PENDING'}">승인 대기</c:when>
+									<c:when test="${r.status == 'APPROVED'}">승인 완료</c:when>
+									<c:when test="${r.status == 'REJECTED'}">반려</c:when>
+									<c:when test="${r.status == 'CANCELED'}">취소</c:when>
+									<c:otherwise>-</c:otherwise>
+								</c:choose>
+							</td>
 							<td class="px-4 py-2 text-right">
 								<form method="post" action="<c:url value='/admin/leave/approve.do'/>" class="inline">
 									<input type="hidden" name="id" value="${r.id}" />

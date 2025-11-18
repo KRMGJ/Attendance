@@ -37,10 +37,24 @@
 					<c:forEach var="r" items="${requests}">
 						<tr class="border-t">
 							<td class="px-4 py-2"><c:out value="${r.startDate}" /> ~ <c:out value="${r.endDate}" /></td>
-							<td class="px-4 py-2"><c:out value="${r.type}" /></td>
+							<td>
+								<c:choose>
+									<c:when test="${r.type == 'ANNUAL'}">연차</c:when>
+									<c:when test="${r.type == 'SICK'}">병가</c:when>
+									<c:otherwise>-</c:otherwise>
+								</c:choose>
+							</td>
 							<td class="px-4 py-2"><c:out value="${empty r.approver ? '-' : r.approver}" /></td>
-							<td class="px-4 py-2"><c:out value="${empty r.approvedAt ? '-' : r.approvedAt}" /></td>
-							<td class="px-4 py-2"><c:out value="${r.status}" /></td>
+							<td class="px-4 py-2"><c:out value="${empty r.approvedAt ? '-' : r.approvedAt}" /></td>							
+							<td>
+								<c:choose>
+									<c:when test="${r.status == 'PENDING'}">승인 대기</c:when>
+									<c:when test="${r.status == 'APPROVED'}">승인 완료</c:when>
+									<c:when test="${r.status == 'REJECTED'}">반려</c:when>
+									<c:when test="${r.status == 'CANCELED'}">취소</c:when>
+									<c:otherwise>-</c:otherwise>
+								</c:choose>
+							</td>
 						</tr>
 					</c:forEach>
 				</c:when>

@@ -46,13 +46,23 @@
 
 		<dt class="text-gray-500">고용형태</dt>
 		<dd class="md:col-span-2">
-			<c:out value="${employee.employmentType}" />
+			<c:choose>
+				<c:when test="${employee.employmentType == 'FULL_TIME'}">정규직</c:when>
+				<c:when test="${employee.employmentType == 'PART_TIME'}">계약직</c:when>
+				<c:when test="${employee.employmentType == 'INTERN'}">인턴</c:when>
+				<c:otherwise>-</c:otherwise>
+			</c:choose>
 		</dd>
-
+		
 		<c:if test="${not empty employee.status}">
 			<dt class="text-gray-500">상태</dt>
 			<dd class="md:col-span-2">
-				<c:out value="${employee.status}" />
+				<c:choose>
+					<c:when test="${employee.status == 'ACTIVE'}">재직 중</c:when>
+					<c:when test="${employee.status == 'LEAVE'}">휴직 중</c:when>
+					<c:when test="${employee.status == 'RESIGNED'}">퇴사</c:when>
+					<c:otherwise>-</c:otherwise>
+				</c:choose>
 			</dd>
 		</c:if>
 
@@ -115,13 +125,10 @@
 
 		<%-- 퇴사 처리 버튼: 재직 중일 때만 노출 --%>
 		<c:if test="${employee.status == 'ACTIVE'}">
-			<form method="post"
-				  action="<c:url value='/employee/resign.do'/>"
-				  class="inline"
+			<form method="post" action="<c:url value='/employee/resign.do'/>" class="inline"
 				  onsubmit="return confirm('이 직원을 퇴사 처리하시겠습니까?');">
 				<input type="hidden" name="id" value="${employee.id}" />
-				<button type="submit"
-						class="px-4 py-2 rounded-md bg-amber-600 text-white">
+				<button type="submit" class="px-4 py-2 rounded-md bg-amber-600 text-white">
 					퇴사 처리
 				</button>
 			</form>

@@ -35,7 +35,15 @@
 							<td class="px-4 py-2"><c:out value="${row.workDate}" /></td>
 							<td class="px-4 py-2"><c:out value="${empty row.checkIn ? '-' : row.checkIn}" /></td>
 							<td class="px-4 py-2"><c:out value="${empty row.checkOut ? '-' : row.checkOut}" /></td>
-							<td class="px-4 py-2"><c:out value="${row.status}" /></td>
+							<td class="px-4 py-2">
+								<c:choose>
+									<c:when test="${row.status == 'PRESENT'}">정상 출근</c:when>
+									<c:when test="${row.status == 'LATE'}">지각</c:when>
+									<c:when test="${row.status == 'EARLY_LEAVE'}">조퇴</c:when>
+									<c:when test="${row.status == 'ABSENT'}">결근</c:when>
+									<c:otherwise>-</c:otherwise>
+								</c:choose>
+							</td>
 							<td class="px-4 py-2"><c:out value="${row.overtimeMinutes}" /></td>
 						</tr>
 					</c:forEach>

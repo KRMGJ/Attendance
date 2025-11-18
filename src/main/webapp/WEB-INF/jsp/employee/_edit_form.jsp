@@ -11,7 +11,12 @@
 			<div>
 				<div class="text-gray-500 text-xs mb-1">고용 상태</div>
 				<div class="font-medium">
-					<c:out value="${employee.status}" />
+					<c:choose>
+						<c:when test="${employee.status == 'ACTIVE'}">재직 중</c:when>
+						<c:when test="${employee.status == 'LEAVE'}">휴직 중</c:when>
+						<c:when test="${employee.status == 'RESIGNED'}">퇴사</c:when>
+						<c:otherwise>-</c:otherwise>
+					</c:choose>
 				</div>
 			</div>
 			<div>
@@ -97,18 +102,17 @@
 			<!-- 고용 형태 -->
 			<div class="col-span-1">
 				<label class="block text-sm mb-1">고용 형태</label>
-				<select name="employmentType"
-					class="w-full rounded border px-3 py-2">
+				<select name="employmentType" class="w-full rounded border px-3 py-2">
 					<option value="FULL_TIME"
-						<c:if test="${employee.employmentType == '정규직'}">selected</c:if>>
+						<c:if test="${employee.employmentType == 'FULL_TIME'}">selected</c:if>>
 						정규직
 					</option>
 					<option value="PART_TIME"
-						<c:if test="${employee.employmentType == '계약직'}">selected</c:if>>
+						<c:if test="${employee.employmentType == 'PART_TIME'}">selected</c:if>>
 						계약직
 					</option>
 					<option value="INTERN"
-						<c:if test="${employee.employmentType == '인턴'}">selected</c:if>>
+						<c:if test="${employee.employmentType == 'INTERN'}">selected</c:if>>
 						인턴
 					</option>
 				</select>

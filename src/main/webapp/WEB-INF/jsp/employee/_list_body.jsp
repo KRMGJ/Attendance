@@ -8,31 +8,33 @@
 	<form id="searchForm" method="get"
 		class="flex flex-wrap items-end gap-3 mb-4">
 		<div>
-			<label class="block text-sm mb-1">이름/이메일</label> <input name="q"
-				value="${paramQ}" class="rounded border px-3 py-2" placeholder="검색어" />
+			<label class="block text-sm mb-1">이름/이메일</label> 
+			<input name="q" value="${paramQ}" class="rounded border px-3 py-2" placeholder="검색어" />
 		</div>
 		<div>
-			<label class="block text-sm mb-1">부서</label> <input name="dept"
-				value="${paramDept}" class="rounded border px-3 py-2"
-				placeholder="부서" />
+			<label class="block text-sm mb-1">부서</label> 
+			<input name="dept" value="${paramDept}" class="rounded border px-3 py-2" placeholder="부서" />
 		</div>
+
+	    <div>
+	        <label class="block text-sm mb-1">상태</label>
+	        <select name="status" class="rounded border px-3 py-2 w-32">
+	            <option value="" ${empty paramStatus ? 'selected' : ''}>전체</option>
+	            <option value="ACTIVE"   ${paramStatus == 'ACTIVE' ? 'selected' : ''}>재직</option>
+	            <option value="LEAVE"    ${paramStatus == 'LEAVE' ? 'selected' : ''}>휴직</option>
+	            <option value="RESIGNED" ${paramStatus == 'RESIGNED' ? 'selected' : ''}>퇴사</option>
+	        </select>
+	    </div>
 		<div>
-			<label class="block text-sm mb-1">상태</label> <input name="status"
-				value="${paramStatus}" class="rounded border px-3 py-2"
-				placeholder="재직/휴직/퇴사" />
-		</div>
-		<div>
-			<label class="block text-sm mb-1">페이지 크기</label> <input type="number"
-				name="size" min="1" value="${size}"
-				class="w-24 rounded border px-3 py-2" />
+			<label class="block text-sm mb-1">페이지 크기</label> 
+			<input type="number" name="size" min="1" value="${size}" class="w-24 rounded border px-3 py-2" />
 		</div>
 		<button class="rounded-md bg-gray-900 text-white px-4 py-2 h-10">검색</button>
 	</form>
 
 	<div class="flex items-center justify-between mb-3">
 		<h2 class="text-lg font-semibold">직원 목록</h2>
-		<a href="<c:url value='/employee/join.do'/>"
-			class="px-3 py-2 rounded-md bg-gray-900 text-white">직원 등록</a>
+		<a href="<c:url value='/employee/join.do'/>" class="px-3 py-2 rounded-md bg-gray-900 text-white">직원 등록</a>
 	</div>
 
 	<div class="overflow-x-auto">
@@ -57,8 +59,23 @@
 								<td class="px-4 py-2"><c:out value="${e.email}" /></td>
 								<td class="px-4 py-2"><c:out value="${empty e.department ? '-' : e.department}" /></td>
 								<td class="px-4 py-2"><c:out value="${e.position}" /></td>
-								<td class="px-4 py-2"><c:out value="${e.status}" /></td>
-								<td class="px-4 py-2"><c:out value="${empty e.employmentType ? '-' : e.employmentType}" /></td>
+								<td class="px-4 py-2">
+									<c:choose>
+										<c:when test="${e.status == 'ACTIVE'}">재직 중</c:when>
+										<c:when test="${e.status == 'LEAVE'}">휴직 중</c:when>
+										<c:when test="${e.status == 'RESIGNED'}">퇴사</c:when>
+										<c:otherwise>-</c:otherwise>
+									</c:choose>
+								</td>
+								
+								<td class="px-4 py-2">
+									<c:choose>
+										<c:when test="${e.employmentType == 'FULL_TIME'}">정규직</c:when>
+										<c:when test="${e.employmentType == 'PART_TIME'}">계약직</c:when>
+										<c:when test="${e.employmentType == 'INTERN'}">인턴</c:when>
+										<c:otherwise>-</c:otherwise>
+									</c:choose>
+								</td>
 								<td class="px-4 py-2 text-right"><a class="underline"
 									href="<c:url value='/employee/detail.do?id=${e.id}'/>">보기</a></td>
 							</tr>
@@ -66,8 +83,7 @@
 					</c:when>
 					<c:otherwise>
 						<tr>
-							<td class="px-4 py-6 text-center text-gray-500" colspan="7">등록된
-								직원이 없습니다.</td>
+							<td class="px-4 py-6 text-center text-gray-500" colspan="7">등록된 직원이 없습니다.</td>
 						</tr>
 					</c:otherwise>
 				</c:choose>
