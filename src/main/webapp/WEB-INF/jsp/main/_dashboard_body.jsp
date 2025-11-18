@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
 <div class="space-y-6">
 	<div class="bg-white border rounded-xl p-6 shadow-sm">
@@ -53,34 +54,33 @@
 		</div>
 		
 		<div class="bg-white border rounded-xl p-6 shadow-sm">
-        <h3 class="font-semibold mb-2">근무시간 요약</h3>
+        	<h3 class="font-semibold mb-2">근무시간 요약</h3>
+        	<p class="text-gray-700 text-sm mb-1">이번 달:
+            	<strong>
+            		<fmt:formatNumber value="${monthlyMinutes div 60}" maxFractionDigits="0" />시간
+           	    	<fmt:formatNumber value="${monthlyMinutes mod 60}" pattern="00" />분
+                </strong>
+        	</p>
 
-        <p class="text-gray-700 text-sm mb-1">
-            이번 달:
-            <strong>
-                ${monthlyMinutes / 60}시간 ${monthlyMinutes % 60}분
-            </strong>
-        </p>
+        	<p class="text-gray-700 text-sm mb-1">이번 주: 
+        		<strong> 
+        			<fmt:formatNumber value="${weeklyMinutes div 60}" maxFractionDigits="0" />시간 
+        			<fmt:formatNumber value="${weeklyMinutes mod 60}" pattern="00" />분
+				</strong>
+			</p>
 
-        <p class="text-gray-700 text-sm mb-1">
-            이번 주:
-            <strong>
-                ${weeklyMinutes / 60}시간 ${weeklyMinutes % 60}분
-            </strong>
-        </p>
-
-        <p class="text-gray-700 text-sm">
-            오늘:
-            <strong>
-                <c:choose>
-                    <c:when test="${not empty today.workedMinutes}">
-                        ${today.workedMinutes / 60}시간 ${today.workedMinutes % 60}분
-                    </c:when>
-                    <c:otherwise>0시간 0분</c:otherwise>
-                </c:choose>
-            </strong>
-        </p>
-    </div>
+	        <p class="text-gray-700 text-sm">오늘:
+	            <strong>
+	                <c:choose>
+	                    <c:when test="${not empty today.workedMinutes}">
+							<fmt:formatNumber value="${today.workedMinutes div 60}" maxFractionDigits="0" />시간
+                            <fmt:formatNumber value="${today.workedMinutes mod 60}" pattern="00" />분
+	                    </c:when>
+	                    <c:otherwise>0시간 0분</c:otherwise>
+	                </c:choose>
+	            </strong>
+	        </p>
+	    </div>
 	</div>
 
 	<div class="bg-white border rounded-xl p-6 shadow-sm">
