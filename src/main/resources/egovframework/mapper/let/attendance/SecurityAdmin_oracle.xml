@@ -8,7 +8,7 @@
 			<if test="kw != null">
 				(LOWER(u.USERNAME) LIKE #{kw} OR LOWER(u.EMAIL) LIKE #{kw})
 			</if>
-			<if test="role != null">
+			<if test="role != null and role != ''">
 				AND EXISTS (
 				SELECT 1 FROM AUTHORITIES ar
 				WHERE ar.USERNAME = u.USERNAME
@@ -36,7 +36,7 @@
 			<if test="kw != null">
 				(LOWER(u.USERNAME) LIKE #{kw} OR LOWER(u.EMAIL) LIKE #{kw})
 			</if>
-			<if test="role != null">
+			<if test="role != null and role != ''">
 				AND EXISTS (
 				SELECT 1 FROM AUTHORITIES ar2
 				WHERE ar2.USERNAME = u.USERNAME
