@@ -112,16 +112,13 @@ public class AttendanceServiceImpl implements AttendanceService {
 			Date now = new Date();
 			LocalTime nowTime = now.toInstant().atZone(ZONE).toLocalTime();
 
-			// 직원별 기준 종료시간 계산
 			LocalTime workEnd = resolveWorkEnd(emp);
 
 			a.setCheckOut(now);
 
 			if (nowTime.isBefore(workEnd)) {
-				// 조퇴
 				a.setStatus(EARLY_LEAVE);
 			} else {
-				// 연장근로 계산 (직원별 기준 종료시간 기준)
 				LocalDateTime endBase = LocalDateTime.ofInstant(today.toInstant(), ZONE).withHour(workEnd.getHour())
 						.withMinute(workEnd.getMinute());
 
@@ -134,6 +131,8 @@ public class AttendanceServiceImpl implements AttendanceService {
 					a.setStatus(PRESENT);
 				}
 			}
+			int workedMinutes = calcWorkedMinutes(a.getCheckIn(), now);
+			a.setWorkedMinutes(workedMinutes);
 
 			attendanceRepository.save(a);
 			return "checkout_success";
@@ -160,7 +159,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 			attendance = AttendanceViewDto.builder().workDate(att.getWorkDate().toString())
 					.checkIn(att.getCheckIn() != null ? formatDate(att.getCheckIn()) : null)
 					.checkOut(att.getCheckOut() != null ? formatDate(att.getCheckOut()) : null).status(att.getStatus())
-					.build();
+					.workedMinutes(att.getWorkedMinutes()).build();
 		} catch (Exception e) {
 			log.error("Error fetching today's attendance for empId {}: {}", empId, e.getMessage());
 			throw e;
@@ -262,6 +261,15 @@ public class AttendanceServiceImpl implements AttendanceService {
 		}
 	}
 
+	@Override
+	public int getWorkedMinutesByPeriod(String email, Date from, Date to) throws Exception {
+		if (email == null || from == null || to == null) {
+			return 0;
+		}
+		Employee emp = loadEmployeeByUsername(email);
+		return attendanceDAO.sumWorkedMinutesByPeriod(emp.getId(), from, to);
+	}
+
 	/**
 	 * username으로 직원 정보 로드
 	 * 
@@ -284,6 +292,12 @@ public class AttendanceServiceImpl implements AttendanceService {
 		return Date.from(todayMidnight.atZone(ZONE).toInstant());
 	}
 
+	/**
+	 * 직원별 출근 시간 설정값 확인
+	 * 
+	 * @param emp 직원 정보
+	 * @return 출근 시간
+	 */
 	private LocalTime resolveWorkStart(Employee emp) {
 		if (emp.getWorkStartTime() != null && !emp.getWorkStartTime().isEmpty()) {
 			return LocalTime.parse(emp.getWorkStartTime()); // "HH:mm"
@@ -291,6 +305,12 @@ public class AttendanceServiceImpl implements AttendanceService {
 		return WORK_START;
 	}
 
+	/**
+	 * 직원별 퇴근 시간 설정값 확인
+	 * 
+	 * @param emp 직원 정보
+	 * @return 퇴근 시간
+	 */
 	private LocalTime resolveWorkEnd(Employee emp) {
 		if (emp.getWorkEndTime() != null && !emp.getWorkEndTime().isEmpty()) {
 			return LocalTime.parse(emp.getWorkEndTime());
@@ -298,4 +318,30 @@ public class AttendanceServiceImpl implements AttendanceService {
 		return WORK_END;
 	}
 
+	/**
+	 * 출퇴근 시간으로 근무 시간(분 단위) 계산
+	 * 
+	 * @param checkIn  출근 시간
+	 * @param checkOut 퇴근 시간
+	 * @return 근무 시간(분 단위)
+	 */
+	private int calcWorkedMinutes(Date checkIn, Date checkOut) {
+		if (checkIn == null || checkOut == null) {
+			return 0;
+		}
+		long diffMillis = checkOut.getTime() - checkIn.getTime();
+		if (diffMillis <= 0L) {
+			return 0;
+		}
+		long minutes = diffMillis / (1000L * 60L);
+
+		long lunchMinutes = 0L;
+		if (checkIn.toInstant().atZone(ZONE).toLocalTime().isBefore(LocalTime.of(13, 0))
+				&& checkOut.toInstant().atZone(ZONE).toLocalTime().isAfter(LocalTime.of(12, 0))) {
+			lunchMinutes = 60L;
+		}
+		minutes -= lunchMinutes;
+
+		return (int) minutes;
+	}
 }

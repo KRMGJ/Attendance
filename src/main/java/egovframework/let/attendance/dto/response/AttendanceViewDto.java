@@ -14,4 +14,5 @@ public class AttendanceViewDto {
 	private String checkIn;
 	private String checkOut;
 	private String status;
+	private int workedMinutes;
 }

@@ -11,6 +11,7 @@
 		<result property="checkOut" column="a_check_out" />
 		<result property="status" column="a_status" />
 		<result property="overtimeMinutes" column="a_overtime_minutes" />
+		<result property="workedMinutes" column="a_worked_minutes" />
 		<association property="employee" javaType="egovframework.let.attendance.entity.Employee">
 			<id property="id" column="e_id" />
 			<result property="name" column="e_name" />
@@ -67,6 +68,7 @@
 		a.check_out AS a_check_out,
 		a.status AS a_status,
 		a.overtime_minutes AS a_overtime_minutes,
+		a.worked_minutes AS a_worked_minutes,
 		e.id AS e_id,
 		e.name AS
 		e_name,
@@ -110,6 +112,13 @@
 		AND a.work_date BETWEEN #{from} AND #{to}
 		ORDER BY a.work_date
 		ASC
+	</select>
+	
+	<select id="sumWorkedMinutesByPeriod" parameterType="map" resultType="int">
+	    SELECT NVL(SUM(worked_minutes), 0)
+	    FROM ATTENDANCE
+	    WHERE emp_id = #{empId}
+	      AND work_date BETWEEN #{from} AND #{to}
 	</select>
 
 	<select id="selectMonthlyDeptReport" parameterType="map" resultMap="MonthlyDeptReportMap">

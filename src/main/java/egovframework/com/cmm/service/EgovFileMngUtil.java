@@ -20,14 +20,12 @@ import egovframework.com.cmm.EgovWebUtil;
 import egovframework.let.utl.fcc.service.EgovStringUtil;
 
 /**
- * @Class Name  : EgovFileMngUtil.java
+ * @Class Name : EgovFileMngUtil.java
  * @Description : 메시지 처리 관련 유틸리티
  * @Modification Information
  *
- *     수정일         수정자                   수정내용
- *     -------          --------        ---------------------------
- *   2009.02.13       이삼섭                  최초 생성
- *   2011.08.31  JJY            경량환경 템플릿 커스터마이징버전 생성
+ *               수정일 수정자 수정내용 ------- -------- ---------------------------
+ *               2009.02.13 이삼섭 최초 생성 2011.08.31 JJY 경량환경 템플릿 커스터마이징버전 생성
  *
  * @author 공통 서비스 개발팀 이삼섭
  * @since 2009. 02. 13
@@ -38,94 +36,96 @@ import egovframework.let.utl.fcc.service.EgovStringUtil;
 @Component("EgovFileMngUtil")
 public class EgovFileMngUtil {
 
-    public static final int BUFF_SIZE = 2048;
+	public static final int BUFF_SIZE = 2048;
 
-    @Resource(name = "propertiesService")
-    protected EgovPropertyService propertyService;
+	@Resource(name = "propertiesService")
+	protected EgovPropertyService propertyService;
 
-    @Resource(name = "egovFileIdGnrService")
-    private EgovIdGnrService idgenService;
+	@Resource(name = "egovFileIdGnrService")
+	private EgovIdGnrService idgenService;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EgovFileMngUtil.class);
+	@SuppressWarnings("unused")
+	private static final Logger LOGGER = LoggerFactory.getLogger(EgovFileMngUtil.class);
 
-    /**
-     * 첨부파일에 대한 목록 정보를 취득한다.
-     *
-     * @param files
-     * @return
-     * @throws Exception
-     */
-    public List<FileVO> parseFileInf(Map<String, MultipartFile> files, String KeyStr, int fileKeyParam, String atchFileId, String storePath) throws Exception {
-	int fileKey = fileKeyParam;
+	/**
+	 * 첨부파일에 대한 목록 정보를 취득한다.
+	 *
+	 * @param files
+	 * @return
+	 * @throws Exception
+	 */
+	public List<FileVO> parseFileInf(Map<String, MultipartFile> files, String KeyStr, int fileKeyParam,
+			String atchFileId, String storePath) throws Exception {
+		int fileKey = fileKeyParam;
 
-	String storePathString = "";
-	String atchFileIdString = "";
+		String storePathString = "";
+		String atchFileIdString = "";
 
-	if ("".equals(storePath) || storePath == null) {
-	    storePathString = propertyService.getString("Globals.fileStorePath");
-	} else {
-	    storePathString = propertyService.getString(storePath);
+		if ("".equals(storePath) || storePath == null) {
+			storePathString = propertyService.getString("Globals.fileStorePath");
+		} else {
+			storePathString = propertyService.getString(storePath);
+		}
+
+		if ("".equals(atchFileId) || atchFileId == null) {
+			atchFileIdString = idgenService.getNextStringId();
+		} else {
+			atchFileIdString = atchFileId;
+		}
+
+		File saveFolder = new File(EgovWebUtil.filePathBlackList(storePathString));
+
+		if (!saveFolder.exists() || saveFolder.isFile()) {
+			saveFolder.mkdirs();
+		}
+
+		Iterator<Entry<String, MultipartFile>> itr = files.entrySet().iterator();
+		MultipartFile file;
+		String filePath = "";
+		List<FileVO> result = new ArrayList<FileVO>();
+		FileVO fvo;
+
+		while (itr.hasNext()) {
+			Entry<String, MultipartFile> entry = itr.next();
+
+			file = entry.getValue();
+			String orginFileName = file.getOriginalFilename();
+
+			// --------------------------------------
+			// 원 파일명이 없는 경우 처리
+			// (첨부가 되지 않은 input file type)
+			// --------------------------------------
+			if ("".equals(orginFileName)) {
+				continue;
+			}
+			//// ------------------------------------
+
+			int index = orginFileName.lastIndexOf(".");
+			// String fileName = orginFileName.substring(0, index);
+			String fileExt = orginFileName.substring(index + 1);
+			String newName = KeyStr + EgovStringUtil.getTimeStamp() + fileKey;
+			long _size = file.getSize();
+
+			if (!"".equals(orginFileName)) {
+				filePath = storePathString + File.separator + newName;
+				file.transferTo(new File(EgovWebUtil.filePathBlackList(filePath)));
+			}
+			fvo = new FileVO();
+			fvo.setFileExtsn(fileExt);
+			fvo.setFileStreCours(storePathString);
+			fvo.setFileMg(Long.toString(_size));
+			fvo.setOrignlFileNm(orginFileName);
+			fvo.setStreFileNm(newName);
+			fvo.setAtchFileId(atchFileIdString);
+			fvo.setFileSn(String.valueOf(fileKey));
+
+			// writeFile(file, newName, storePathString);
+			result.add(fvo);
+
+			fileKey++;
+		}
+
+		return result;
 	}
-
-	if ("".equals(atchFileId) || atchFileId == null) {
-	    atchFileIdString = idgenService.getNextStringId();
-	} else {
-	    atchFileIdString = atchFileId;
-	}
-	
-	File saveFolder = new File(EgovWebUtil.filePathBlackList(storePathString));
-	
-	if (!saveFolder.exists() || saveFolder.isFile()) {
-	    saveFolder.mkdirs();
-	}
-	
-	Iterator<Entry<String, MultipartFile>> itr = files.entrySet().iterator();
-	MultipartFile file;
-	String filePath = "";
-	List<FileVO> result  = new ArrayList<FileVO>();
-	FileVO fvo;
-	
-	while (itr.hasNext()) {
-	    Entry<String, MultipartFile> entry = itr.next();
-
-	    file = entry.getValue();
-	    String orginFileName = file.getOriginalFilename();
-
-	    //--------------------------------------
-	    // 원 파일명이 없는 경우 처리
-	    // (첨부가 되지 않은 input file type)
-	    //--------------------------------------
-	    if ("".equals(orginFileName)) {
-		continue;
-	    }
-	    ////------------------------------------
-
-	    int index = orginFileName.lastIndexOf(".");
-	    //String fileName = orginFileName.substring(0, index);
-	    String fileExt = orginFileName.substring(index + 1);
-	    String newName = KeyStr + EgovStringUtil.getTimeStamp() + fileKey;
-	    long _size = file.getSize();
-
-	    if (!"".equals(orginFileName)) {
-		filePath = storePathString + File.separator + newName;
-		file.transferTo(new File(EgovWebUtil.filePathBlackList(filePath)));
-	    }
-	    fvo = new FileVO();
-	    fvo.setFileExtsn(fileExt);
-	    fvo.setFileStreCours(storePathString);
-	    fvo.setFileMg(Long.toString(_size));
-	    fvo.setOrignlFileNm(orginFileName);
-	    fvo.setStreFileNm(newName);
-	    fvo.setAtchFileId(atchFileIdString);
-	    fvo.setFileSn(String.valueOf(fileKey));
-
-	    //writeFile(file, newName, storePathString);
-	    result.add(fvo);
-
-	    fileKey++;
-	}
-
-	return result;
-    }
 
 }

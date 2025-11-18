@@ -67,6 +67,11 @@ public class Attendance {
 	@Comment("초과 근무 시간(분 단위)")
 	private int overtimeMinutes = 0;
 
+	@Builder.Default
+	@Column(name = "worked_minutes", nullable = false)
+	@Comment("근무 시간(분 단위)")
+	private int workedMinutes = 0;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "emp_id", insertable = false, updatable = false)
 	private Employee employee;

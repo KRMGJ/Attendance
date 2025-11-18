@@ -69,4 +69,14 @@ public interface AttendanceService {
 	 * @return 부서별 월간 보고서 리스트
 	 */
 	List<MonthlyDeptReportDto> getMonthlyDeptReport(Date start, Date end) throws Exception;
+
+	int getWorkedMinutesByPeriod(String email, Date from, Date to) throws Exception;
+
+	default int getWeeklyWorkedMinutes(String email, Date weekStart, Date weekEnd) throws Exception {
+		return getWorkedMinutesByPeriod(email, weekStart, weekEnd);
+	}
+
+	default int getMonthlyWorkedMinutes(String email, Date monthStart, Date monthEnd) throws Exception {
+		return getWorkedMinutesByPeriod(email, monthStart, monthEnd);
+	}
 }

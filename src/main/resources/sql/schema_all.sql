@@ -311,11 +311,15 @@ CREATE TABLE attendance (
     check_out        TIMESTAMP(6),
     status           VARCHAR2(20) NOT NULL,
     overtime_minutes NUMBER(10)   DEFAULT 0 NOT NULL,
+    worked_minutes 	 NUMBER(10)   DEFAULT 0 NOT NULL,
     CONSTRAINT pk_attendance PRIMARY KEY (id),
     CONSTRAINT uk_attendance_emp_workdate UNIQUE (emp_id, work_date),
     CONSTRAINT fk_attendance_emp
         FOREIGN KEY (emp_id) REFERENCES employee(id)
 );
+
+ALTER TABLE ATTENDANCE
+  ADD worked_minutes NUMBER(10) DEFAULT 0 NOT NULL;
 
 COMMENT ON TABLE attendance IS '근태 기록 테이블';
 COMMENT ON COLUMN attendance.id               IS '근태 기록 식별자';
@@ -325,6 +329,7 @@ COMMENT ON COLUMN attendance.check_in         IS '출근 시간';
 COMMENT ON COLUMN attendance.check_out        IS '퇴근 시간';
 COMMENT ON COLUMN attendance.status           IS '근무 상태(정상, 지각, 조퇴, 결근 등)';
 COMMENT ON COLUMN attendance.overtime_minutes IS '초과 근무 시간(분 단위)';
+COMMENT ON COLUMN attendance.worked_minutes   IS '일일 근무시간(분 단위)';
 
 --------------------------------------------------------------------------------
 -- LEAVE_REQUEST : 휴가 신청 테이블

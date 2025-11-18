@@ -11,7 +11,7 @@
 		</p>
 	</div>
 
-	<div class="grid md:grid-cols-2 gap-6">
+	<div class="grid md:grid-cols-3 gap-6">
 		<div class="bg-white border rounded-xl p-6 shadow-sm">
 			<h3 class="font-semibold mb-2">오늘 근태</h3>
 			<p class="text-sm mb-3 text-gray-600">
@@ -51,6 +51,36 @@
 			<a href="<c:url value='/leave/requests.do'/>"
 				class="px-4 py-2 rounded-md bg-gray-900 text-white">휴가 내역 보기</a>
 		</div>
+		
+		<div class="bg-white border rounded-xl p-6 shadow-sm">
+        <h3 class="font-semibold mb-2">근무시간 요약</h3>
+
+        <p class="text-gray-700 text-sm mb-1">
+            이번 달:
+            <strong>
+                ${monthlyMinutes / 60}시간 ${monthlyMinutes % 60}분
+            </strong>
+        </p>
+
+        <p class="text-gray-700 text-sm mb-1">
+            이번 주:
+            <strong>
+                ${weeklyMinutes / 60}시간 ${weeklyMinutes % 60}분
+            </strong>
+        </p>
+
+        <p class="text-gray-700 text-sm">
+            오늘:
+            <strong>
+                <c:choose>
+                    <c:when test="${not empty today.workedMinutes}">
+                        ${today.workedMinutes / 60}시간 ${today.workedMinutes % 60}분
+                    </c:when>
+                    <c:otherwise>0시간 0분</c:otherwise>
+                </c:choose>
+            </strong>
+        </p>
+    </div>
 	</div>
 
 	<div class="bg-white border rounded-xl p-6 shadow-sm">

@@ -79,4 +79,12 @@ public class AttendanceDAO extends EgovAbstractMapper {
 		param.put("end", end);
 		return selectList("attendanceDAO.selectMonthlyDeptReport", param);
 	}
+
+	public int sumWorkedMinutesByPeriod(String empId, Date from, Date to) {
+		Map<String, Object> param = new HashMap<>();
+		param.put("empId", empId);
+		param.put("from", from);
+		param.put("to", to);
+		return selectOne("attendanceDAO.sumWorkedMinutesByPeriod", param);
+	}
 }
