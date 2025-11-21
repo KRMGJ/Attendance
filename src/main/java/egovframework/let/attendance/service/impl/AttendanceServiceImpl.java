@@ -38,6 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service("attendanceService")
+@Transactional(readOnly = true)
 public class AttendanceServiceImpl implements AttendanceService {
 	private static final ZoneId ZONE = ZoneId.of("Asia/Seoul");
 	private static final LocalTime WORK_START = LocalTime.of(9, 0);
@@ -147,7 +148,6 @@ public class AttendanceServiceImpl implements AttendanceService {
 	 * 오늘 출퇴근 정보 조회
 	 */
 	@Override
-	@Transactional(readOnly = true)
 	public AttendanceViewDto getToday(String empId) throws Exception {
 		Date today = getTodayDate();
 		AttendanceViewDto attendance = null;
@@ -171,7 +171,6 @@ public class AttendanceServiceImpl implements AttendanceService {
 	 * 최근 출퇴근 정보 조회
 	 */
 	@Override
-	@Transactional(readOnly = true)
 	public List<AttendanceViewDto> getRecent(String empId) throws Exception {
 		List<AttendanceViewDto> recent = null;
 		try {
@@ -193,7 +192,6 @@ public class AttendanceServiceImpl implements AttendanceService {
 	 * 나의 출퇴근 기록 조회
 	 */
 	@Override
-	@Transactional(readOnly = true)
 	public List<AttendanceListDto> getMyAttendance(String userEmail, Date from, Date to) throws Exception {
 		List<AttendanceListDto> attendanceList = null;
 		try {
@@ -226,7 +224,6 @@ public class AttendanceServiceImpl implements AttendanceService {
 	 * 관리자 출퇴근 기록 조회
 	 */
 	@Override
-	@Transactional(readOnly = true)
 	public Page<AttendanceListDto> list(AdminAttendanceSearch cond) throws Exception {
 		Page<AttendanceListDto> dtos = null;
 		try {
@@ -248,7 +245,6 @@ public class AttendanceServiceImpl implements AttendanceService {
 	 * 부서별 월간 보고서 조회
 	 */
 	@Override
-	@Transactional(readOnly = true)
 	public List<MonthlyDeptReportDto> getMonthlyDeptReport(Date start, Date end) throws Exception {
 		try {
 			if (start == null || end == null) {
@@ -271,15 +267,14 @@ public class AttendanceServiceImpl implements AttendanceService {
 	}
 
 	/**
-	 * username으로 직원 정보 로드
+	 * email로 직원 정보 로드
 	 * 
-	 * @param username 사용자 이름(이메일)
+	 * @param email 직원 이메일
 	 * @return 직원 정보
 	 */
-	private Employee loadEmployeeByUsername(String username) {
-		// username을 이메일로 사용 중이라는 전제
-		return employeeRepository.findByEmail(username)
-				.orElseThrow(() -> new IllegalArgumentException("직원 정보를 찾을 수 없음: " + username));
+	private Employee loadEmployeeByUsername(String email) {
+		return employeeRepository.findByEmail(email)
+				.orElseThrow(() -> new IllegalArgumentException("직원 정보를 찾을 수 없음: " + email));
 	}
 
 	/**
@@ -300,7 +295,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 	 */
 	private LocalTime resolveWorkStart(Employee emp) {
 		if (emp.getWorkStartTime() != null && !emp.getWorkStartTime().isEmpty()) {
-			return LocalTime.parse(emp.getWorkStartTime()); // "HH:mm"
+			return LocalTime.parse(emp.getWorkStartTime());
 		}
 		return WORK_START;
 	}

@@ -291,12 +291,10 @@ public class LeaveServiceImpl implements LeaveService {
 	public void grantMonthlyAccrualIfEligible(Date targetDate) throws Exception {
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"));
 		cal.setTime(targetDate);
-		// 전월로 이동
 		cal.add(Calendar.MONTH, -1);
 		int y = cal.get(Calendar.YEAR);
 		int m = cal.get(Calendar.MONTH) + 1;
 		try {
-			// 1년 미만 + 전월 개근자
 			List<String> empIds = leaveBalanceDAO.selectFirstYearFullAttendanceEmployees(y, m);
 			for (String empId : empIds) {
 				Integer year = y;

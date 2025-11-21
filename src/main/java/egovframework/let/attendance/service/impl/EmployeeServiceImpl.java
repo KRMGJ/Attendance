@@ -180,17 +180,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 				throw new IllegalArgumentException("Invalid employment type: " + dto.getEmploymentType());
 			}
 			dto.setEmploymentType(type);
-			emp.setName(dto.getName());
-			emp.setEmail(dto.getEmail());
-			emp.setEmployeeNumber(dto.getEmployeeNumber());
-			emp.setDepartment(dto.getDepartment());
-			emp.setPosition(dto.getPosition());
-			emp.setHireDate(dto.getHireDate());
-			emp.setPhone(dto.getPhone());
-			emp.setEmergencyContactPhone(dto.getEmergencyContactPhone());
-			emp.setAddress(dto.getAddress());
-			emp.setWorkStartTime(dto.getWorkStartTime());
-			emp.setWorkEndTime(dto.getWorkEndTime());
+			emp = Employee.builder().id(emp.getId()).name(dto.getName()).password(emp.getPassword())
+					.email(dto.getEmail()).employeeNumber(dto.getEmployeeNumber())
+					.employmentType(dto.getEmploymentType()).position(dto.getPosition()).department(dto.getDepartment())
+					.phone(dto.getPhone()).emergencyContactPhone(dto.getEmergencyContactPhone())
+					.address(dto.getAddress()).hireDate(emp.getHireDate()).workStartTime(dto.getWorkStartTime())
+					.workEndTime(dto.getWorkEndTime()).resignDate(emp.getResignDate()).status(emp.getStatus()).build();
 
 			if (dto.getPassword() != null && !dto.getPassword().trim().isEmpty()) {
 				emp.setPassword(passwordEncoder.encode(dto.getPassword()));
