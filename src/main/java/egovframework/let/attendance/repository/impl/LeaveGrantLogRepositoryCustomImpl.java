@@ -10,11 +10,13 @@ import javax.annotation.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
 
 import egovframework.let.attendance.dto.request.AdminGrantLogSearch;
 import egovframework.let.attendance.repository.LeaveGrantLogRepositoryCustom;
 import egovframework.let.attendance.repository.mybatis.LeaveGrantLogDAO;
 
+@Repository("leaveGrantLogReppositoryCustomImpl")
 public class LeaveGrantLogRepositoryCustomImpl implements LeaveGrantLogRepositoryCustom {
 
 	@Resource(name = "leaveGrantLogDAO")

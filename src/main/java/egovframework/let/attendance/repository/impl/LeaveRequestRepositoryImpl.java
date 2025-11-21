@@ -5,7 +5,8 @@ import static egovframework.let.attendance.common.Enums.PENDING;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -15,10 +16,10 @@ import egovframework.let.attendance.entity.LeaveRequest;
 import egovframework.let.attendance.repository.LeaveRequestRepositoryCustom;
 import egovframework.let.attendance.repository.mybatis.LeaveRequestDAO;
 
-@Repository
+@Repository("leaveRequestRepositoryImpl")
 public class LeaveRequestRepositoryImpl implements LeaveRequestRepositoryCustom {
 
-	@Autowired
+	@Resource(name = "leaveRequestDAO")
 	private LeaveRequestDAO leaveRequestDAO;
 
 	@Override

@@ -4,7 +4,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -15,10 +16,10 @@ import egovframework.let.attendance.entity.Attendance;
 import egovframework.let.attendance.repository.AttendanceRepositoryCustom;
 import egovframework.let.attendance.repository.mybatis.AttendanceDAO;
 
-@Repository
+@Repository("attendanceRepositoryImpl")
 public class AttendanceRepositoryImpl implements AttendanceRepositoryCustom {
 
-	@Autowired
+	@Resource(name = "attendanceDAO")
 	private AttendanceDAO attendanceDAO;
 
 	@Override

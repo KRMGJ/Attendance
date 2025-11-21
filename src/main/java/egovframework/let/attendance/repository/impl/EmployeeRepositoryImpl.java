@@ -3,7 +3,8 @@ package egovframework.let.attendance.repository.impl;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -14,10 +15,10 @@ import egovframework.let.attendance.entity.Employee;
 import egovframework.let.attendance.repository.EmployeeRepositoryCustom;
 import egovframework.let.attendance.repository.mybatis.EmployeeDAO;
 
-@Repository
+@Repository("employeeRepositryImpl")
 public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
 
-	@Autowired
+	@Resource(name = "employeeDAO")
 	private EmployeeDAO employeeDAO;
 
 	@Override
