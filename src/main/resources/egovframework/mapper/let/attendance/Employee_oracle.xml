@@ -65,17 +65,17 @@
 		WHERE ID = #{id}
 	</update>
 
-	<select id="countList" resultType="long">
+	<select id="countList" resultType="int">
 		SELECT COUNT(*)
 		FROM employee e
 		<where>
-			<if test="kw != null">
+			<if test="kw != null or kw != ''">
 				(LOWER(e.name) LIKE #{kw} OR LOWER(e.email) LIKE #{kw})
 			</if>
-			<if test="dept != null">
+			<if test="dept != null or dept != ''">
 				AND e.department = #{dept}
 			</if>
-			<if test="status != null">
+			<if test="status != null or status != ''">
 				AND e.status = #{status}
 			</if>
 		</where>
@@ -88,13 +88,13 @@
 		e.hire_date, e.resign_date, e.updated_at
 		FROM employee e
 		<where>
-			<if test="kw != null">
+			<if test="kw != null or kw != ''">
 				(LOWER(e.name) LIKE #{kw} OR LOWER(e.email) LIKE #{kw})
 			</if>
-			<if test="dept != null">
+			<if test="dept != null or dept != ''">
 				AND e.department = #{dept}
 			</if>
-			<if test="status != null">
+			<if test="status != null or status != ''">
 				AND e.status = #{status}
 			</if>
 		</where>

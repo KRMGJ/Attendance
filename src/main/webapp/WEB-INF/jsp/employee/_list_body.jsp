@@ -62,7 +62,7 @@
 								<td class="px-4 py-2">
 									<c:choose>
 										<c:when test="${e.status == 'ACTIVE'}">재직 중</c:when>
-										<c:when test="${e.status == 'LEAVE'}">휴직 중</c:when>
+										<c:when test="${e.status == 'ON_LEAVE'}">휴직 중</c:when>
 										<c:when test="${e.status == 'RESIGNED'}">퇴사</c:when>
 										<c:otherwise>-</c:otherwise>
 									</c:choose>
@@ -93,24 +93,18 @@
 
 	<!-- 페이지네이션 -->
 	<div class="mt-4 flex justify-center">
-		<ui:pagination paginationInfo="${paginationInfo}" type="text" jsFunction="linkPage"/>
+		<ui:pagination paginationInfo="${paginationInfo}" type="text" jsFunction="goPage"/>
 	</div>
 </div>
 
 <script>
-	function goPage(pageNo) {
-		const f = document.getElementById('searchForm');
-		if (f) {
-			let h = document.createElement('input');
-			h.type = 'hidden';
-			h.name = 'page';
-			h.value = pageNo;
-			f.appendChild(h);
-			f.submit();
-		} else {
-			const u = new URL(location.href);
-			u.searchParams.set('page', pageNo);
-			location.href = u.toString();
-		}
+function goPage(pageNo) {
+	const url = new URL(location.href);
+	url.searchParams.set('page', pageNo);
+	const sizeSel = document.querySelector('#sizeForm select[name="size"]');
+	if (sizeSel) {
+		url.searchParams.set('size', sizeSel.value);
 	}
+	location.href = url.toString();
+}
 </script>

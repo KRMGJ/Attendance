@@ -75,7 +75,7 @@ public class EmployeeDAO extends EgovAbstractMapper {
 	 * @param status 고용 상태
 	 * @return 직원 수
 	 */
-	public long countList(String kw, String dept, String status) {
+	public int countList(String kw, String dept, String status) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("kw", kw);
 		params.put("dept", dept);

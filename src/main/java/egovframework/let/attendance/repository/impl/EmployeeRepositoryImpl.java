@@ -31,7 +31,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
 		int offset = (int) pageable.getOffset();
 		int limit = pageable.getPageSize();
 
-		long total = employeeDAO.countList(kw, dept, status);
+		int total = employeeDAO.countList(kw, dept, status);
 		List<Employee> content = total == 0 ? Collections.emptyList()
 				: employeeDAO.selectListPage(kw, dept, status, offset, limit);
 

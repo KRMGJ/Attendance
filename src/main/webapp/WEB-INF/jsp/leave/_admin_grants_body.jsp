@@ -74,7 +74,7 @@
 					<th class="px-4 py-2 text-left">부서</th>
 					<th class="px-4 py-2 text-left">연도</th>
 					<th class="px-4 py-2 text-left">지급 사유</th>
-					<th class="px-4 py-2 text-right">변경 일수</th>
+					<th class="px-4 py-2 text-left">변경 일수</th>
 					<th class="px-4 py-2 text-left">지급일시</th>
 				</tr>
 			</thead>
@@ -89,13 +89,13 @@
 								<td class="px-4 py-2"><c:out value="${r.year}" /></td>
 								<td>
 									<c:choose>
-										<c:when test="${g.reason == 'ANNUAL_GRANT_CALENDAR'}">캘린더 기준 연차 지급</c:when>
-										<c:when test="${g.reason == 'ANNUAL_GRANT_ANNIVERSARY'}">입사기념일 기준 연차 지급</c:when>
-										<c:when test="${g.reason == 'MONTHLY_ACCRUAL'}">월만근 연차 지급</c:when>
+										<c:when test="${r.reason == 'ANNUAL_GRANT_CALENDAR'}">캘린더 기준 연차 지급</c:when>
+										<c:when test="${r.reason == 'ANNUAL_GRANT_ANNIVERSARY'}">입사기념일 기준 연차 지급</c:when>
+										<c:when test="${r.reason == 'MONTHLY_ACCRUAL'}">월만근 연차 지급</c:when>
 										<c:otherwise>-</c:otherwise>
 									</c:choose>
 								</td>
-								<td class="px-4 py-2 text-right">
+								<td class="px-4 py-2 text-left">
 									<c:choose>
 										<c:when test="${r.changeDays > 0}">
 											<span class="text-green-600">+<c:out value="${r.changeDays}" /></span>
