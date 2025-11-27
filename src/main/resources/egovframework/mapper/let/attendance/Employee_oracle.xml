@@ -69,13 +69,13 @@
 		SELECT COUNT(*)
 		FROM employee e
 		<where>
-			<if test="kw != null or kw != ''">
+			<if test="kw != null">
 				(LOWER(e.name) LIKE #{kw} OR LOWER(e.email) LIKE #{kw})
 			</if>
-			<if test="dept != null or dept != ''">
+			<if test="dept != null">
 				AND e.department = #{dept}
 			</if>
-			<if test="status != null or status != ''">
+			<if test="status != null">
 				AND e.status = #{status}
 			</if>
 		</where>
@@ -88,13 +88,13 @@
 		e.hire_date, e.resign_date, e.updated_at
 		FROM employee e
 		<where>
-			<if test="kw != null or kw != ''">
+			<if test="kw != null">
 				(LOWER(e.name) LIKE #{kw} OR LOWER(e.email) LIKE #{kw})
 			</if>
-			<if test="dept != null or dept != ''">
+			<if test="dept != null">
 				AND e.department = #{dept}
 			</if>
-			<if test="status != null or status != ''">
+			<if test="status != null">
 				AND e.status = #{status}
 			</if>
 		</where>

@@ -25,8 +25,10 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
 	public Page<Employee> searchForAdmin(AdminEmployeeSearch cond, Pageable pageable) {
 		String kw = (cond.getQ() == null || cond.getQ().trim().isEmpty()) ? null
 				: "%" + cond.getQ().trim().toLowerCase() + "%";
-		String dept = cond.getDept();
-		String status = cond.getStatus();
+		String dept = (cond.getDept() == null || cond.getDept().trim().isEmpty()) ? null : cond.getDept().trim();
+
+		String status = (cond.getStatus() == null || cond.getStatus().trim().isEmpty()) ? null
+				: cond.getStatus().trim();
 
 		int offset = (int) pageable.getOffset();
 		int limit = pageable.getPageSize();
