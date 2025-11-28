@@ -1,10 +1,10 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="ui" uri="http://egovframework.gov/ctl/ui"%>
+<%@ taglib prefix="ui2" uri="http://egovframework.let/attendance/ui" %>
 
 <div class="bg-white border rounded-xl p-6 shadow-sm">
 
-	<!-- 검색 폼 -->
 	<form id="searchForm" method="get"
 		class="flex flex-wrap items-end gap-3 mb-4">
 		<div>
@@ -14,6 +14,10 @@
 		<div>
 			<label class="block text-sm mb-1">부서</label> 
 			<input name="dept" value="${paramDept}" class="rounded border px-3 py-2" placeholder="부서" />
+		</div>
+		<div>
+			<label class="block text-sm mb-1">직급</label> 
+			<input name="position" value="${paramPosition}" class="rounded border px-3 py-2" placeholder="직급" />
 		</div>
 
 	    <div>
@@ -60,21 +64,17 @@
 								<td class="px-4 py-2"><c:out value="${empty e.department ? '-' : e.department}" /></td>
 								<td class="px-4 py-2"><c:out value="${e.position}" /></td>
 								<td class="px-4 py-2">
-									<c:choose>
-										<c:when test="${e.status == 'ACTIVE'}">재직 중</c:when>
-										<c:when test="${e.status == 'ON_LEAVE'}">휴직 중</c:when>
-										<c:when test="${e.status == 'RESIGNED'}">퇴사</c:when>
-										<c:otherwise>-</c:otherwise>
-									</c:choose>
+									<span class="${ui2:employmentStatusColor(e.status)} font-medium">
+										${ui2:employmentStatusIcon(e.status)}
+										${ui2:label(e.status)}
+									</span>
 								</td>
 								
 								<td class="px-4 py-2">
-									<c:choose>
-										<c:when test="${e.employmentType == 'FULL_TIME'}">정규직</c:when>
-										<c:when test="${e.employmentType == 'PART_TIME'}">계약직</c:when>
-										<c:when test="${e.employmentType == 'INTERN'}">인턴</c:when>
-										<c:otherwise>-</c:otherwise>
-									</c:choose>
+									<span class="${ui2:employmentTypeColor(e.employmentType)} font-medium">
+										${ui2:employmentTypeIcon(e.employmentType)}
+										${ui2:label(e.employmentType)}
+									</span>
 								</td>
 								<td class="px-4 py-2 text-right"><a class="underline"
 									href="<c:url value='/employee/detail.do?id=${e.id}'/>">보기</a></td>
@@ -91,20 +91,19 @@
 		</table>
 	</div>
 
-	<!-- 페이지네이션 -->
 	<div class="mt-4 flex justify-center">
 		<ui:pagination paginationInfo="${paginationInfo}" type="text" jsFunction="goPage"/>
 	</div>
 </div>
 
 <script>
-function goPage(pageNo) {
-	const url = new URL(location.href);
-	url.searchParams.set('page', pageNo);
-	const sizeSel = document.querySelector('#sizeForm select[name="size"]');
-	if (sizeSel) {
-		url.searchParams.set('size', sizeSel.value);
+	function goPage(pageNo) {
+		const url = new URL(location.href);
+		url.searchParams.set('page', pageNo);
+		const sizeSel = document.querySelector('#sizeForm select[name="size"]');
+		if (sizeSel) {
+			url.searchParams.set('size', sizeSel.value);
+		}
+		location.href = url.toString();
 	}
-	location.href = url.toString();
-}
 </script>
