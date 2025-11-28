@@ -105,9 +105,9 @@
 								<td class="px-4 py-2"><c:out value="${empty a.checkIn ? '-' : a.checkIn}" /></td>
 								<td class="px-4 py-2"><c:out value="${empty a.checkOut ? '-' : a.checkOut}" /></td>
 								<td class="px-4 py-2">
-									<span class="${ui2:workStatusColor(row.status)} font-medium">
-										${ui2:workStatusIcon(row.status)}
-										${ui2:label(row.status)}
+									<span class="${ui2:workStatusColor(a.status)} font-medium">
+										${ui2:workStatusIcon(a.status)}
+										${ui2:label(a.status)}
 									</span>
 								</td>
 							</tr>
