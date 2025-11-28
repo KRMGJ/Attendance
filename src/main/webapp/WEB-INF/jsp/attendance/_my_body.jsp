@@ -2,6 +2,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="ui" uri="http://egovframework.gov/ctl/ui" %>
+<%@ taglib prefix="ui2" uri="http://egovframework.let/attendance/ui" %>
+
 <div class="bg-white border rounded-xl p-6 shadow-sm">
 	<div class="flex items-center justify-between mb-4">
 		<h2 class="text-lg font-semibold">내 근태</h2>
@@ -38,13 +40,10 @@
 							<td class="px-4 py-2"><c:out value="${empty row.checkIn ? '-' : row.checkIn}" /></td>
 							<td class="px-4 py-2"><c:out value="${empty row.checkOut ? '-' : row.checkOut}" /></td>
 							<td class="px-4 py-2">
-								<c:choose>
-									<c:when test="${row.status == 'PRESENT'}">정상 출근</c:when>
-									<c:when test="${row.status == 'LATE'}">지각</c:when>
-									<c:when test="${row.status == 'EARLY_LEAVE'}">조퇴</c:when>
-									<c:when test="${row.status == 'ABSENT'}">결근</c:when>
-									<c:otherwise>-</c:otherwise>
-								</c:choose>
+								<span class="${ui2:workStatusColor(row.status)} font-medium">
+									${ui2:workStatusIcon(row.status)}
+									${ui2:label(row.status)}
+								</span>
 							</td>
 							<td class="px-4 py-2"><c:out value="${row.overtimeMinutes}" /></td>
 						</tr>
@@ -63,15 +62,15 @@
 	<ui:pagination paginationInfo="${paginationInfo}" type="text" jsFunction="linkPage"/>
 </div>
 <script>
-  function linkPage(pageNo) {
-    const from = '${paramFrom}';
-    const to = '${paramTo}';
-    const size = '${size}';
-    const params = new URLSearchParams();
-    if (from) params.set('from', from);
-    if (to) params.set('to', to);
-    if (size) params.set('size', size);
-    params.set('page', pageNo);
-    location.href = '/attendance/my.do?' + params.toString();
-  }
+	function linkPage(pageNo) {
+		const from = '${paramFrom}';
+		const to = '${paramTo}';
+		const size = '${size}';
+		const params = new URLSearchParams();
+		if (from) params.set('from', from);
+		if (to) params.set('to', to);
+		if (size) params.set('size', size);
+		params.set('page', pageNo);
+		location.href = '/attendance/my.do?' + params.toString();
+	}
 </script>
