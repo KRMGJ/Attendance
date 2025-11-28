@@ -95,23 +95,52 @@
 		)
 		WHERE rn &gt; #{offset}
 	</select>
+	
+	<select id="countMyRange" resultType="long">
+	    SELECT COUNT(*)
+	    FROM ATTENDANCE a
+	    JOIN EMPLOYEE e ON e.id = a.emp_id
+	    WHERE a.emp_id = #{empId}
+	    <if test="from != null">
+	        AND a.work_date &gt;= #{from}
+	    </if>
+	    <if test="to != null">
+	        AND a.work_date &lt;= #{to}
+	    </if>
+	</select>
 
-	<!-- 개인용 출퇴근기록 기간 조회 -->
-	<select id="findMyRange" resultMap="AttendanceWithEmpMap">
-		SELECT
-		a.id AS a_id, a.emp_id
-		AS a_emp_id, a.work_date AS a_work_date,
-		a.check_in AS a_check_in,
-		a.check_out AS a_check_out,
-		a.status AS a_status, a.overtime_minutes AS
-		a_overtime_minutes,
-		e.id AS e_id, e.name AS e_name, e.email AS e_email
-		FROM ATTENDANCE a
-		JOIN EMPLOYEE e ON e.id = a.emp_id
-		WHERE a.emp_id = #{empId}
-		AND a.work_date BETWEEN #{from} AND #{to}
-		ORDER BY a.work_date
-		ASC
+	<select id="findMyRange" parameterType="map" resultMap="AttendanceWithEmpMap">
+	    SELECT *
+	    FROM (
+	        SELECT
+	            t.*,
+	            ROWNUM rn
+	        FROM (
+	            SELECT
+	                a.id                AS a_id,
+	                a.emp_id            AS a_emp_id,
+	                a.work_date         AS a_work_date,
+	                a.check_in          AS a_check_in,
+	                a.check_out         AS a_check_out,
+	                a.status            AS a_status,
+	                a.overtime_minutes  AS a_overtime_minutes,
+	                e.id                AS e_id,
+	                e.name              AS e_name,
+	                e.email             AS e_email
+	            FROM ATTENDANCE a
+	            JOIN EMPLOYEE e ON e.id = a.emp_id
+	            WHERE a.emp_id = #{empId}
+	            <if test="from != null">
+	                AND a.work_date &gt;= #{from}
+	            </if>
+	            <if test="to != null">
+	                AND a.work_date &lt;= #{to}
+	            </if>
+	            ORDER BY a.work_date ASC
+	        ) t
+	        WHERE ROWNUM &lt;= #{offset} + #{limit}
+	    )
+	    WHERE rn &gt; #{offset}
 	</select>
 	
 	<select id="sumWorkedMinutesByPeriod" parameterType="map" resultType="int">

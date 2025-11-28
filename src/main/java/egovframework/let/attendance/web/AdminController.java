@@ -94,6 +94,8 @@ public class AdminController {
 			@RequestParam(value = "page", defaultValue = "1") int page,
 			@RequestParam(value = "size", defaultValue = "20") int size, Model model) throws Exception {
 
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
 		Date toEnd = to != null ? endOfDay(to) : null;
 
 		AdminAttendanceSearch cond = AdminAttendanceSearch.builder().q(q).from(from).to(toEnd)
@@ -104,8 +106,8 @@ public class AdminController {
 		model.addAttribute("list", list.getContent());
 		model.addAttribute("paginationInfo", buildPi(page, size, (int) list.getTotalElements()));
 		model.addAttribute("paramQ", q);
-		model.addAttribute("paramFrom", from);
-		model.addAttribute("paramTo", to);
+		model.addAttribute("paramFrom", from == null ? "" : sdf.format(from));
+		model.addAttribute("paramTo", to == null ? "" : sdf.format(to));
 		model.addAttribute("size", size);
 		return "attendance/admin_list";
 	}

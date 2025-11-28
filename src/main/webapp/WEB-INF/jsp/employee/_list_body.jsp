@@ -34,7 +34,7 @@
 
 	<div class="flex items-center justify-between mb-3">
 		<h2 class="text-lg font-semibold">직원 목록</h2>
-		<a href="<c:url value='/employee/join.do'/>" class="px-3 py-2 rounded-md bg-gray-900 text-white">직원 등록</a>
+		<a href="<c:url value='/admin/employee/join.do'/>" class="px-3 py-2 rounded-md bg-gray-900 text-white">직원 등록</a>
 	</div>
 
 	<div class="overflow-x-auto">

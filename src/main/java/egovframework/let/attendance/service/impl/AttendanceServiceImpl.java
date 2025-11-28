@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import egovframework.let.attendance.dto.request.AdminAttendanceSearch;
+import egovframework.let.attendance.dto.request.UserAttendanceSearch;
 import egovframework.let.attendance.dto.response.AttendanceListDto;
 import egovframework.let.attendance.dto.response.AttendanceViewDto;
 import egovframework.let.attendance.dto.response.MonthlyDeptReportDto;
@@ -192,29 +193,28 @@ public class AttendanceServiceImpl implements AttendanceService {
 	 * 나의 출퇴근 기록 조회
 	 */
 	@Override
-	public List<AttendanceListDto> getMyAttendance(String userEmail, Date from, Date to) throws Exception {
-		List<AttendanceListDto> attendanceList = null;
+	public Page<AttendanceListDto> getMyAttendance(UserAttendanceSearch cond) throws Exception {
+		Page<AttendanceListDto> attendanceList = null;
 		try {
-			Employee emp = loadEmployeeByUsername(userEmail);
-			if (from != null || to != null) {
-				List<Attendance> records = attendanceDAO.findMyRange(emp.getId(), from, to);
-				attendanceList = records.stream()
-						.map(a -> AttendanceListDto.builder().id(a.getId()).empId(a.getEmpId())
-								.workDate(formatDateOnly(a.getWorkDate())).checkIn(formatDate(a.getCheckIn()))
-								.checkOut(a.getCheckOut() != null ? formatDate(a.getCheckOut()) : null)
-								.status(a.getStatus()).overtimeMinutes(a.getOvertimeMinutes()).employee(emp).build())
-						.collect(Collectors.toList());
-			} else {
-				List<Attendance> records = attendanceRepository.findTop100ByEmpIdOrderByWorkDateDesc(emp.getId());
-				attendanceList = records.stream()
-						.map(a -> AttendanceListDto.builder().id(a.getId()).empId(a.getEmpId())
-								.workDate(formatDateOnly(a.getWorkDate())).checkIn(formatDate(a.getCheckIn()))
-								.checkOut(a.getCheckOut() != null ? formatDate(a.getCheckOut()) : null)
-								.status(a.getStatus()).overtimeMinutes(a.getOvertimeMinutes()).employee(emp).build())
-						.collect(Collectors.toList());
-			}
+			Pageable pageable = PageRequest.of(cond.getPage(), cond.getSize());
+			Employee emp = loadEmployeeByUsername(cond.getEmail());
+//			if (from != null || to != null) {
+			Page<Attendance> result = attendanceRepository.findMyRange(emp.getId(), cond, pageable);
+			attendanceList = result.map(a -> AttendanceListDto.builder().id(a.getId()).empId(a.getEmpId())
+					.workDate(formatDateOnly(a.getWorkDate())).checkIn(formatDate(a.getCheckIn()))
+					.checkOut(a.getCheckOut() != null ? formatDate(a.getCheckOut()) : null).status(a.getStatus())
+					.overtimeMinutes(a.getOvertimeMinutes()).employee(emp).build());
+//			} else {
+//				List<Attendance> records = attendanceRepository.findTop100ByEmpIdOrderByWorkDateDesc(emp.getId());
+//				attendanceList = records.stream()
+//						.map(a -> AttendanceListDto.builder().id(a.getId()).empId(a.getEmpId())
+//								.workDate(formatDateOnly(a.getWorkDate())).checkIn(formatDate(a.getCheckIn()))
+//								.checkOut(a.getCheckOut() != null ? formatDate(a.getCheckOut()) : null)
+//								.status(a.getStatus()).overtimeMinutes(a.getOvertimeMinutes()).employee(emp).build())
+//						.collect(Collectors.toList());
+//			}
 		} catch (Exception e) {
-			log.error("Error fetching attendance records for user {}: {}", userEmail, e.getMessage());
+			log.error("Error fetching attendance records for user {}: {}", cond.getEmail(), e.getMessage());
 			throw e;
 		}
 		return attendanceList;

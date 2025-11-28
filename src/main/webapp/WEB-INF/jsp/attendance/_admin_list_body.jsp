@@ -4,11 +4,9 @@
 <%@ taglib prefix="ui" uri="http://egovframework.gov/ctl/ui" %>
 <div class="bg-white border rounded-xl p-6 shadow-sm">
 	<form class="grid md:grid-cols-5 gap-3 mb-4" method="get">
-		<input name="q" value="${param.q}"
-			class="rounded border px-3 py-2 md:col-span-2" placeholder="이름/이메일" />
-		<input type="date" name="from" value="${param.from}"
-			class="rounded border px-3 py-2" /> <input type="date" name="to"
-			value="${param.to}" class="rounded border px-3 py-2" />
+		<input name="q" value="${param.q}" class="rounded border px-3 py-2 md:col-span-2" placeholder="이름/이메일" />
+		<input type="date" name="from" value="${param.from}" class="rounded border px-3 py-2" /> 
+		<input type="date" name="to" value="${param.to}" class="rounded border px-3 py-2" />
 		<button class="rounded-md bg-gray-900 text-white px-4">검색</button>
 	</form>
 	<div class="overflow-x-auto">

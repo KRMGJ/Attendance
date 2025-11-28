@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import egovframework.let.attendance.dto.request.AdminAttendanceSearch;
+import egovframework.let.attendance.dto.request.UserAttendanceSearch;
 import egovframework.let.attendance.entity.Attendance;
 import egovframework.let.attendance.repository.AttendanceRepositoryCustom;
 import egovframework.let.attendance.repository.mybatis.AttendanceDAO;
@@ -36,6 +37,19 @@ public class AttendanceRepositoryImpl implements AttendanceRepositoryCustom {
 		List<Attendance> content = total == 0 ? Collections.emptyList()
 				: attendanceDAO.selectAdminPage(kw, from, to, offset, limit);
 
+		return new PageImpl<>(content, pageable, total);
+	}
+
+	@Override
+	public Page<Attendance> findMyRange(String empId, UserAttendanceSearch cond, Pageable pageable) {
+		Date from = cond.getFrom();
+		Date to = cond.getTo();
+		int offset = (int) pageable.getOffset();
+		int limit = pageable.getPageSize();
+
+		long total = attendanceDAO.countMyRange(empId, from, to);
+		List<Attendance> content = total == 0 ? Collections.emptyList()
+				: attendanceDAO.findMyRange(empId, from, to, offset, limit);
 		return new PageImpl<>(content, pageable, total);
 	}
 }

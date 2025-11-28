@@ -1,14 +1,17 @@
 package egovframework.let.attendance.web;
 
+import static egovframework.let.attendance.common.Utils.buildPi;
+
 import java.security.Principal;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.TimeZone;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import egovframework.let.attendance.dto.request.UserAttendanceSearch;
 import egovframework.let.attendance.dto.response.AttendanceListDto;
 import egovframework.let.attendance.service.AttendanceService;
 
@@ -55,8 +59,11 @@ public class AttendanceController {
 	@RequestMapping(value = "/my.do", method = RequestMethod.GET)
 	public String myAttendance(Principal principal,
 			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date from,
-			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date to, Model model)
-			throws Exception {
+			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date to, Model model,
+			@RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(value = "size", defaultValue = "10") int size) throws Exception {
+
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
 		String email = principal.getName();
 
@@ -72,8 +79,16 @@ public class AttendanceController {
 			to = cal.getTime();
 		}
 
-		List<AttendanceListDto> rows = attendanceService.getMyAttendance(email, from, to);
-		model.addAttribute("myAttendance", rows);
+		UserAttendanceSearch cond = UserAttendanceSearch.builder().email(email).from(from).to(to)
+				.page(Math.max(page - 1, 0)).size(size).build();
+
+		Page<AttendanceListDto> list = attendanceService.getMyAttendance(cond);
+
+		model.addAttribute("myAttendance", list.getContent());
+		model.addAttribute("paginationInfo", buildPi(page, size, (int) list.getTotalElements()));
+		model.addAttribute("paramFrom", from == null ? "" : sdf.format(from));
+		model.addAttribute("paramTo", to == null ? "" : sdf.format(to));
+		model.addAttribute("size", size);
 		model.addAttribute("from", from);
 		model.addAttribute("to", to);
 

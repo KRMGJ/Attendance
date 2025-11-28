@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 
 import egovframework.let.attendance.dto.request.AdminAttendanceSearch;
+import egovframework.let.attendance.dto.request.UserAttendanceSearch;
 import egovframework.let.attendance.dto.response.AttendanceListDto;
 import egovframework.let.attendance.dto.response.AttendanceViewDto;
 import egovframework.let.attendance.dto.response.MonthlyDeptReportDto;
@@ -51,7 +52,7 @@ public interface AttendanceService {
 	 * @param to        종료 날짜
 	 * @return 출퇴근 기록 리스트
 	 */
-	List<AttendanceListDto> getMyAttendance(String userEmail, Date from, Date to) throws Exception;
+	Page<AttendanceListDto> getMyAttendance(UserAttendanceSearch cond) throws Exception;
 
 	/**
 	 * 관리자 출퇴근 기록 조회

@@ -51,18 +51,38 @@ public class AttendanceDAO extends EgovAbstractMapper {
 	}
 
 	/**
-	 * 특정 직원의 출퇴근 기록 조회 (기간 범위)
+	 * 나의 출퇴근 기록 건수 조회
 	 * 
-	 * @param empId 직원 ID
+	 * @param empId 사원 아이디
 	 * @param from  시작 날짜
 	 * @param to    종료 날짜
-	 * @return 출퇴근 기록 목록
+	 * @return 출퇴근 기록 건수
 	 */
-	public List<Attendance> findMyRange(String empId, Date from, Date to) {
+	public long countMyRange(String empId, Date from, Date to) {
 		Map<String, Object> param = new HashMap<>();
 		param.put("empId", empId);
 		param.put("from", from);
 		param.put("to", to);
+		return selectOne("attendanceDAO.countMyRange", param);
+	}
+
+	/**
+	 * 나의 출퇴근 기록 페이지 조회
+	 * 
+	 * @param empId  사원 아이디
+	 * @param from   시작 날짜
+	 * @param to     종료 날짜
+	 * @param offset 페이지 오프셋
+	 * @param limit  페이지 크기
+	 * @return 출퇴근 기록 목록
+	 */
+	public List<Attendance> findMyRange(String empId, Date from, Date to, int offset, int limit) {
+		Map<String, Object> param = new HashMap<>();
+		param.put("empId", empId);
+		param.put("from", from);
+		param.put("to", to);
+		param.put("offset", offset);
+		param.put("limit", limit);
 		return selectList("attendanceDAO.findMyRange", param);
 	}
 
