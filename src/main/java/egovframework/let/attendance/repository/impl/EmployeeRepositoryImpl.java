@@ -25,17 +25,19 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
 	public Page<Employee> searchForAdmin(AdminEmployeeSearch cond, Pageable pageable) {
 		String kw = (cond.getQ() == null || cond.getQ().trim().isEmpty()) ? null
 				: "%" + cond.getQ().trim().toLowerCase() + "%";
-		String dept = (cond.getDept() == null || cond.getDept().trim().isEmpty()) ? null : cond.getDept().trim();
-
+		String dept = (cond.getDept() == null || cond.getDept().trim().isEmpty() || cond.getDept().equals("ALL")) ? null
+				: "%" + cond.getDept().trim().toLowerCase() + "%";
+		String position = (cond.getPosition() == null || cond.getPosition().trim().isEmpty()
+				|| cond.getPosition().equals("ALL")) ? null : "%" + cond.getPosition().trim().toLowerCase() + "%";
 		String status = (cond.getStatus() == null || cond.getStatus().trim().isEmpty()) ? null
 				: cond.getStatus().trim();
 
 		int offset = (int) pageable.getOffset();
 		int limit = pageable.getPageSize();
 
-		int total = employeeDAO.countList(kw, dept, status);
+		int total = employeeDAO.countList(kw, dept, position, status);
 		List<Employee> content = total == 0 ? Collections.emptyList()
-				: employeeDAO.selectListPage(kw, dept, status, offset, limit);
+				: employeeDAO.selectListPage(kw, dept, position, status, offset, limit);
 
 		return new PageImpl<>(content, pageable, total);
 	}

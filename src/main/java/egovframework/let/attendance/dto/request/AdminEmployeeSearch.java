@@ -14,6 +14,7 @@ import lombok.Setter;
 public class AdminEmployeeSearch {
 	private String q;
 	private String dept;
+	private String position;
 	private String status;
 	private int page;
 	private int size;

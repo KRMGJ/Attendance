@@ -118,11 +118,12 @@ public class AdminController {
 	@RequestMapping(value = "/employee/list.do", method = RequestMethod.GET)
 	public String list(@RequestParam(value = "q", required = false) String q,
 			@RequestParam(value = "dept", required = false) String dept,
+			@RequestParam(value = "position", required = false) String position,
 			@RequestParam(value = "status", required = false) String status,
 			@RequestParam(value = "page", defaultValue = "1") int page,
 			@RequestParam(value = "size", defaultValue = "20") int size, Model model) throws Exception {
 
-		AdminEmployeeSearch cond = AdminEmployeeSearch.builder().q(q).dept(dept).status(status)
+		AdminEmployeeSearch cond = AdminEmployeeSearch.builder().q(q).dept(dept).position(position).status(status)
 				.page(Math.max(page - 1, 0)).size(size).build();
 
 		Page<EmployeeViewDto> list = employeeService.list(cond);
@@ -131,6 +132,7 @@ public class AdminController {
 		model.addAttribute("paginationInfo", buildPi(page, size, (int) list.getTotalElements()));
 		model.addAttribute("paramQ", q);
 		model.addAttribute("paramDept", dept);
+		model.addAttribute("paramPosition", position);
 		model.addAttribute("paramStatus", status);
 		model.addAttribute("size", size);
 		return "employee/list";

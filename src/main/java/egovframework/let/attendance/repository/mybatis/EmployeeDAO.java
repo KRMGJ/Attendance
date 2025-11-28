@@ -70,15 +70,17 @@ public class EmployeeDAO extends EgovAbstractMapper {
 	/**
 	 * 직원 목록 카운트
 	 * 
-	 * @param kw     검색 키워드
-	 * @param dept   부서
-	 * @param status 고용 상태
+	 * @param kw       검색 키워드
+	 * @param dept     부서
+	 * @param position 직위
+	 * @param status   고용 상태
 	 * @return 직원 수
 	 */
-	public int countList(String kw, String dept, String status) {
+	public int countList(String kw, String dept, String position, String status) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("kw", kw);
 		params.put("dept", dept);
+		params.put("position", position);
 		params.put("status", status);
 		return selectOne("employeeDAO.countList", params);
 	}
@@ -86,17 +88,20 @@ public class EmployeeDAO extends EgovAbstractMapper {
 	/**
 	 * 직원 목록 페이징 조회
 	 * 
-	 * @param kw     검색 키워드
-	 * @param dept   부서
-	 * @param status 고용 상태
-	 * @param offset 오프셋
-	 * @param limit  페이지 크기
+	 * @param kw       검색 키워드
+	 * @param dept     부서
+	 * @param position 직위
+	 * @param status   고용 상태
+	 * @param offset   오프셋
+	 * @param limit    페이지 크기
 	 * @return 직원 목록
 	 */
-	public List<Employee> selectListPage(String kw, String dept, String status, int offset, int limit) {
+	public List<Employee> selectListPage(String kw, String dept, String position, String status, int offset,
+			int limit) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("kw", kw);
 		params.put("dept", dept);
+		params.put("position", position);
 		params.put("status", status);
 		params.put("offset", offset);
 		params.put("limit", limit);
