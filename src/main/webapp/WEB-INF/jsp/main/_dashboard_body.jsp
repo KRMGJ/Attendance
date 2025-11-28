@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="ui2" uri="http://egovframework.let/attendance/ui" %>
 
 <div class="space-y-6">
 	<div class="bg-white border rounded-xl p-6 shadow-sm">
@@ -104,13 +105,10 @@
 								<td class="px-4 py-2"><c:out value="${empty a.checkIn ? '-' : a.checkIn}" /></td>
 								<td class="px-4 py-2"><c:out value="${empty a.checkOut ? '-' : a.checkOut}" /></td>
 								<td class="px-4 py-2">
-									<c:choose>
-										<c:when test="${a.status == 'PRESENT'}">정상 출근</c:when>
-										<c:when test="${a.status == 'LATE'}">지각</c:when>
-										<c:when test="${a.status == 'EARLY_LEAVE'}">조퇴</c:when>
-										<c:when test="${a.status == 'ABSENT'}">결근</c:when>
-										<c:otherwise>-</c:otherwise>
-									</c:choose>
+									<span class="${ui2:workStatusColor(row.status)} font-medium">
+										${ui2:workStatusIcon(row.status)}
+										${ui2:label(row.status)}
+									</span>
 								</td>
 							</tr>
 						</c:forEach>
@@ -127,17 +125,16 @@
 	</div>
 </div>
 <c:if test="${not empty attendanceResult}">
-<script>
-  const messages = {
-    checkin_success: "출근이 정상적으로 처리되었습니다.",
-    checkin_fail: "출근 처리에 실패했습니다. 다시 시도해주세요.",
-    already_check_in: "이미 출근 처리가 되어 있습니다.",
-    checkout_success: "퇴근이 정상적으로 처리되었습니다.",
-    checkout_fail: "퇴근 처리에 실패했습니다. 다시 시도해주세요.",
-    already_check_out: "이미 퇴근 처리가 되어 있습니다."
-  };
-  const code = "${attendanceResult}";
-  if (code) alert(messages[code] || "처리 결과를 알 수 없습니다.");
-</script>
-
+	<script>
+		const messages = {
+			checkin_success: "출근이 정상적으로 처리되었습니다.",
+			checkin_fail: "출근 처리에 실패했습니다. 다시 시도해주세요.",
+			already_check_in: "이미 출근 처리가 되어 있습니다.",
+			checkout_success: "퇴근이 정상적으로 처리되었습니다.",
+			checkout_fail: "퇴근 처리에 실패했습니다. 다시 시도해주세요.",
+			already_check_out: "이미 퇴근 처리가 되어 있습니다."
+		};
+		const code = "${attendanceResult}";
+		if (code) alert(messages[code] || "처리 결과를 알 수 없습니다.");
+	</script>
 </c:if>
