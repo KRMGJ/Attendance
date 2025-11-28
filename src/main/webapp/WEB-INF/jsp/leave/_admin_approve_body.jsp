@@ -2,12 +2,12 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="ui" uri="http://egovframework.gov/ctl/ui"%>
+<%@ taglib prefix="ui2" uri="http://egovframework.let/attendance/ui" %>
 
 <div class="bg-white border rounded-xl p-6 shadow-sm">
 	<div class="flex items-center justify-between mb-4">
 		<h2 class="text-lg font-semibold">휴가 승인</h2>
 
-		<!-- 페이지 크기 선택 -->
 		<form id="sizeForm" method="get" class="flex items-center gap-2">
 			<input type="hidden" name="page" value="${empty param.page ? 1 : param.page}" />
 			<label class="text-sm text-gray-600">페이지 크기</label> 
@@ -37,21 +37,17 @@
 						<tr class="border-t">
 							<td class="px-4 py-2"><c:out value="${r.employeeName}" /></td>
 							<td class="px-4 py-2"><c:out value="${r.startDate}" /> ~ <c:out value="${r.endDate}" /></td>
-							<td>
-								<c:choose>
-									<c:when test="${r.type == 'ANNUAL'}">연차</c:when>
-									<c:when test="${r.type == 'SICK'}">병가</c:when>
-									<c:otherwise>-</c:otherwise>
-								</c:choose>
+							<td class="px-4 py-2">
+								<span class="${ui2:leaveTypeColor(r.type)} font-medium">
+									${ui2:leaveTypeIcon(r.type)}
+									${ui2:label(r.type)}
+								</span>
 							</td>							
-							<td>
-								<c:choose>
-									<c:when test="${r.status == 'PENDING'}">승인 대기</c:when>
-									<c:when test="${r.status == 'APPROVED'}">승인 완료</c:when>
-									<c:when test="${r.status == 'REJECTED'}">반려</c:when>
-									<c:when test="${r.status == 'CANCELED'}">취소</c:when>
-									<c:otherwise>-</c:otherwise>
-								</c:choose>
+							<td class="px-4 py-2">
+								<span class="${ui2:leaveStatusColor(r.status)} font-medium">
+									${ui2:leaveStatusIcon(r.status)}
+									${ui2:label(r.status)}
+								</span>
 							</td>
 							<td class="px-4 py-2 text-right">
 								<form method="post" action="<c:url value='/admin/leave/approve.do'/>" class="inline">
@@ -76,7 +72,6 @@
 		</tbody>
 	</table>
 
-	<!-- 페이지네이션 -->
 	<div class="mt-4 flex justify-center">
 		<ui:pagination paginationInfo="${paginationInfo}" type="text" jsFunction="goPage" />
 	</div>

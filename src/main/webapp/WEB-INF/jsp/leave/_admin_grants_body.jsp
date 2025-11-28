@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="ui" uri="http://egovframework.gov/ctl/ui"%>
+<%@ taglib prefix="ui2" uri="http://egovframework.let/attendance/ui" %>
 
 <c:url value="/admin/leave/grants.do" var="GRANTS_URL" />
 
@@ -87,13 +88,11 @@
 								<td class="px-4 py-2"><c:out value="${r.empEmail}" /></td>
 								<td class="px-4 py-2"><c:out value="${empty r.department ? '-' : r.department}" /></td>
 								<td class="px-4 py-2"><c:out value="${r.year}" /></td>
-								<td>
-									<c:choose>
-										<c:when test="${r.reason == 'ANNUAL_GRANT_CALENDAR'}">캘린더 기준 연차 지급</c:when>
-										<c:when test="${r.reason == 'ANNUAL_GRANT_ANNIVERSARY'}">입사기념일 기준 연차 지급</c:when>
-										<c:when test="${r.reason == 'MONTHLY_ACCRUAL'}">월만근 연차 지급</c:when>
-										<c:otherwise>-</c:otherwise>
-									</c:choose>
+								<td class="px-4 py-2">
+									<span class="${ui2:grantReasonColor(r.reason)} font-medium">
+										${ui2:grantReasonIcon(r.reason)}
+										${ui2:label(r.reason)}
+									</span>
 								</td>
 								<td class="px-4 py-2 text-left">
 									<c:choose>
@@ -122,11 +121,9 @@
 		</table>
 	</div>
 
-	<c:if test="${not empty paginationInfo}">
-		<div class="mt-4 flex justify-center">
-			<ui:pagination paginationInfo="${paginationInfo}" type="text" jsFunction="goPage" />
-		</div>
-	</c:if>
+	<div class="mt-4 flex justify-center">
+		<ui:pagination paginationInfo="${paginationInfo}" type="text" jsFunction="goPage" />
+	</div>
 </div>
 
 <script>

@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="ui" uri="http://egovframework.gov/ctl/ui"%>
+<%@ taglib prefix="ui2" uri="http://egovframework.let/attendance/ui" %>
 
 <div class="bg-white border rounded-xl p-6 shadow-sm">
 	<div class="flex items-center justify-between mb-4">
@@ -37,23 +38,19 @@
 					<c:forEach var="r" items="${requests}">
 						<tr class="border-t">
 							<td class="px-4 py-2"><c:out value="${r.startDate}" /> ~ <c:out value="${r.endDate}" /></td>
-							<td>
-								<c:choose>
-									<c:when test="${r.type == 'ANNUAL'}">연차</c:when>
-									<c:when test="${r.type == 'SICK'}">병가</c:when>
-									<c:otherwise>-</c:otherwise>
-								</c:choose>
+							<td class="px-4 py-2">
+								<span class="${ui2:leaveTypeColor(r.type)} font-medium">
+									${ui2:leaveTypeIcon(r.type)}
+									${ui2:label(r.type)}
+								</span>
 							</td>
 							<td class="px-4 py-2"><c:out value="${empty r.approver ? '-' : r.approver}" /></td>
 							<td class="px-4 py-2"><c:out value="${empty r.approvedAt ? '-' : r.approvedAt}" /></td>							
-							<td>
-								<c:choose>
-									<c:when test="${r.status == 'PENDING'}">승인 대기</c:when>
-									<c:when test="${r.status == 'APPROVED'}">승인 완료</c:when>
-									<c:when test="${r.status == 'REJECTED'}">반려</c:when>
-									<c:when test="${r.status == 'CANCELED'}">취소</c:when>
-									<c:otherwise>-</c:otherwise>
-								</c:choose>
+							<td class="px-4 py-2">
+								<span class="${ui2:leaveStatusColor(r.status)} font-medium">
+									${ui2:leaveStatusIcon(r.status)}
+									${ui2:label(r.status)}
+								</span>
 							</td>
 						</tr>
 					</c:forEach>
@@ -68,7 +65,6 @@
 		</tbody>
 	</table>
 
-	<!-- 페이지네이션 -->
 	<div class="mt-4 flex justify-center">
 		<ui:pagination paginationInfo="${paginationInfo}" type="text" jsFunction="linkPage" />
 	</div>
