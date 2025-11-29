@@ -52,11 +52,11 @@
 							<td class="px-4 py-2 text-right">
 								<form method="post" action="<c:url value='/admin/leave/approve.do'/>" class="inline">
 									<input type="hidden" name="id" value="${r.id}" />
-									<button class="px-3 py-1.5 rounded-md bg-emerald-600 text-white">승인</button>
+									<button id="approve" class="px-3 py-1.5 rounded-md bg-emerald-600 text-white">승인</button>
 								</form>
 								<form method="post" action="<c:url value='/admin/leave/reject.do'/>" class="inline">
 									<input type="hidden" name="id" value="${r.id}" />
-									<button class="px-3 py-1.5 rounded-md bg-rose-600 text-white">반려</button>
+									<button id="reject" class="px-3 py-1.5 rounded-md bg-rose-600 text-white">반려</button>
 								</form>
 							</td>
 						</tr>
@@ -86,4 +86,18 @@
 			url.searchParams.set('size', sizeSel.value);
 		location.href = url.toString();
 	}
+	document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function(event) {
+            const action = event.submitter.id;
+            if (action === 'approve') {
+                if (!confirm('이 휴가 신청을 승인하시겠습니까?')) {
+                    event.preventDefault();
+                }
+            } else if (action === 'reject') {
+                if (!confirm('이 휴가 신청을 반려하시겠습니까?')) {
+                    event.preventDefault();
+                }
+            }
+        });
+    });
 </script>
