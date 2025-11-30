@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import egovframework.let.attendance.entity.LeaveBalance;
 
-@Repository
+@Repository("leaveBalanceRepository")
 public interface LeaveBalanceRepository extends JpaRepository<LeaveBalance, String> {
 	Optional<LeaveBalance> findByEmpIdAndYear(String empId, int year);
 

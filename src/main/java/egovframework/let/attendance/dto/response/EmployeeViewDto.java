@@ -15,10 +15,18 @@ public class EmployeeViewDto {
 	private String id;
 	private String name;
 	private String email;
+	private String employeeNumber;
+	private String password;
+	private String department;
 	private String position;
 	private String employmentType;
 	private String status;
 	private String hireDate;
+	private String phone;
+	private String emergencyContactPhone;
+	private String address;
+	private String workStartTime;
+	private String workEndTime;
 	private String resignDate;
 	private String updatedAt;
 }

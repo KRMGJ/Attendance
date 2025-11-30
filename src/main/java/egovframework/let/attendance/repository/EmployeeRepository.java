@@ -8,8 +8,8 @@ import org.springframework.stereotype.Repository;
 
 import egovframework.let.attendance.entity.Employee;
 
-@Repository
-public interface EmployeeRepository extends JpaRepository<Employee, String> {
+@Repository("employeeRepository")
+public interface EmployeeRepository extends JpaRepository<Employee, String>, EmployeeRepositoryCustom {
 	Optional<Employee> findByEmail(String email);
 
 	List<Employee> findAllByOrderByHireDateDesc();

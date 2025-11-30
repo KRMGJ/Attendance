@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -25,13 +26,13 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "session_limit")
+@Table(name = "session_limit", indexes = { @Index(name = "ix_sessionlimit_username", columnList = "username") })
 @org.hibernate.annotations.Table(appliesTo = "session_limit", comment = "세션 제한 관리 테이블")
 @Builder
 public class SessionLimit {
 
 	@Id
-	@Column(length = 100)
+	@Column(name = "session_id", length = 100)
 	@Comment("세션ID")
 	private String sessionId;
 
@@ -44,7 +45,7 @@ public class SessionLimit {
 	private String username;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(nullable = false)
+	@Column(name = "expires_at", nullable = false)
 	@Comment("만료일시")
 	private Date expiresAt;
 

@@ -16,6 +16,7 @@ import lombok.Setter;
 public class LeaveRequestListDto {
 	private String id;
 	private String empId;
+	private String employeeName;
 	private String type;
 	private String startDate;
 	private String endDate;

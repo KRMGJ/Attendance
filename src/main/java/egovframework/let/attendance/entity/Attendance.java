@@ -1,7 +1,6 @@
 package egovframework.let.attendance.entity;
 
 import java.util.Date;
-import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,7 +9,6 @@ import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -30,9 +28,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "attendance", indexes = {
-		@Index(name = "ix_attendance_emp_workdate", columnList = "emp_id, work_date") }, uniqueConstraints = {
-				@UniqueConstraint(name = "uk_attendance_emp_workdate", columnNames = { "emp_id", "work_date" }) })
+@Table(name = "attendance", uniqueConstraints = {
+		@UniqueConstraint(name = "uk_attendance_emp_workdate", columnNames = { "emp_id", "work_date" }) }, indexes = {
+				@Index(name = "ix_attendance_workdate", columnList = "work_date") })
 @org.hibernate.annotations.Table(appliesTo = "attendance", comment = "근태 기록 테이블")
 public class Attendance {
 
@@ -69,14 +67,12 @@ public class Attendance {
 	@Comment("초과 근무 시간(분 단위)")
 	private int overtimeMinutes = 0;
 
+	@Builder.Default
+	@Column(name = "worked_minutes", nullable = false)
+	@Comment("근무 시간(분 단위)")
+	private int workedMinutes = 0;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "emp_id", insertable = false, updatable = false)
 	private Employee employee;
-
-	@PrePersist
-	public void prePersist() {
-		if (id == null) {
-			id = UUID.randomUUID().toString();
-		}
-	}
 }

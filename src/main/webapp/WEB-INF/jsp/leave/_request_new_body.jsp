@@ -5,20 +5,20 @@
 	<form method="post" action="<c:url value='/leave/new.do'/>"
 		class="space-y-4">
 		<div>
-			<label class="block text-sm mb-1">구분</label> <select name="type"
-				class="w-full rounded border px-3 py-2">
+			<label class="block text-sm mb-1">구분</label> 
+			<select name="type" class="w-full rounded border px-3 py-2">
 				<option value="ANNUAL">연차</option>
 				<option value="SICK">병가</option>
 			</select>
 		</div>
 		<div class="grid grid-cols-2 gap-3">
 			<div>
-				<label class="block text-sm mb-1">시작일</label> <input type="date"
-					name="startDate" class="w-full rounded border px-3 py-2" required />
+				<label class="block text-sm mb-1">시작일</label> 
+				<input type="date" name="startDate" class="w-full rounded border px-3 py-2" required />
 			</div>
 			<div>
-				<label class="block text-sm mb-1">종료일</label> <input type="date"
-					name="endDate" class="w-full rounded border px-3 py-2" required />
+				<label class="block text-sm mb-1">종료일</label> 
+				<input type="date" name="endDate" class="w-full rounded border px-3 py-2" required />
 			</div>
 		</div>
 		<div>

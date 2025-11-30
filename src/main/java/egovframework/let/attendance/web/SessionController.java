@@ -1,8 +1,8 @@
 package egovframework.let.attendance.web;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/auth/session")
 public class SessionController {
 
-	@Autowired
+	@Resource(name = "sessionLimitRepository")
 	private SessionLimitRepository sessionLimitRepository;
 
 	/**
@@ -28,8 +28,8 @@ public class SessionController {
 	@ResponseBody
 	public ResponseEntity<String> extend(HttpSession session) {
 		SessionLimit limit = sessionLimitRepository.findBySessionId(session.getId()).orElseGet(
-				() -> SessionLimit.create(session.getId(), String.valueOf(session.getAttribute("username")), 30));
-		limit.extend(30);
+				() -> SessionLimit.create(session.getId(), String.valueOf(session.getAttribute("username")), 60));
+		limit.extend(60);
 		sessionLimitRepository.save(limit);
 
 		long expiresAt = limit.getExpiresAt().getTime();

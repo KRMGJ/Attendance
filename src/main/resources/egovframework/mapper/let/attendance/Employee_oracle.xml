@@ -1,23 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="egovframework.let.attendance.repository.mybatis.EmployeeDAO">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="employeeDAO">
 
 	<resultMap id="EmployeeViewMap" type="egovframework.let.attendance.dto.response.EmployeeViewDto">
 		<id property="id" column="ID" />
 		<result property="name" column="NAME" />
 		<result property="email" column="EMAIL" />
+		<result property="employeeNumber" column="EMPLOYEE_NUMBER" />
+		<result property="password" column="PASSWORD" />
+		<result property="department" column="DEPARTMENT" />
 		<result property="position" column="POSITION" />
 		<result property="employmentType" column="EMPLOYMENT_TYPE" />
 		<result property="status" column="STATUS" />
 		<result property="hireDate" column="HIRE_DATE" jdbcType="TIMESTAMP" />
+		<result property="phone" column="PHONE" />
+		<result property="emergencyContactPhone" column="EMERGENCY_CONTACT_PHONE" />
+		<result property="address" column="ADDRESS" />
+		<result property="workStartTime" column="WORK_START_TIME" />
+        <result property="workEndTime" column="WORK_END_TIME" />
 		<result property="resignDate" column="RESIGN_DATE" jdbcType="TIMESTAMP" />
 		<result property="updatedAt" column="UPDATED_AT" jdbcType="TIMESTAMP" />
 	</resultMap>
 
 	<select id="selectViewById" parameterType="string" resultMap="EmployeeViewMap">
-		SELECT ID, NAME, EMAIL, POSITION, EMPLOYMENT_TYPE, STATUS, HIRE_DATE, RESIGN_DATE,
-		UPDATED_AT
+		SELECT ID, NAME, EMAIL, EMPLOYEE_NUMBER, PASSWORD, DEPARTMENT, POSITION,
+		EMPLOYMENT_TYPE, STATUS, HIRE_DATE, PHONE, EMERGENCY_CONTACT_PHONE,
+		ADDRESS, WORK_START_TIME, WORK_END_TIME, RESIGN_DATE, UPDATED_AT
 		FROM EMPLOYEE
 		WHERE ID = #{id}
 	</select>
@@ -31,37 +39,77 @@
 	<select id="canEdit" resultType="int">
 		SELECT CASE
 		WHEN EXISTS (
-		SELECT 1 FROM AUTHORITIES WHERE USERNAME = #{actorUsername} AND AUTHORITY IN
+		SELECT 1
+		FROM AUTHORITIES WHERE USERNAME = #{actorUsername} AND AUTHORITY IN
 		('ROLE_ADMIN','ADMIN')
 		) THEN 1
 		WHEN EXISTS (
 		SELECT 1
 		FROM EMPLOYEE E
 		JOIN USERS U ON U.USERNAME = E.EMAIL
-		WHERE E.ID = #{id} AND U.USERNAME = #{actorUsername}
+		WHERE E.ID = #{id} AND U.USERNAME
+		= #{actorUsername}
 		) THEN 1
 		ELSE 0
 		END AS OK
 		FROM DUAL
 	</select>
 
-	<update id="updateProfile" parameterType="egovframework.let.attendance.dto.request.EditEmployeeDto">
-		UPDATE EMPLOYEE
-		SET NAME = #{name},
-		EMAIL = #{email},
-		POSITION = #{position},
-		EMPLOYMENT_TYPE = #{employmentType},
-		UPDATED_AT = #{updatedAt, jdbcType=TIMESTAMP}
-		WHERE ID = #{id}
-	</update>
-
 	<update id="updatePassword">
 		<!-- 직원 비밀번호 보관 위치 정책: 1) EMPLOYEE 테이블에 PASSWORD 컬럼이 있다면 거기에 저장 2) Spring 
 			Security JDBC를 쓰는 경우 USERS 테이블을 갱신 -->
 		UPDATE EMPLOYEE
 		SET PASSWORD = #{password},
-		UPDATED_AT = #{updatedAt, jdbcType=TIMESTAMP}
-		WHERE ID = #{id} 
+		UPDATED_AT = #{updatedAt,
+		jdbcType=TIMESTAMP}
+		WHERE ID = #{id}
 	</update>
+
+	<select id="countList" resultType="int">
+		SELECT COUNT(*)
+		FROM employee e
+		<where>
+			<if test="kw != null and kw != ''">
+				(LOWER(e.name) LIKE #{kw} OR LOWER(e.email) LIKE #{kw})
+			</if>
+			<if test="dept != null and dept != ''">
+				AND (LOWER(e.department) LIKE #{dept})
+			</if>
+			<if test="position != null and position != ''">
+                AND (LOWER(e.position) LIKE #{position})
+            </if>
+			<if test="status != null and status != ''">
+				AND e.status = #{status}
+			</if>
+		</where>
+	</select>
+
+	<select id="selectListPage" resultType="egovframework.let.attendance.entity.Employee">
+		SELECT * FROM (
+		SELECT t.*, ROWNUM rn FROM (
+		SELECT e.id, e.name, e.email, e.position, e.department, e.employment_type,  e.status,
+		e.hire_date, e.resign_date, e.updated_at
+		FROM employee e
+		<where>
+			<if test="kw != null and kw != ''">
+				(LOWER(e.name) LIKE #{kw} OR LOWER(e.email) LIKE #{kw})
+			</if>
+			<if test="dept != null and dept != ''">
+				AND (LOWER(e.department) LIKE #{dept})
+			</if>
+			<if test="position != null and position != ''"> 
+				AND (LOWER(e.position) LIKE #{position})
+			</if>
+			<if test="status != null and status != ''">
+				AND e.status = #{status}
+			</if>
+		</where>
+		ORDER BY e.updated_at DESC
+		) t
+		WHERE ROWNUM &lt;= #{offset} + #{limit}
+		)
+		WHERE rn &gt; #{offset}
+	</select>
+
 
 </mapper>

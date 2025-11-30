@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import egovframework.let.attendance.entity.Attendance;
 
-@Repository
+@Repository("attendanceRepository")
 public interface AttendanceRepository extends JpaRepository<Attendance, String>, AttendanceRepositoryCustom {
 	Optional<Attendance> findByEmpIdAndWorkDate(String empId, Date workDate);
 

@@ -98,7 +98,7 @@
 	</servlet-mapping>
 
 	<welcome-file-list>
-		<welcome-file>WEB-INF/jsp/main/dashboard.jsp</welcome-file>
+		<welcome-file>main.do</welcome-file>
 	</welcome-file-list>
 	<login-config>
 		<auth-method>BASIC</auth-method>

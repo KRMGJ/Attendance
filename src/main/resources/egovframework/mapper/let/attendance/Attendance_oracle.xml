@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper
-	namespace="egovframework.let.attendance.repository.mybatis.AttendanceDAO">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="attendanceDAO">
 
 	<!-- Attendance + Employee 연계 매핑 -->
-	<resultMap id="AttendanceWithEmpMap"
-		type="egovframework.let.attendance.entity.Attendance">
+	<resultMap id="AttendanceWithEmpMap" type="egovframework.let.attendance.entity.Attendance">
 		<id property="id" column="a_id" />
 		<result property="empId" column="a_emp_id" />
 		<result property="workDate" column="a_work_date" />
@@ -14,6 +11,7 @@
 		<result property="checkOut" column="a_check_out" />
 		<result property="status" column="a_status" />
 		<result property="overtimeMinutes" column="a_overtime_minutes" />
+		<result property="workedMinutes" column="a_worked_minutes" />
 		<association property="employee" javaType="egovframework.let.attendance.entity.Employee">
 			<id property="id" column="e_id" />
 			<result property="name" column="e_name" />
@@ -21,8 +19,7 @@
 		</association>
 	</resultMap>
 
-	<resultMap id="MonthlyDeptReportMap"
-		type="egovframework.let.attendance.dto.response.MonthlyDeptReportDto">
+	<resultMap id="MonthlyDeptReportMap" type="egovframework.let.attendance.dto.response.MonthlyDeptReportDto">
 		<result property="department" column="department" />
 		<result property="headcount" column="headcount" />
 		<result property="workDays" column="work_days" />
@@ -71,6 +68,7 @@
 		a.check_out AS a_check_out,
 		a.status AS a_status,
 		a.overtime_minutes AS a_overtime_minutes,
+		a.worked_minutes AS a_worked_minutes,
 		e.id AS e_id,
 		e.name AS
 		e_name,
@@ -97,30 +95,64 @@
 		)
 		WHERE rn &gt; #{offset}
 	</select>
+	
+	<select id="countMyRange" resultType="long">
+	    SELECT COUNT(*)
+	    FROM ATTENDANCE a
+	    JOIN EMPLOYEE e ON e.id = a.emp_id
+	    WHERE a.emp_id = #{empId}
+	    <if test="from != null">
+	        AND a.work_date &gt;= #{from}
+	    </if>
+	    <if test="to != null">
+	        AND a.work_date &lt;= #{to}
+	    </if>
+	</select>
 
-	<!-- 개인용 출퇴근기록 기간 조회 -->
-	<select id="findMyRange" resultMap="AttendanceWithEmpMap">
-		SELECT
-		a.id AS a_id, a.emp_id
-		AS a_emp_id, a.work_date AS a_work_date,
-		a.check_in AS a_check_in,
-		a.check_out AS a_check_out,
-		a.status AS a_status, a.overtime_minutes AS
-		a_overtime_minutes,
-		e.id AS e_id, e.name AS e_name, e.email AS e_email
-		FROM ATTENDANCE a
-		JOIN EMPLOYEE e ON e.id = a.emp_id
-		WHERE e.emp_id =
-		#{empId}
-		AND a.work_date BETWEEN #{from} AND #{to}
-		ORDER BY a.work_date
-		ASC
+	<select id="findMyRange" parameterType="map" resultMap="AttendanceWithEmpMap">
+	    SELECT *
+	    FROM (
+	        SELECT
+	            t.*,
+	            ROWNUM rn
+	        FROM (
+	            SELECT
+	                a.id                AS a_id,
+	                a.emp_id            AS a_emp_id,
+	                a.work_date         AS a_work_date,
+	                a.check_in          AS a_check_in,
+	                a.check_out         AS a_check_out,
+	                a.status            AS a_status,
+	                a.overtime_minutes  AS a_overtime_minutes,
+	                e.id                AS e_id,
+	                e.name              AS e_name,
+	                e.email             AS e_email
+	            FROM ATTENDANCE a
+	            JOIN EMPLOYEE e ON e.id = a.emp_id
+	            WHERE a.emp_id = #{empId}
+	            <if test="from != null">
+	                AND a.work_date &gt;= #{from}
+	            </if>
+	            <if test="to != null">
+	                AND a.work_date &lt;= #{to}
+	            </if>
+	            ORDER BY a.work_date ASC
+	        ) t
+	        WHERE ROWNUM &lt;= #{offset} + #{limit}
+	    )
+	    WHERE rn &gt; #{offset}
+	</select>
+	
+	<select id="sumWorkedMinutesByPeriod" parameterType="map" resultType="int">
+	    SELECT NVL(SUM(worked_minutes), 0)
+	    FROM ATTENDANCE
+	    WHERE emp_id = #{empId}
+	      AND work_date BETWEEN #{from} AND #{to}
 	</select>
 
 	<select id="selectMonthlyDeptReport" parameterType="map" resultMap="MonthlyDeptReportMap">
 		WITH
 		A AS (
-		/* 근태 원천: 부서 키 정규화 */
 		SELECT
 		NVL(TRIM(e.department), '-') AS dept,
 			a.emp_id,
@@ -134,7 +166,6 @@
 		AND TRUNC(CAST(#{end, jdbcType=DATE} AS DATE))
 		),
 		L AS (
-			/* 승인된 휴가: 총일수 + 병가일수 */
 			SELECT NVL(TRIM(e.department), '-') AS dept,
 				SUM(
 					GREATEST(
@@ -160,39 +191,32 @@
 			GROUP BY NVL(TRIM(e.department), '-')
 		),
 		D AS (
-			/* 근무·연장·지각·조퇴·결근 집계 */
 			SELECT dept AS department,
 				COUNT(DISTINCT emp_id) AS headcount,
 				COUNT(CASE WHEN status IN ('정상 출근','지각','조퇴','PRESENT','LATE','EARLY_LEAVE') THEN 1 END) AS work_days,
 
-			/* 총 근무분(분) */
 			SUM(CASE WHEN status IN ('정상 출근','지각','조퇴','PRESENT','LATE','EARLY_LEAVE')
 				THEN NVL(TRUNC((CAST(check_out AS DATE) - CAST(check_in AS DATE)) * 24 * 60), 0)
 				ELSE 0 END) AS total_minutes,
 
-			/* 총 연장(분) */
 			SUM(NVL(TRUNC(overtime_minutes),0)) AS total_overtime,
 
-			/* 야간 연장(22~05) */
 			SUM(CASE WHEN
 				( (check_out IS NOT NULL AND TO_NUMBER(TO_CHAR(check_out,'HH24')) BETWEEN 22 AND 23)
 					OR (check_in IS NOT NULL AND TO_NUMBER(TO_CHAR(check_in ,'HH24')) BETWEEN 0 AND 5) )
 				THEN NVL(TRUNC(overtime_minutes),0) ELSE 0 END) AS night_overtime,
 
-			/* 주말 연장(토/일) */
 			SUM(CASE WHEN TO_CHAR(work_date,'DY','NLS_DATE_LANGUAGE=ENGLISH') IN ('SAT','SUN')
 				THEN NVL(TRUNC(overtime_minutes),0) ELSE 0 END) AS weekend_overtime,
 
 			SUM(CASE WHEN status IN ('지각','LATE') THEN 1 ELSE 0 END) AS late_cnt,
 			SUM(CASE WHEN status IN ('조퇴','EARLY_LEAVE') THEN 1 ELSE 0 END) AS early_leave_cnt,
 
-			/* 결근 일수(= absent_days) */
 			SUM(CASE WHEN status IN ('결근','ABSENT') THEN 1 ELSE 0 END) AS absent_days
 		FROM A
 		GROUP BY dept
 		),
 		C AS (
-			/* 결과에 포함할 부서 집합 */
 			SELECT department AS dept FROM D
 			UNION
 			SELECT dept FROM L
@@ -211,7 +235,6 @@
 			NVL(l.total_leave_days,0) AS total_leave_days,
 			NVL(l.sick_leave_days,0) AS sick_leave_days,
 
-			/* 파생 평균(분) */
 			CASE WHEN NVL(d.headcount,0) > 0
 				THEN FLOOR(NVL(d.total_minutes,0) / d.headcount) ELSE 0 END AS avg_minutes,
 			CASE WHEN NVL(d.headcount,0) > 0

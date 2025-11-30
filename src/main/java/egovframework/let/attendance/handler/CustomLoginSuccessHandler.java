@@ -2,11 +2,11 @@ package egovframework.let.attendance.handler;
 
 import java.io.IOException;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -19,10 +19,10 @@ import egovframework.let.attendance.repository.SessionLimitRepository;
 @Component
 public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 
-	@Autowired
+	@Resource(name = "employeeRepository")
 	private EmployeeRepository employeeRepository;
 
-	@Autowired
+	@Resource(name = "sessionLimitRepository")
 	private SessionLimitRepository sessionLimitRepository;
 
 	@Override
@@ -38,7 +38,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 			session.setAttribute("empName", emp.getName());
 		}
 
-		SessionLimit limit = SessionLimit.create(session.getId(), username, 30);
+		SessionLimit limit = SessionLimit.create(session.getId(), username, 60);
 		sessionLimitRepository.save(limit);
 
 		response.sendRedirect(request.getContextPath() + "/main.do");

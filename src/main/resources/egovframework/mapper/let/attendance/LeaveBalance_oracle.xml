@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper
-	namespace="egovframework.let.attendance.repository.mybatis.LeaveBalanceDAO">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="leaveBalanceDAO">
 
 	<!-- 1년 미만 + 전월 개근자 -->
 	<select id="selectFirstYearFullAttendanceEmployees" resultType="long">
-		<!-- /* y: #{year}, m: #{month} */ -->
 		SELECT e.id
 		FROM employee e
 		WHERE e.resign_date IS NULL
@@ -15,7 +12,6 @@
 		ADD_MONTHS(TRUNC(TO_DATE(#{year}||LPAD(#{month},2,'0')||'01','YYYYMMDD'),'MM'),
 		1) - 1,
 		e.hire_date ) &lt; 12
-		/* 전월 결근/지각/조퇴 없으면 개근으로 간주 */
 		AND NOT EXISTS (
 		SELECT 1
 		FROM attendance a

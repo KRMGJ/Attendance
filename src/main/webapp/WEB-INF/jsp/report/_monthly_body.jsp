@@ -233,7 +233,8 @@
 
 	<!-- CSV 다운로드 -->
 	<div class="mt-4 flex gap-2">
-		<a href="<c:url value='/report/monthly.csv'><c:param name='ym' value='${empty param.ym ? ym : param.ym}'/></c:url>"
-			class="px-3 py-2 rounded-md border">CSV 다운로드</a>
+		<a href="<c:url value='/admin/report/monthlyCsv.do'><c:param name='ym' value='${empty param.ym ? ym : param.ym}'/></c:url>"class="px-3 py-2 rounded-md border">
+			CSV 다운로드
+		</a>
 	</div>
 </div>

@@ -1,14 +1,10 @@
 package egovframework.let.attendance.entity;
 
-import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
@@ -27,8 +23,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Table(name = "leave_balance", uniqueConstraints = {
-		@UniqueConstraint(name = "uk_leave_balance_emp_year", columnNames = { "emp_id", "year" }) }, indexes = {
-				@Index(name = "ix_leave_balance_emp", columnList = "emp_id") })
+		@UniqueConstraint(name = "uk_leave_balance_emp_year", columnNames = { "emp_id", "year" }) })
 @org.hibernate.annotations.Table(appliesTo = "leave_balance", comment = "연차 잔여일 테이블")
 @Builder
 public class LeaveBalance {
@@ -67,12 +62,4 @@ public class LeaveBalance {
 	public int getRemaining() {
 		return total - used;
 	}
-
-	@PrePersist
-	public void prePersist() {
-		if (id == null) {
-			id = UUID.randomUUID().toString();
-		}
-	}
-
 }

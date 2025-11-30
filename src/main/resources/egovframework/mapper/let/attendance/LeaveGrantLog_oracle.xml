@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="leaveGrantLogDAO">
+
+	<resultMap id="LeaveGrantLogAdminMap" type="map">
+		<id property="id" column="id" />
+		<result property="empId" column="emp_id" />
+		<result property="year" column="year" />
+		<result property="reason" column="reason" />
+		<result property="changeDays" column="change_days" />
+		<result property="grantedAt" column="granted_at" jdbcType="TIMESTAMP" javaType="Date" />
+		<result property="empName" column="emp_name" />
+		<result property="empEmail" column="emp_email" />
+		<result property="department" column="department" />
+		<result property="kind" column="kind" />
+	</resultMap>
+
+
+	<select id="countLog" parameterType="map" resultType="long">
+		SELECT COUNT(*)
+		FROM leave_grant_log g
+		JOIN employee e ON e.id =
+		g.emp_id
+		<where>
+			<if test="kw != null">
+				AND (LOWER(e.name) LIKE #{kw} OR LOWER(e.email) LIKE
+				#{kw})
+			</if>
+			<if test="reason != null">
+				AND LOWER(g.reason) LIKE #{reason}
+			</if>
+			<if test="year != null">
+				AND g.year = #{year}
+			</if>
+			<if test="from != null">
+				AND g.granted_at &gt;= #{from}
+			</if>
+			<if test="to != null">
+				AND g.granted_at &lt;= #{to}
+			</if>
+			<if test="kind != null and kind != '' and kind == 'GRANT'">
+				AND g.change_days > 0
+			</if>
+			<if test="kind != null and kind != '' and kind == 'DEDUCT'">
+				AND g.change_days &lt; 0
+			</if>
+		</where>
+	</select>
+
+	<select id="selectLogPaged" parameterType="map" resultMap="LeaveGrantLogAdminMap">
+		SELECT
+		g.id AS id,
+		g.emp_id AS emp_id,
+		e.name AS emp_name,
+		e.email AS emp_email,
+		e.department AS department,
+		g.year AS year,
+		g.reason AS reason,
+		g.change_days AS change_days,
+		g.granted_at AS granted_at
+		FROM leave_grant_log g
+		JOIN
+		employee e ON e.id = g.emp_id
+		<where>
+			<if test="kw != null">
+				AND (LOWER(e.name) LIKE #{kw}
+				OR LOWER(e.email) LIKE
+				#{kw})
+			</if>
+			<if test="reason != null">
+				AND LOWER(g.reason) LIKE #{reason}
+			</if>
+			<if test="year != null">
+				AND g.year = #{year}
+			</if>
+			<if test="from != null">
+				AND g.granted_at &gt;= #{from}
+			</if>
+			<if test="to != null">
+				AND g.granted_at &lt;= #{to}
+			</if>
+			<if test="kind != null and kind != '' and kind == 'GRANT'">
+				AND g.change_days > 0
+			</if>
+			<if test="kind != null and kind != '' and kind == 'DEDUCT'">
+				AND g.change_days &lt; 0
+			</if>
+		</where>
+		ORDER BY g.granted_at DESC
+		OFFSET #{offset} ROWS FETCH NEXT #{limit}
+		ROWS ONLY
+	</select>
+
+</mapper>

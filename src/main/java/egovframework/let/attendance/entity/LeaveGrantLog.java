@@ -1,7 +1,6 @@
 package egovframework.let.attendance.entity;
 
 import java.util.Date;
-import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,7 +10,6 @@ import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -19,11 +17,17 @@ import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.Comment;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "leave_grant_log", uniqueConstraints = {
 		@UniqueConstraint(name = "uk_grant_emp_year_reason_dt", columnNames = { "emp_id", "year", "reason",
@@ -47,9 +51,9 @@ public class LeaveGrantLog {
 	@Comment("지급사유")
 	private String reason;
 
-	@Column(name = "days", nullable = false)
-	@Comment("지급일수")
-	private Integer days;
+	@Column(name = "change_days", nullable = false)
+	@Comment("변경일수(양수=지급, 음수=차감)")
+	private Integer changeDays;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "granted_at", nullable = false)
@@ -64,11 +68,4 @@ public class LeaveGrantLog {
 	@JoinColumns({ @JoinColumn(name = "emp_id", referencedColumnName = "emp_id", insertable = false, updatable = false),
 			@JoinColumn(name = "year", referencedColumnName = "year", insertable = false, updatable = false) })
 	private LeaveBalance leaveBalance;
-
-	@PrePersist
-	public void prePersist() {
-		if (id == null) {
-			id = UUID.randomUUID().toString();
-		}
-	}
 }

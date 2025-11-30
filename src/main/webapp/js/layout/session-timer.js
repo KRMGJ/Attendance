@@ -5,16 +5,20 @@
 
 	var EXTEND_API = '/auth/session/extend.do';
 	var LOGIN_URL = '/login.do?expired=1';
+	var LOGIN_PATH = '/login.do';
 	var WARN_SEC = 60;
 	var TICK_MS = 1000;
 
+	if (location.pathname === LOGIN_PATH) return;
+
 	var lastRemain = null;
+	var timerId = null;
 
 	/**
 	 * 초 단위 시간을 "MM:SS" 형식으로 포맷팅
 	 */
 	function pad2(n) { return (n < 10 ? '0' : '') + n; }
-	
+
 	/**
 	 * 초 단위 시간을 "MM:SS" 형식으로 포맷팅
 	 */
@@ -23,7 +27,7 @@
 		var m = Math.floor(s / 60), r = s % 60;
 		return pad2(m) + ':' + pad2(r);
 	}
-	
+
 	/**
 	 * 남은시간을 표시
 	 */
@@ -52,13 +56,13 @@
 	/**
 	 * 1초 간격으로 남은시간 감소 및 표시
 	 */
-	setInterval(function() {
+	timerId = setInterval(function() {
 		if (lastRemain == null) return;
 		lastRemain = Math.max(0, lastRemain - 1);
 		paint(lastRemain);
 		if (lastRemain === 0) {
-			// 절대 만료 도달 → 로그인 페이지로
-			window.location.href = LOGIN_URL;
+			clearInterval(timerId);
+			location.href = '/logout.do';
 		}
 	}, TICK_MS);
 

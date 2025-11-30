@@ -1,10 +1,25 @@
 <%@ page contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="ui" uri="http://egovframework.gov/ctl/ui" %>
+<%@ taglib prefix="ui2" uri="http://egovframework.let/attendance/ui" %>
+
 <div class="bg-white border rounded-xl p-6 shadow-sm">
 	<div class="flex items-center justify-between mb-4">
 		<h2 class="text-lg font-semibold">내 근태</h2>
-		<a class="px-3 py-2 rounded-md border"
-			href="<c:url value='/attendance/checkin.do'/>">출·퇴근</a>
+	</div>
+	<div class="flex items-end gap-3 mb-4">
+	    <form method="get" action="<c:url value='/attendance/my.do'/>" class="flex gap-3 items-end">
+	        <div>
+	            <label class="block text-sm mb-1">시작일</label>
+	            <input type="date" name="from" value="${paramFrom}" class="rounded border px-3 py-2" />
+	        </div>
+	        <div>
+	            <label class="block text-sm mb-1">종료일</label>
+	            <input type="date" name="to" value="${paramTo}" class="rounded border px-3 py-2" />
+	        </div>
+	        <button class="rounded-md bg-gray-900 text-white px-4 py-2">조회</button>
+	    </form>
 	</div>
 	<table class="min-w-full text-sm">
 		<thead class="bg-gray-50">
@@ -24,7 +39,12 @@
 							<td class="px-4 py-2"><c:out value="${row.workDate}" /></td>
 							<td class="px-4 py-2"><c:out value="${empty row.checkIn ? '-' : row.checkIn}" /></td>
 							<td class="px-4 py-2"><c:out value="${empty row.checkOut ? '-' : row.checkOut}" /></td>
-							<td class="px-4 py-2"><c:out value="${row.status}" /></td>
+							<td class="px-4 py-2">
+								<span class="${ui2:workStatusColor(row.status)} font-medium">
+									${ui2:workStatusIcon(row.status)}
+									${ui2:label(row.status)}
+								</span>
+							</td>
 							<td class="px-4 py-2"><c:out value="${row.overtimeMinutes}" /></td>
 						</tr>
 					</c:forEach>
@@ -38,3 +58,19 @@
 		</tbody>
 	</table>
 </div>
+<div class="mt-4 flex justify-center">
+	<ui:pagination paginationInfo="${paginationInfo}" type="text" jsFunction="linkPage"/>
+</div>
+<script>
+	function linkPage(pageNo) {
+		const from = '${paramFrom}';
+		const to = '${paramTo}';
+		const size = '${size}';
+		const params = new URLSearchParams();
+		if (from) params.set('from', from);
+		if (to) params.set('to', to);
+		if (size) params.set('size', size);
+		params.set('page', pageNo);
+		location.href = '/attendance/my.do?' + params.toString();
+	}
+</script>

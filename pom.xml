@@ -352,6 +352,12 @@
 			<version>2.15.4</version>
 		</dependency>
 		
+<!-- https://mvnrepository.com/artifact/cubrid/cubrid-jdbc -->
+<dependency>
+    <groupId>org.cubrid</groupId>
+    <artifactId>cubrid-jdbc</artifactId>
+    <version>11.3.2.0053</version>
+</dependency>
  	</dependencies>
 
 	<build>

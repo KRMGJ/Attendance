@@ -4,25 +4,23 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import javax.annotation.Resource;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
 
 import egovframework.let.attendance.dto.request.AdminAttendanceSearch;
+import egovframework.let.attendance.dto.request.UserAttendanceSearch;
 import egovframework.let.attendance.entity.Attendance;
 import egovframework.let.attendance.repository.AttendanceRepositoryCustom;
 import egovframework.let.attendance.repository.mybatis.AttendanceDAO;
 
+@Repository("attendanceRepositoryImpl")
 public class AttendanceRepositoryImpl implements AttendanceRepositoryCustom {
 
-	@PersistenceContext
-	private EntityManager entityManager;
-
-	@Autowired
+	@Resource(name = "attendanceDAO")
 	private AttendanceDAO attendanceDAO;
 
 	@Override
@@ -39,6 +37,19 @@ public class AttendanceRepositoryImpl implements AttendanceRepositoryCustom {
 		List<Attendance> content = total == 0 ? Collections.emptyList()
 				: attendanceDAO.selectAdminPage(kw, from, to, offset, limit);
 
+		return new PageImpl<>(content, pageable, total);
+	}
+
+	@Override
+	public Page<Attendance> findMyRange(String empId, UserAttendanceSearch cond, Pageable pageable) {
+		Date from = cond.getFrom();
+		Date to = cond.getTo();
+		int offset = (int) pageable.getOffset();
+		int limit = pageable.getPageSize();
+
+		long total = attendanceDAO.countMyRange(empId, from, to);
+		List<Attendance> content = total == 0 ? Collections.emptyList()
+				: attendanceDAO.findMyRange(empId, from, to, offset, limit);
 		return new PageImpl<>(content, pageable, total);
 	}
 }

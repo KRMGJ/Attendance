@@ -14,14 +14,18 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
+
+import org.egovframe.rte.fdl.idgnr.EgovIdGnrService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import egovframework.let.attendance.dto.request.AdminAttendanceSearch;
+import egovframework.let.attendance.dto.request.UserAttendanceSearch;
 import egovframework.let.attendance.dto.response.AttendanceListDto;
 import egovframework.let.attendance.dto.response.AttendanceViewDto;
 import egovframework.let.attendance.dto.response.MonthlyDeptReportDto;
@@ -34,46 +38,31 @@ import egovframework.let.attendance.service.AttendanceService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Service
+@Service("attendanceService")
+@Transactional(readOnly = true)
 public class AttendanceServiceImpl implements AttendanceService {
 	private static final ZoneId ZONE = ZoneId.of("Asia/Seoul");
 	private static final LocalTime WORK_START = LocalTime.of(9, 0);
 	private static final LocalTime WORK_END = LocalTime.of(18, 0);
 
-	@Autowired
+	@Resource(name = "attendanceDAO")
 	private AttendanceDAO attendanceDAO;
 
-	@Autowired
+	@Resource(name = "attendanceRepository")
 	private AttendanceRepository attendanceRepository;
 
-	@Autowired
+	@Resource(name = "employeeRepository")
 	private EmployeeRepository employeeRepository;
 
-	/**
-	 * username으로 직원 정보 로드
-	 * 
-	 * @param username 사용자 이름(이메일)
-	 * @return 직원 정보
-	 */
-	private Employee loadEmployeeByUsername(String username) {
-		// username을 이메일로 사용 중이라는 전제
-		return employeeRepository.findByEmail(username)
-				.orElseThrow(() -> new IllegalArgumentException("직원 정보를 찾을 수 없음: " + username));
-	}
-
-	/**
-	 * 오늘 날짜의 00:00:00 시각을 Date 객체로 반환
-	 */
-	private Date getTodayDate() {
-		LocalDateTime todayMidnight = LocalDateTime.now(ZONE).withHour(0).withMinute(0).withSecond(0).withNano(0);
-		return Date.from(todayMidnight.atZone(ZONE).toInstant());
-	}
+	@Resource(name = "attendanceIdGnrService")
+	private EgovIdGnrService attendanceIdGnrService;
 
 	/**
 	 * 출근 처리
 	 */
 	@Override
-	public String checkIn(String username) {
+	@Transactional(rollbackFor = Exception.class)
+	public String checkIn(String username) throws Exception {
 		try {
 			Employee emp = loadEmployeeByUsername(username);
 
@@ -85,26 +74,32 @@ public class AttendanceServiceImpl implements AttendanceService {
 			Date now = new Date();
 			LocalTime nowTime = now.toInstant().atZone(ZONE).toLocalTime();
 
-			Attendance a = Attendance.builder().empId(emp.getId()).workDate(today).checkIn(now).build();
+			// 직원별 기준 시작시간 계산
+			LocalTime workStart = resolveWorkStart(emp);
 
-			// 지각 판정
-			String status = nowTime.isAfter(WORK_START) ? LATE : PRESENT;
+			Attendance a = Attendance.builder().id(attendanceIdGnrService.getNextStringId()).empId(emp.getId())
+					.workDate(today).checkIn(now).build();
+
+			// 지각 판정: 직원별 기준시간 사용
+			String status = nowTime.isAfter(workStart) ? LATE : PRESENT;
 			a.setStatus(status);
 			a.setOvertimeMinutes(0);
 
 			attendanceRepository.save(a);
+			return "checkin_success";
 		} catch (Exception e) {
 			log.error("Error during check-in for user {}: {}", username, e.getMessage());
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			return "checkin_fail";
 		}
-		return "checkin_success";
 	}
 
 	/**
 	 * 퇴근 처리
 	 */
 	@Override
-	public String checkOut(String username) {
+	@Transactional(rollbackFor = Exception.class)
+	public String checkOut(String username) throws Exception {
 		try {
 			Employee emp = loadEmployeeByUsername(username);
 
@@ -119,15 +114,16 @@ public class AttendanceServiceImpl implements AttendanceService {
 			Date now = new Date();
 			LocalTime nowTime = now.toInstant().atZone(ZONE).toLocalTime();
 
+			LocalTime workEnd = resolveWorkEnd(emp);
+
 			a.setCheckOut(now);
 
-			// 조퇴 판정
-			if (nowTime.isBefore(WORK_END)) {
+			if (nowTime.isBefore(workEnd)) {
 				a.setStatus(EARLY_LEAVE);
 			} else {
-				// 연장근로 계산
-				LocalDateTime endBase = LocalDateTime.ofInstant(today.toInstant(), ZONE).withHour(WORK_END.getHour())
-						.withMinute(WORK_END.getMinute());
+				LocalDateTime endBase = LocalDateTime.ofInstant(today.toInstant(), ZONE).withHour(workEnd.getHour())
+						.withMinute(workEnd.getMinute());
+
 				LocalDateTime nowLocal = now.toInstant().atZone(ZONE).toLocalDateTime();
 				long overtime = Duration.between(endBase, nowLocal).toMinutes();
 
@@ -137,20 +133,23 @@ public class AttendanceServiceImpl implements AttendanceService {
 					a.setStatus(PRESENT);
 				}
 			}
+			int workedMinutes = calcWorkedMinutes(a.getCheckIn(), now);
+			a.setWorkedMinutes(workedMinutes);
+
 			attendanceRepository.save(a);
+			return "checkout_success";
 		} catch (Exception e) {
 			log.error("Error during check-out for user {}: {}", username, e.getMessage());
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			return "checkout_fail";
 		}
-		return "checkout_success";
 	}
 
 	/**
 	 * 오늘 출퇴근 정보 조회
 	 */
 	@Override
-	@Transactional(readOnly = true)
-	public AttendanceViewDto getToday(String empId) {
+	public AttendanceViewDto getToday(String empId) throws Exception {
 		Date today = getTodayDate();
 		AttendanceViewDto attendance = null;
 		try {
@@ -161,9 +160,10 @@ public class AttendanceServiceImpl implements AttendanceService {
 			attendance = AttendanceViewDto.builder().workDate(att.getWorkDate().toString())
 					.checkIn(att.getCheckIn() != null ? formatDate(att.getCheckIn()) : null)
 					.checkOut(att.getCheckOut() != null ? formatDate(att.getCheckOut()) : null).status(att.getStatus())
-					.build();
+					.workedMinutes(att.getWorkedMinutes()).build();
 		} catch (Exception e) {
 			log.error("Error fetching today's attendance for empId {}: {}", empId, e.getMessage());
+			throw e;
 		}
 		return attendance;
 	}
@@ -172,8 +172,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 	 * 최근 출퇴근 정보 조회
 	 */
 	@Override
-	@Transactional(readOnly = true)
-	public List<AttendanceViewDto> getRecent(String empId) {
+	public List<AttendanceViewDto> getRecent(String empId) throws Exception {
 		List<AttendanceViewDto> recent = null;
 		try {
 			List<Attendance> att = attendanceRepository.findTop7ByEmpIdOrderByWorkDateDesc(empId);
@@ -185,6 +184,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 					.collect(Collectors.toList());
 		} catch (Exception e) {
 			log.error("Error fetching recent attendance for empId {}: {}", empId, e.getMessage());
+			throw e;
 		}
 		return recent;
 	}
@@ -193,30 +193,29 @@ public class AttendanceServiceImpl implements AttendanceService {
 	 * 나의 출퇴근 기록 조회
 	 */
 	@Override
-	@Transactional(readOnly = true)
-	public List<AttendanceListDto> getMyAttendance(String userEmail, Date from, Date to) {
-		List<AttendanceListDto> attendanceList = null;
+	public Page<AttendanceListDto> getMyAttendance(UserAttendanceSearch cond) throws Exception {
+		Page<AttendanceListDto> attendanceList = null;
 		try {
-			Employee emp = loadEmployeeByUsername(userEmail);
-			if (from != null || to != null) {
-				List<Attendance> records = attendanceDAO.findMyRange(emp.getId(), from, to);
-				attendanceList = records.stream()
-						.map(a -> AttendanceListDto.builder().id(a.getId()).empId(a.getEmpId())
-								.workDate(formatDateOnly(a.getWorkDate())).checkIn(formatDate(a.getCheckIn()))
-								.checkOut(a.getCheckOut() != null ? formatDate(a.getCheckOut()) : null)
-								.status(a.getStatus()).overtimeMinutes(a.getOvertimeMinutes()).employee(emp).build())
-						.collect(Collectors.toList());
-			} else {
-				List<Attendance> records = attendanceRepository.findTop100ByEmpIdOrderByWorkDateDesc(emp.getId());
-				attendanceList = records.stream()
-						.map(a -> AttendanceListDto.builder().id(a.getId()).empId(a.getEmpId())
-								.workDate(formatDateOnly(a.getWorkDate())).checkIn(formatDate(a.getCheckIn()))
-								.checkOut(a.getCheckOut() != null ? formatDate(a.getCheckOut()) : null)
-								.status(a.getStatus()).overtimeMinutes(a.getOvertimeMinutes()).employee(emp).build())
-						.collect(Collectors.toList());
-			}
+			Pageable pageable = PageRequest.of(cond.getPage(), cond.getSize());
+			Employee emp = loadEmployeeByUsername(cond.getEmail());
+//			if (from != null || to != null) {
+			Page<Attendance> result = attendanceRepository.findMyRange(emp.getId(), cond, pageable);
+			attendanceList = result.map(a -> AttendanceListDto.builder().id(a.getId()).empId(a.getEmpId())
+					.workDate(formatDateOnly(a.getWorkDate())).checkIn(formatDate(a.getCheckIn()))
+					.checkOut(a.getCheckOut() != null ? formatDate(a.getCheckOut()) : null).status(a.getStatus())
+					.overtimeMinutes(a.getOvertimeMinutes()).employee(emp).build());
+//			} else {
+//				List<Attendance> records = attendanceRepository.findTop100ByEmpIdOrderByWorkDateDesc(emp.getId());
+//				attendanceList = records.stream()
+//						.map(a -> AttendanceListDto.builder().id(a.getId()).empId(a.getEmpId())
+//								.workDate(formatDateOnly(a.getWorkDate())).checkIn(formatDate(a.getCheckIn()))
+//								.checkOut(a.getCheckOut() != null ? formatDate(a.getCheckOut()) : null)
+//								.status(a.getStatus()).overtimeMinutes(a.getOvertimeMinutes()).employee(emp).build())
+//						.collect(Collectors.toList());
+//			}
 		} catch (Exception e) {
-			log.error("Error fetching attendance records for user {}: {}", userEmail, e.getMessage());
+			log.error("Error fetching attendance records for user {}: {}", cond.getEmail(), e.getMessage());
+			throw e;
 		}
 		return attendanceList;
 	}
@@ -225,8 +224,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 	 * 관리자 출퇴근 기록 조회
 	 */
 	@Override
-	@Transactional(readOnly = true)
-	public Page<AttendanceListDto> list(AdminAttendanceSearch cond) {
+	public Page<AttendanceListDto> list(AdminAttendanceSearch cond) throws Exception {
 		Page<AttendanceListDto> dtos = null;
 		try {
 			Pageable pageable = PageRequest.of(cond.getPage(), cond.getSize());
@@ -238,6 +236,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 					.employee(attendance.getEmployee()).build());
 		} catch (Exception e) {
 			log.error("Error fetching attendance list for admin", e);
+			throw e;
 		}
 		return dtos;
 	}
@@ -246,7 +245,98 @@ public class AttendanceServiceImpl implements AttendanceService {
 	 * 부서별 월간 보고서 조회
 	 */
 	@Override
-	public List<MonthlyDeptReportDto> getMonthlyDeptReport(Date start, Date end) {
-		return attendanceDAO.selectMonthlyDeptReport(start, end);
+	public List<MonthlyDeptReportDto> getMonthlyDeptReport(Date start, Date end) throws Exception {
+		try {
+			if (start == null || end == null) {
+				throw new IllegalArgumentException("시작 날짜와 종료 날짜는 필수입니다.");
+			}
+			return attendanceDAO.selectMonthlyDeptReport(start, end);
+		} catch (Exception e) {
+			log.error("Error validating dates for monthly department report: {}", e.getMessage());
+			throw e;
+		}
+	}
+
+	@Override
+	public int getWorkedMinutesByPeriod(String email, Date from, Date to) throws Exception {
+		if (email == null || from == null || to == null) {
+			return 0;
+		}
+		Employee emp = loadEmployeeByUsername(email);
+		return attendanceDAO.sumWorkedMinutesByPeriod(emp.getId(), from, to);
+	}
+
+	/**
+	 * email로 직원 정보 로드
+	 * 
+	 * @param email 직원 이메일
+	 * @return 직원 정보
+	 */
+	private Employee loadEmployeeByUsername(String email) {
+		return employeeRepository.findByEmail(email)
+				.orElseThrow(() -> new IllegalArgumentException("직원 정보를 찾을 수 없음: " + email));
+	}
+
+	/**
+	 * 오늘 날짜의 00:00:00 시각을 Date 객체로 반환
+	 * 
+	 * @return 오늘 날짜의 Date 객체
+	 */
+	private Date getTodayDate() {
+		LocalDateTime todayMidnight = LocalDateTime.now(ZONE).withHour(0).withMinute(0).withSecond(0).withNano(0);
+		return Date.from(todayMidnight.atZone(ZONE).toInstant());
+	}
+
+	/**
+	 * 직원별 출근 시간 설정값 확인
+	 * 
+	 * @param emp 직원 정보
+	 * @return 출근 시간
+	 */
+	private LocalTime resolveWorkStart(Employee emp) {
+		if (emp.getWorkStartTime() != null && !emp.getWorkStartTime().isEmpty()) {
+			return LocalTime.parse(emp.getWorkStartTime());
+		}
+		return WORK_START;
+	}
+
+	/**
+	 * 직원별 퇴근 시간 설정값 확인
+	 * 
+	 * @param emp 직원 정보
+	 * @return 퇴근 시간
+	 */
+	private LocalTime resolveWorkEnd(Employee emp) {
+		if (emp.getWorkEndTime() != null && !emp.getWorkEndTime().isEmpty()) {
+			return LocalTime.parse(emp.getWorkEndTime());
+		}
+		return WORK_END;
+	}
+
+	/**
+	 * 출퇴근 시간으로 근무 시간(분 단위) 계산
+	 * 
+	 * @param checkIn  출근 시간
+	 * @param checkOut 퇴근 시간
+	 * @return 근무 시간(분 단위)
+	 */
+	private int calcWorkedMinutes(Date checkIn, Date checkOut) {
+		if (checkIn == null || checkOut == null) {
+			return 0;
+		}
+		long diffMillis = checkOut.getTime() - checkIn.getTime();
+		if (diffMillis <= 0L) {
+			return 0;
+		}
+		long minutes = diffMillis / (1000L * 60L);
+
+		long lunchMinutes = 0L;
+		if (checkIn.toInstant().atZone(ZONE).toLocalTime().isBefore(LocalTime.of(13, 0))
+				&& checkOut.toInstant().atZone(ZONE).toLocalTime().isAfter(LocalTime.of(12, 0))) {
+			lunchMinutes = 60L;
+		}
+		minutes -= lunchMinutes;
+
+		return (int) minutes;
 	}
 }

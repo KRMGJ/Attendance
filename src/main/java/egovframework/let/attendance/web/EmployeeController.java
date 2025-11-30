@@ -2,17 +2,16 @@ package egovframework.let.attendance.web;
 
 import java.security.Principal;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
+
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import egovframework.let.attendance.dto.request.EditEmployeeDto;
-import egovframework.let.attendance.dto.request.RegistEmployeeDto;
 import egovframework.let.attendance.dto.response.EmployeeViewDto;
 import egovframework.let.attendance.service.EmployeeService;
 
@@ -20,38 +19,15 @@ import egovframework.let.attendance.service.EmployeeService;
 @RequestMapping("/employee")
 public class EmployeeController {
 
-	@Autowired
+	@Resource(name = "employeeService")
 	private EmployeeService employeeService;
-
-	/**
-	 * 사원 등록 폼
-	 */
-	@RequestMapping(value = "/join.do", method = RequestMethod.GET)
-	public String joinForm(Model model) {
-		model.addAttribute("registEmployeeDto", new RegistEmployeeDto());
-		return "employee/join";
-	}
-
-	/**
-	 * 사원 등록 처리
-	 */
-	@RequestMapping(value = "/join.do", method = RequestMethod.POST)
-	public String join(@ModelAttribute("registEmployeeDto") RegistEmployeeDto dto, RedirectAttributes attributes)
-			throws Exception {
-		try {
-			employeeService.register(dto);
-			attributes.addFlashAttribute("result", "success");
-		} catch (Exception e) {
-			attributes.addFlashAttribute("result", "fail");
-		}
-		return "redirect:/employee/join.do";
-	}
 
 	/**
 	 * 사원 상세 조회
 	 */
+	@PreAuthorize("hasRole('ROLE_HR') or #username == authentication.name")
 	@RequestMapping(value = "/detail.do", method = RequestMethod.GET)
-	public String employeeDetail(@RequestParam String id, Model model) {
+	public String employeeDetail(@RequestParam String id, Model model) throws Exception {
 		EmployeeViewDto employee = employeeService.getEmployeeDetail(id);
 		model.addAttribute("employee", employee);
 		return "employee/detail";
@@ -60,20 +36,42 @@ public class EmployeeController {
 	/**
 	 * 사원 정보 수정 폼
 	 */
+	@PreAuthorize("hasRole('ROLE_HR')")
 	@RequestMapping(value = "/edit.do", method = RequestMethod.GET)
-	public String editForm(@RequestParam("id") String id, Model model) {
+	public String editForm(@RequestParam("id") String id, Model model) throws Exception {
 		EmployeeViewDto v = employeeService.loadView(id);
 		model.addAttribute("employee", v);
-		return "employee/edit"; // 질문에 준 JSP
+		return "employee/edit";
 	}
 
 	/**
 	 * 사원 정보 수정 처리
 	 */
+	@PreAuthorize("hasRole('ROLE_HR')")
 	@RequestMapping(value = "/edit.do", method = RequestMethod.POST)
-	public String editSubmit(EditEmployeeDto dto, Model model, Principal principal) {
+	public String editSubmit(EditEmployeeDto dto, Model model, Principal principal) throws Exception {
 		employeeService.edit(dto, principal.getName());
 		return "redirect:/employee/detail.do?id=" + dto.getId();
+	}
+
+	/**
+	 * 사원 퇴사 처리
+	 */
+	@PreAuthorize("hasRole('ROLE_HR')")
+	@RequestMapping(value = "/resign.do", method = RequestMethod.POST)
+	public String retireEmployee(@RequestParam("id") String id) throws Exception {
+		employeeService.resign(id);
+		return "redirect:/employee/detail.do?id=" + id;
+	}
+
+	/**
+	 * 사원 복직 처리
+	 */
+	@PreAuthorize("hasRole('ROLE_HR')")
+	@RequestMapping(value = "/reactivate.do", method = RequestMethod.POST)
+	public String rejoinEmployee(@RequestParam("id") String id) throws Exception {
+		employeeService.reactivate(id);
+		return "redirect:/employee/detail.do?id=" + id;
 	}
 
 }

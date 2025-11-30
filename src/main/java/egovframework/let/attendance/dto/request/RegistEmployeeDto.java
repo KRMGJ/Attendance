@@ -1,5 +1,7 @@
 package egovframework.let.attendance.dto.request;
 
+import java.util.Date;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,7 +10,15 @@ import lombok.Setter;
 public class RegistEmployeeDto {
 	private String name;
 	private String email;
+	private String employeeNumber;
 	private String password;
+	private String department;
 	private String position;
 	private String employmentType;
+	private Date hireDate;
+	private String phone;
+	private String emergencyContactPhone;
+	private String address;
+	private String workStartTime = "09:00";
+	private String workEndTime = "18:00";
 }

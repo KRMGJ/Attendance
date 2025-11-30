@@ -27,12 +27,28 @@
         	/>
 		</security:authentication-provider>
 	</security:authentication-manager>
+	
+	<security:global-method-security pre-post-annotations="enabled" proxy-target-class="true">
+    	<security:expression-handler ref="methodExprHandler"/>
+	</security:global-method-security>
 
 	<security:http use-expressions="true">
+		<security:expression-handler ref="webExprHandler"/>
 		<security:csrf disabled="true" />
 		<security:intercept-url pattern="/login.do"  access="permitAll"/>
-		<security:intercept-url pattern="/employee/join.do" access="permitAll"/>
-		<!-- <security:intercept-url pattern="/auth/session/**" access="permitAll"/> -->
+		<security:intercept-url pattern="/employee/join.do" access="hasRole('ROLE_ADMIN')"/>
+  		<security:intercept-url pattern="/admin/security/**" access="hasRole('ROLE_ADMIN')"/>
+	    <security:intercept-url pattern="/admin/employee/**" access="hasAnyRole('ROLE_HR','ROLE_ADMIN')"/>
+	    <security:intercept-url pattern="/admin/attendance/**" method="GET" access="hasAnyRole('ROLE_HR','ROLE_ADMIN','ROLE_AUDITOR')"/>
+	    <security:intercept-url pattern="/admin/attendance/**" method="POST" access="hasAnyRole('ROLE_HR','ROLE_ADMIN')"/>
+	    <security:intercept-url pattern="/admin/leave/**" access="hasAnyRole('ROLE_HR','ROLE_ADMIN')"/>
+	    <security:intercept-url pattern="/admin/report/**" access="hasAnyRole('ROLE_ADMIN','ROLE_AUDITOR','ROLE_HR','ROLE_MANAGER')"/>
+	    <security:intercept-url pattern="/attendance/**" access="hasRole('ROLE_USER')"/>
+	    <security:intercept-url pattern="/leave/**" access="hasRole('ROLE_USER')"/>
+	    <security:intercept-url pattern="/internal/**" access="hasRole('ROLE_SYSTEM')"/>
+	    <security:intercept-url pattern="/batch/**"    access="hasRole('ROLE_SYSTEM')"/>
+	    <security:intercept-url pattern="/main.do" access="isAuthenticated()"/>
+	    <security:intercept-url pattern="/**"      access="isAuthenticated()"/>
 		<security:intercept-url pattern="/**" access="isAuthenticated()"/>
 		<security:form-login login-page="/login.do"
 							 login-processing-url="/loginProcess.do" 
@@ -49,8 +65,18 @@
 		</security:session-management>
 	</security:http>
 	
-	<bean id="unauthorizedEntryPoint" class="org.springframework.security.web.authentication.HttpStatusEntryPoint">
-    	<constructor-arg value="UNAUTHORIZED"/>
+	<bean id="methodExprHandler" class="org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler">
+    	<property name="roleHierarchy" ref="roleHierarchy"/>
+	</bean>
+	
+	<bean id="roleHierarchy" class="org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl"/>
+
+	<bean id="roleHierarchyRefresher" class="egovframework.let.attendance.security.RoleHierarchyRefresher" init-method="refresh">
+		<!-- <property name="roleHierarchy" ref="roleHierarchy"/> -->
+	</bean>
+	
+	<bean id="webExprHandler" class="org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler">
+    	<property name="roleHierarchy" ref="roleHierarchy"/>
 	</bean>
 
 	<!-- URL에 세미콜론(semicolon)허용 여부(기본값/false) -->

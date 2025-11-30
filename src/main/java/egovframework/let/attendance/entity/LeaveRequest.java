@@ -1,7 +1,6 @@
 package egovframework.let.attendance.entity;
 
 import java.util.Date;
-import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,7 +8,6 @@ import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -28,10 +26,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "leave_request", indexes = {
-		@Index(name = "ix_leave_request_emp_status", columnList = "emp_id, status") }, uniqueConstraints = {
-				@UniqueConstraint(name = "uk_leave_request_emp_start_end", columnNames = { "emp_id", "start_date",
-						"end_date" }) })
+@Table(name = "leave_request", uniqueConstraints = {
+		@UniqueConstraint(name = "uk_leave_request_emp_start_end", columnNames = { "emp_id", "start_date",
+				"end_date" }) }, indexes = {
+						@Index(name = "ix_lrq_status_created", columnList = "status, created_at") })
 @org.hibernate.annotations.Table(appliesTo = "leave_request", comment = "휴가 신청 테이블")
 @Builder
 public class LeaveRequest {
@@ -88,11 +86,4 @@ public class LeaveRequest {
 	@ManyToOne
 	@JoinColumn(name = "emp_id", referencedColumnName = "id", insertable = false, updatable = false)
 	private Employee employee;
-
-	@PrePersist
-	public void prePersist() {
-		if (id == null) {
-			id = UUID.randomUUID().toString();
-		}
-	}
 }
